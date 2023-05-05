@@ -21,3 +21,11 @@ spring:
       hibernate.format_sql: true
       hibernate.default_batch_fetch_size: 100
   sql.init.mode: always
+
+---
+
+spring:
+  config.activate.on-profile: heroku
+  datasource.url: ${JAWSDB_URL}
+  jpa.hibernate.ddl-auto: create
+  sql.init.mode: always
