@@ -1,0 +1,9 @@
+spring:
+  profiles:
+    active: local
+    include: db, oauth2
+    group:
+      local:
+        - db-local
+      heroku:
+        - db-heroku
