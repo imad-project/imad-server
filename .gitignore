@@ -9,6 +9,7 @@
 
 ### yml configuration file
 /src/main/resources/application-oauth2.yml
+/src/main/resources/application-jwt.yml
 
 
 ### Intellij+all ###
