@@ -27,9 +27,9 @@ public class SecurityConfig {
                 .requestMatchers("/login/**", "/user", "/oauth2/**", "/auth/**", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .oauth2Login()
-                .redirectionEndpoint()
-                .baseUri("/oauth2/code/*")
+//                .oauth2Login()
+//                .redirectionEndpoint()
+//                .baseUri("/oauth2/code/*")
         ;
 
         return http.getOrBuild();

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserAccountController {
     private final UserAccountService userAccountService;
 
-    @PostMapping("/user")
+    @PostMapping("/signup")
     public ResponseEntity<String> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
         return ResponseEntity.ok(userAccountService.createUserAccount(signUpRequest));
     }

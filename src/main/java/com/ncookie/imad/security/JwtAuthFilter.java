@@ -1,5 +1,6 @@
 package com.ncookie.imad.security;
 
+
 import com.ncookie.imad.domain.type.AuthProvider;
 import com.ncookie.imad.exception.BadRequestException;
 import com.ncookie.imad.repository.UserAccountRepository;
@@ -8,10 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONObject;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,9 +23,9 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
-public class SecurityFilter extends OncePerRequestFilter {
+@Component
+public class JwtAuthFilter extends OncePerRequestFilter {
     private final SecurityUtil securityUtil;
     private final UserAccountRepository userRepository;
 
@@ -76,8 +79,12 @@ public class SecurityFilter extends OncePerRequestFilter {
     private JSONObject createJsonError(String errorCode, String errorMessage) {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("error_code", errorCode);
-        jsonObject.put("error_message", errorMessage);
+        try {
+            jsonObject.put("error_code", errorCode);
+            jsonObject.put("error_message", errorMessage);
+        } catch (JSONException ex) {
+            writeErrorLogs("JSONException", ex.getMessage(), ex.getStackTrace());
+        }
 
         return jsonObject;
     }

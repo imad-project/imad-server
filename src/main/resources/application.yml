@@ -1,7 +1,8 @@
 spring:
   profiles:
     active: local
-    include: db, oauth2, oauth3
+    include: db, oauth2, app
+#    include: db, oauth3
     group:
       local:
         - db-local

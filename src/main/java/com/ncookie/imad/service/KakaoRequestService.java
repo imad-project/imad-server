@@ -20,20 +20,22 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class KakaoRequestService implements RequestService {
     private final UserAccountRepository userAccountRepository;
+    private final UserAccountService userAccountService;
+
     private final SecurityUtil securityUtil;
     private final WebClient webClient;
 
 
-    @Value("oauth2.spring.security.oauth2.client.registration.kakao.authorization-grant-type")
+    @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
     private String GRANT_TYPE;
 
-    @Value("oauth2.spring.security.oauth2.client.registration.kakao.client-id")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String CLIENT_ID;
 
-    @Value("oauth2.spring.security.oauth2.client.registration.kakao.redirect-uri")
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String REDIRECT_URI;
 
-    @Value("oauth2.spring.security.oauth2.client.provider.kakao.token_uri")
+    @Value("${spring.security.oauth2.client.provider.kakao.token_uri}")
     private String TOKEN_URI;
 
     @Override
@@ -41,23 +43,31 @@ public class KakaoRequestService implements RequestService {
         TokenResponse tokenResponse = getToken(tokenRequest);
         KakaoUserInfo kakaoUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
-        if (userAccountRepository.existsById(String.valueOf(kakaoUserInfo.getId()))) {
-            String accessToken = securityUtil.createAccessToken(
-                    String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
-            String refreshToken = securityUtil.createRefreshToken(
-                    String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
-            return SignInResponse.builder()
-                    .authProvider(AuthProvider.KAKAO)
-                    .kakaoUserInfo(null)
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+        String accessToken = securityUtil.createAccessToken(
+                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
+        String refreshToken = securityUtil.createRefreshToken(
+                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
+
+        if (!userAccountRepository.existsByUserIdAndAuthProvider(String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO)) {
+            // 신규 회원가입
+
+//            userAccountService.createOauthUserAccount(String.valueOf(kakaoUserInfo.getId()),
+//                    AuthProvider.KAKAO,
+//                    kakaoUserInfo.getKakaoAccount().getProfile().getProfileImageUrl);
+
+
         } else {
-            return SignInResponse.builder()
-                    .authProvider(AuthProvider.KAKAO)
-                    .kakaoUserInfo(kakaoUserInfo)
-                    .build();
+            // refresh 토큰이 만료되어 다시 로그인을 하려고 할 때
+
         }
+
+
+        return SignInResponse.builder()
+                .authProvider(AuthProvider.KAKAO)
+                .kakaoUserInfo(kakaoUserInfo)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     // 인증 서버로부터 access token 을 받아옴
@@ -78,7 +88,7 @@ public class KakaoRequestService implements RequestService {
                 .retrieve()
 //                .onStatus(HttpStatus::is4xxClientError, response -> Mono.just(new BadRequestException()))
                 .bodyToMono(TokenResponse.class)
-                .block();
+                .block();   // 여기서 에러 발생
     }
 
     @Override

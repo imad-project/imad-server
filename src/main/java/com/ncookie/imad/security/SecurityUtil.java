@@ -14,7 +14,8 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @Component
 public class SecurityUtil {
-    @Value("app.auth.token-secret") private String secret;
+    @Value("${app.auth.token-secret}")
+    private String secret;
 
     private static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 2L; // 2 hours
     private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30L; // 30 days

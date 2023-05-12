@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class SignUpRequest {
     private String id;
+    private String password;
     private String email;
     private String nickname;
     private Gender gender;
