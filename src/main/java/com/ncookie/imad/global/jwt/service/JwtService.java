@@ -52,17 +52,27 @@ public class JwtService {
     /**
      * AccessToken 생성 메소드
      */
-    public String createAccessToken(String email, AuthProvider authProvider) {
+    public String createAccessToken(String email) {
         Date now = new Date();
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT) // JWT 의 Subject 지정 -> AccessToken 이므로 AccessToken
                 .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod)) // 토큰 만료 시간 설정
 
-                // claim 으로 user id와 auth provider 사용
+                // claim 으로 email 사용
                 .withClaim(CLAIM_EMAIL, email)
-                .withClaim(CLAIM_AUTH_PROVIDER, authProvider.getAuthProvider())
                 .sign(Algorithm.HMAC512(secretKey)); // HMAC512 알고리즘 사용, application-jwt.yml 에서 지정한 secret 키로 암호화
     }
+//    public String createAccessToken(String email, AuthProvider authProvider) {
+//        Date now = new Date();
+//        return JWT.create()
+//                .withSubject(ACCESS_TOKEN_SUBJECT) // JWT 의 Subject 지정 -> AccessToken 이므로 AccessToken
+//                .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod)) // 토큰 만료 시간 설정
+//
+//                // claim 으로 user id와 auth provider 사용
+//                .withClaim(CLAIM_EMAIL, email)
+//                .withClaim(CLAIM_AUTH_PROVIDER, authProvider.getAuthProvider())
+//                .sign(Algorithm.HMAC512(secretKey)); // HMAC512 알고리즘 사용, application-jwt.yml 에서 지정한 secret 키로 암호화
+//    }
 
     /**
      * RefreshToken 생성
