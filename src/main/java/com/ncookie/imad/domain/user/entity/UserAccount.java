@@ -9,8 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Getter
 @ToString
 @Table(indexes = {
-        @Index(columnList = "userId"),
+        @Index(columnList = "user_id"),
         @Index(columnList = "email", unique = true),
+        @Index(columnList = "nickname", unique = true)
 })
 @NoArgsConstructor
 @AllArgsConstructor
