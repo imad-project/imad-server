@@ -1,7 +1,7 @@
 package com.ncookie.imad.global.oauth2.service;
 
 import com.ncookie.imad.global.dto.request.TokenRequest;
-import com.ncookie.imad.global.dto.response.SignInResponse;
+import com.ncookie.imad.domain.user.dto.response.SignInResponse;
 import com.ncookie.imad.global.dto.response.TokenResponse;
 
 public class NaverRequestService implements RequestService {

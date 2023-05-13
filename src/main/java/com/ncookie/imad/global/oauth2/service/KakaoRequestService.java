@@ -3,7 +3,7 @@ package com.ncookie.imad.global.oauth2.service;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.global.oauth2.userinfo.KakaoUserInfo;
 import com.ncookie.imad.global.dto.request.TokenRequest;
-import com.ncookie.imad.global.dto.response.SignInResponse;
+import com.ncookie.imad.domain.user.dto.response.SignInResponse;
 import com.ncookie.imad.global.dto.response.TokenResponse;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.security.SecurityUtil;
@@ -49,7 +49,7 @@ public class KakaoRequestService implements RequestService {
         String refreshToken = securityUtil.createRefreshToken(
                 String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
 
-        if (!userAccountRepository.existsByUserIdAndAuthProvider(String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO)) {
+        if (!userAccountRepository.existsByIdAndAuthProvider(kakaoUserInfo.getId(), AuthProvider.KAKAO)) {
             // 신규 회원가입
 
 //            userAccountService.createOauthUserAccount(String.valueOf(kakaoUserInfo.getId()),

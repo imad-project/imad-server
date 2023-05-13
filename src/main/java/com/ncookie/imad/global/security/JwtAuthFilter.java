@@ -49,7 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 userId = (String) securityUtil.get(token).get("userId");
                 provider = (String) securityUtil.get(token).get("provider");
 
-                if(!userRepository.existsByUserIdAndAuthProvider(userId, AuthProvider.findByCode(provider))){
+                if(!userRepository.existsByIdAndAuthProvider(1L, AuthProvider.findByCode(provider))){
                     throw new BadRequestException("CANNOT_FOUND_USER");
                 }
             }

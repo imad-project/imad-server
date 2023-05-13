@@ -2,7 +2,7 @@ package com.ncookie.imad.global.oauth2.service;
 
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.global.dto.request.TokenRequest;
-import com.ncookie.imad.global.dto.response.SignInResponse;
+import com.ncookie.imad.domain.user.dto.response.SignInResponse;
 import com.ncookie.imad.global.dto.response.TokenResponse;
 import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
@@ -42,7 +42,7 @@ public class AuthService {
         String provider = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("provider");
         String oldRefreshToken = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("refreshToken");
 
-        if(!userAccountRepository.existsByUserIdAndAuthProvider(userId, AuthProvider.findByCode(provider))){
+        if(!userAccountRepository.existsByIdAndAuthProvider(1L, AuthProvider.findByCode(provider))){
             throw new BadRequestException("CANNOT_FOUND_USER");
         }
 
