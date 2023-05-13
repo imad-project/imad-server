@@ -3,6 +3,7 @@ package com.ncookie.imad.global.jwt.filter;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.jwt.service.JwtService;
+import com.ncookie.imad.global.jwt.util.PasswordUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,8 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.ncookie.imad.global.jwt.service.JwtService.CLAIM_AUTH_PROVIDER;
-import static com.ncookie.imad.global.jwt.service.JwtService.CLAIM_USER_ID;
+import static com.ncookie.imad.global.jwt.service.JwtService.CLAIM_EMAIL;
 
 /**
  * Jwt 인증 필터
@@ -88,7 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
                     String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getId(), user.getAuthProvider()),
+                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail(), user.getAuthProvider()),
                             reIssuedRefreshToken);
                 });
     }
@@ -118,7 +118,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("checkAccessTokenAndAuthentication() 호출");
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
-                .flatMap(accessToken -> jwtService.extractClaimFromJWT(CLAIM_USER_ID, accessToken))
+                .flatMap(accessToken -> jwtService.extractClaimFromJWT(CLAIM_EMAIL, accessToken))
                 .flatMap(userRepository::findById)
                 .ifPresent(this::saveAuthentication);
 

@@ -28,4 +28,3 @@ public class PasswordUtil {
         //StringBuffer를 String으로 변환해서 return 하려면 toString()을 사용하면 된다.
     }
 }
-
