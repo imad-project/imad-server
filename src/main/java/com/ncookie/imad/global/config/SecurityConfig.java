@@ -34,6 +34,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
+
     private final LoginService loginService;
     private final JwtService jwtService;
     private final UserAccountRepository userRepository;
@@ -45,8 +46,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
                 .formLogin().disable()
+                .httpBasic().disable()
+                .csrf().disable()
                 .headers().frameOptions().disable()
                 .and()
 
