@@ -1,4 +1,4 @@
-package com.ncookie.imad.global.dto.response;
+package com.ncookie.imad.domain.user.dto.response;
 
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.global.oauth2.userinfo.AppleUserInfo;

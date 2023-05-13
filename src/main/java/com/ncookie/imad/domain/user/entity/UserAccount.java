@@ -2,25 +2,29 @@ package com.ncookie.imad.domain.user.entity;
 
 import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+@Builder
 @Getter
 @ToString
 @Table(indexes = {
         @Index(columnList = "userId"),
         @Index(columnList = "email", unique = true),
 })
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class UserAccount extends BaseTimeEntity {
     @Id
-    private String userId;
-
-    @Setter @Column(nullable = false, length = 50) private String nickname;
-    @Setter @Column(length = 50) private String userPassword;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id;
 
     @Setter private String email;               // 이메일
+    @Setter @Column(length = 50) private String password;
+
+    @Setter @Column(nullable = false, length = 50) private String nickname;
     @Setter private Gender gender;              // 성별, 0 : 남자, 1 : 여자
     @Setter private int ageRange;               // 연령대
     @Setter private String profileImageUrl;     // 프로필 이미지(URL)
@@ -33,37 +37,20 @@ public class UserAccount extends BaseTimeEntity {
     @Column(nullable = false)
     private AuthProvider authProvider;
 
-    protected UserAccount() {}
+    private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
+    private String refreshToken;
 
-    private UserAccount(String userId,
-                        String nickname,
-                        String userPassword,
-                        Gender gender,
-                        String email,
-                        int ageRange,
-                        String profileImage,
-                        Role role,
-                        AuthProvider authProvider) {
-        this.userId = userId;
-        this.nickname = nickname;
-        this.userPassword = userPassword;
-        this.gender = gender;
-        this.email = email;
-        this.ageRange = ageRange;
-        this.profileImageUrl = profileImage;
-        this.role = role;
-        this.authProvider = authProvider;
+    // 유저 권한 설정 메소드
+    public void authorizeUser() {
+        this.role = Role.USER;
     }
 
-    public static UserAccount of(String userId,
-                                 String nickname,
-                                 String userPassword,
-                                 Gender gender,
-                                 String email,
-                                 int ageRange,
-                                 String profileImage,
-                                 Role role,
-                                 AuthProvider authProvider) {
-        return new UserAccount(userId, nickname, userPassword, gender, email, ageRange, profileImage, role, authProvider);
+    // 비밀번호 암호화 메소드
+    public void passwordEncode(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
+    }
+
+    public void updateRefreshToken(String updateRefreshToken) {
+        this.refreshToken = updateRefreshToken;
     }
 }

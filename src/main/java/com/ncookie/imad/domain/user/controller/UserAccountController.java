@@ -1,8 +1,8 @@
 package com.ncookie.imad.domain.user.controller;
 
-import com.ncookie.imad.global.dto.request.SignUpRequest;
+import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
 import com.ncookie.imad.global.dto.request.TokenRequest;
-import com.ncookie.imad.global.dto.response.SignInResponse;
+import com.ncookie.imad.domain.user.dto.response.SignInResponse;
 import com.ncookie.imad.global.oauth2.service.AuthService;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import jdk.jfr.Description;
@@ -36,8 +36,10 @@ public class UserAccountController {
         return ResponseEntity.ok(authService.refreshToken(tokenRequest));
     }
 
+    // TODO: response 시 JWT 전달해줘야함
     @PostMapping("/api/signup")
     public ResponseEntity<String> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
-        return ResponseEntity.ok(userAccountService.createUserAccount(signUpRequest));
+        return ResponseEntity.ok(String.valueOf(userAccountService.signUp(signUpRequest)));
     }
+
 }
