@@ -28,7 +28,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String email = extractUsername(authentication); // 인증 정보에서 Username(email) 추출
         
         // 일반 회원 로그인이기 때문에 Auth provider는 IMAD 사용
-        String accessToken = jwtService.createAccessToken(email, AuthProvider.IMAD);
+        String accessToken = jwtService.createAccessToken(email);
         String refreshToken = jwtService.createRefreshToken();
 
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
