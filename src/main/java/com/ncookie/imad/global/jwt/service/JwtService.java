@@ -2,7 +2,6 @@ package com.ncookie.imad.global.jwt.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

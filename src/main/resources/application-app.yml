@@ -1,3 +1,0 @@
-app:
-  auth:
-    token-secret: secret-key

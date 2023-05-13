@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.user.controller;
 
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
+import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,8 @@ public class UserAccountController {
 
     // TODO: response 시 JWT 전달해줘야함
     @PostMapping("/api/signup")
-    public ResponseEntity<String> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
-        return ResponseEntity.ok(String.valueOf(userAccountService.signUp(signUpRequest)));
+    public ResponseEntity<Long> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
+        return ResponseEntity.ok(userAccountService.signUp(signUpRequest));
     }
 
 //    @GetMapping("/login/oauth2/code/{registrationId}")
@@ -41,6 +42,4 @@ public class UserAccountController {
 //    public ResponseEntity<SignInResponse> refreshToken(@RequestBody TokenRequest tokenRequest){
 //        return ResponseEntity.ok(authService.refreshToken(tokenRequest));
 //    }
-
-
 }

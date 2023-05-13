@@ -32,7 +32,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
  */
 @Configuration
 @RequiredArgsConstructor
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
     private final LoginService loginService;
@@ -58,7 +58,7 @@ public class SecurityConfig {
 
                 //== URL별 권한 관리 옵션 ==//
                 .authorizeHttpRequests()
-                .requestMatchers("/login/**", "/signup", "/oauth2/**", "/auth/**", "/h2-console/**").permitAll()
+                .requestMatchers("/api/**", "/oauth2/**", "/auth/**", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
 

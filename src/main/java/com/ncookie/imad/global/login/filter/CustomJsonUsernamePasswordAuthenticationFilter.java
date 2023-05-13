@@ -1,7 +1,6 @@
 package com.ncookie.imad.global.login.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -72,7 +71,8 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
         String email = usernamePasswordMap.get(USERNAME_KEY);
         String password = usernamePasswordMap.get(PASSWORD_KEY);
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);//principal 과 credentials 전달
+        //principal 과 credentials 전달
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);
 
         return this.getAuthenticationManager().authenticate(authRequest);
     }

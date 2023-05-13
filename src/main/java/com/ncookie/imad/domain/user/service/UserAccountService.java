@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.user.service;
 
+import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
@@ -17,14 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class UserAccountService {
-    public static final String SIGNUP_DUPLICATED_EMAIL = "SIGNUP_DUPLICATED_EMAIL";
-    public static final String SIGNUP_DUPLICATED_NICKNAME = "SIGNUP_DUPLICATED_NICKNAME";
+    public static final String SIGNUP_DUPLICATED_EMAIL = "이미 존재하는 이메일입니다.";
+    public static final String SIGNUP_DUPLICATED_NICKNAME = "이미 존재하는 닉네임입니다.";
 
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
 
 
-    @Description("자체 로그인")
+    @Description("일반 회원")
     public Long signUp(SignUpRequest signUpRequest) {
         if (userAccountRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             throw new BadRequestException(SIGNUP_DUPLICATED_EMAIL);
@@ -44,7 +45,8 @@ public class UserAccountService {
 
         user.passwordEncode(passwordEncoder);
 
-        return userAccountRepository.save(user).getId();
+        throw new BadRequestException(SIGNUP_DUPLICATED_EMAIL);
+//        return userAccountRepository.save(user).getId();
     }
 
     @Description("일반 회원 생성")

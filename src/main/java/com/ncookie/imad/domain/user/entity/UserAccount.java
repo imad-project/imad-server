@@ -23,7 +23,7 @@ public class UserAccount extends BaseTimeEntity {
     private Long id;
 
     @Setter private String email;               // 이메일
-    @Setter @Column(length = 50) private String password;
+    @Setter private String password;
 
     @Setter @Column(nullable = false, length = 50) private String nickname;
     @Setter private Gender gender;              // 성별, 0 : 남자, 1 : 여자
