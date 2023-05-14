@@ -1,6 +1,11 @@
 package com.ncookie.imad.global.login.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
+import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,12 +32,27 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) {
+                                        Authentication authentication) throws IOException {
         String email = extractUsername(authentication); // 인증 정보에서 Username(email) 추출
         
-        // 일반 회원 로그인이기 때문에 Auth provider는 IMAD 사용
         String accessToken = jwtService.createAccessToken(email);
         String refreshToken = jwtService.createRefreshToken();
+
+        // 로그인 시 response에 유저 정보 첨부
+        ObjectMapper mapper = new ObjectMapper();
+        userRepository.findByEmail(email).ifPresent(user -> {
+                    UserInfoResponse userInfoResponse = UserInfoResponse.builder()
+                            .nickname(user.getNickname())
+                            .email(user.getEmail())
+                            .authProvider(user.getAuthProvider()).build();
+
+                    try {
+                        response.getWriter().write(mapper.writeValueAsString(userInfoResponse));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
 
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
 
