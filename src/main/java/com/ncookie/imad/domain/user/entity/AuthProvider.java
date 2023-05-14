@@ -3,11 +3,11 @@ package com.ncookie.imad.domain.user.entity;
 import java.util.Arrays;
 
 public enum AuthProvider {
-    APPLE("apple"),
-    GOOGLE("google"),
-    KAKAO("kakao"),
-    NAVER("naver"),
-    EMPTY("");
+    APPLE("APPLE"),
+    GOOGLE("GOOGLE"),
+    KAKAO("KAKAO"),
+    NAVER("NAVER"),
+    IMAD("IMAD");
 
     private final String authProvider;
 
@@ -23,6 +23,6 @@ public enum AuthProvider {
         return Arrays.stream(AuthProvider.values())
                 .filter(provider -> provider.getAuthProvider().equals(code))
                 .findFirst()
-                .orElse(EMPTY);
+                .orElse(IMAD);
     }
 }

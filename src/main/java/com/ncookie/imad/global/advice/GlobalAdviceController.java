@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalAdviceController {
     // 비즈니스 오류
     @ExceptionHandler(value = BadRequestException.class)
-    protected ResponseEntity<ErrorResponse> unAuthenticatedException(BadRequestException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
+    protected ResponseEntity<ErrorResponse> badRequestException(BadRequestException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 }

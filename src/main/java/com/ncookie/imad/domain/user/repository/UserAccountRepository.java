@@ -8,6 +8,13 @@ import java.util.Optional;
 
 public interface UserAccountRepository extends JpaRepository<UserAccount, String> {
     Optional<UserAccount> findByEmail(String email);
+    Optional<UserAccount> findByNickname(String nickname);
+    Optional<UserAccount> findByRefreshToken(String refreshToken);
 
-    boolean existsByUserIdAndAuthProvider(String id, AuthProvider authProvider);
+    /*
+     * 일반 유저의 경우 직접 입력한 id, 소셜 유저의 경우 provider에서 제공받은 id와
+     * auth provider를 함께 식별자로 사용함
+     */
+    boolean existsByIdAndAuthProvider(Long id, AuthProvider authProvider);
+    Optional<UserAccount> findByAuthProviderAndSocialId(AuthProvider authProvider, String socialId);
 }
