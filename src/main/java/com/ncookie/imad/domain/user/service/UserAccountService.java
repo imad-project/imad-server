@@ -1,10 +1,12 @@
 package com.ncookie.imad.domain.user.service;
 
+import com.ncookie.imad.domain.user.dto.response.SignUpResponse;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
 import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.global.dto.ResponseStatus;
 import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import jdk.jfr.Description;
@@ -26,7 +28,7 @@ public class UserAccountService {
 
 
     @Description("일반 회원")
-    public Long signUp(SignUpRequest signUpRequest) {
+    public SignUpResponse signUp(SignUpRequest signUpRequest) {
         if (userAccountRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             throw new BadRequestException(SIGNUP_DUPLICATED_EMAIL);
         }
@@ -44,9 +46,17 @@ public class UserAccountService {
                 .build();
 
         user.passwordEncode(passwordEncoder);
+        userAccountRepository.save(user);
 
-        throw new BadRequestException(SIGNUP_DUPLICATED_EMAIL);
-//        return userAccountRepository.save(user).getId();
+        return SignUpResponse.builder()
+                .code(ResponseStatus.SIGNUP_SUCCESS)
+                .statusCode(ResponseStatus.SIGNUP_SUCCESS.getCode())
+                .message("일반 회원가입 성공")
+                .build();
+    }
+
+    public void getUserInfo() {
+
     }
 
     @Description("일반 회원 생성")
