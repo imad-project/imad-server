@@ -1,11 +1,7 @@
 package com.ncookie.imad.global.login.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
-import com.ncookie.imad.domain.user.entity.AuthProvider;
-import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,12 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,7 +28,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+                                        Authentication authentication) {
         String email = extractUsername(authentication); // 인증 정보에서 Username(email) 추출
         
         String accessToken = jwtService.createAccessToken(email);
@@ -48,6 +44,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
                     try {
                         response.getWriter().write(mapper.writeValueAsString(userInfoResponse));
+                        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
