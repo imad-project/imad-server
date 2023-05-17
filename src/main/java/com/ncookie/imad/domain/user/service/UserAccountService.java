@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.user.service;
 
 import com.ncookie.imad.domain.user.dto.response.SignUpResponse;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
+import com.ncookie.imad.domain.user.entity.Gender;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -38,7 +39,11 @@ public class UserAccountService {
         UserAccount user = UserAccount.builder()
                 .email(signUpRequest.getEmail())
                 .password(signUpRequest.getPassword())
+                .nickname(null)
                 .authProvider(signUpRequest.getAuthProvider())
+                .ageRange(-1)
+                .gender(Gender.NONE)
+                .profileImage(-1)
                 .role(Role.USER)
                 .build();
 
@@ -65,7 +70,7 @@ public class UserAccountService {
                         .nickname(user.get().getNickname())
                         .authProvider(user.get().getAuthProvider())
                         .gender(user.get().getGender())
-//                        .profileImage(user.get().getProfileImageUrl())
+                        .profileImage(user.get().getProfileImage())
                         .ageRange(user.get().getAgeRange())
                         .build();
             } else {

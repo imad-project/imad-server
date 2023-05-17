@@ -40,9 +40,13 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         ObjectMapper mapper = new ObjectMapper();
         userRepository.findByEmail(email).ifPresent(user -> {
                     UserInfoResponse userInfoResponse = UserInfoResponse.builder()
-                            .nickname(user.getNickname())
                             .email(user.getEmail())
-                            .authProvider(user.getAuthProvider()).build();
+                            .nickname(user.getNickname())
+                            .authProvider(user.getAuthProvider())
+                            .gender(user.getGender())
+                            .ageRange(user.getAgeRange())
+                            .profileImage(user.getProfileImage())
+                            .build();
 
                     try {
                         response.setCharacterEncoding("UTF-8");

@@ -21,6 +21,7 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
         ObjectMapper mapper = new ObjectMapper();
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(mapper.writeValueAsString(ApiResponse.createError(ResponseCode.LOGIN_FAILURE)));
 
         log.info("소셜 로그인에 실패했습니다. 에러 메시지 : {}", exception.getMessage());

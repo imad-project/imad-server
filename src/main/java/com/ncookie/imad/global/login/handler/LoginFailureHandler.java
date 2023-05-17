@@ -6,6 +6,7 @@ import com.ncookie.imad.global.dto.response.ResponseCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
@@ -26,7 +27,7 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
         response.setContentType("text/plain;charset=UTF-8");
 
         ObjectMapper mapper = new ObjectMapper();
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(mapper.writeValueAsString(ApiResponse.createError(ResponseCode.LOGIN_FAILURE)));
 
         log.info("로그인에 실패했습니다. 메시지 : {}", exception.getMessage());

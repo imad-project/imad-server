@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -55,7 +56,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.addHeader(jwtService.getRefreshHeader(), "Bearer " + refreshToken);
 
         ObjectMapper mapper = new ObjectMapper();
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(mapper.writeValueAsString(
                 ApiResponse.createSuccessWithNoContent(ResponseCode.LOGIN_SUCCESS)));
 

@@ -13,6 +13,5 @@ import lombok.NoArgsConstructor;
 public class SignUpRequest {
     private String email;
     private String password;
-    private String nickname;
     private AuthProvider authProvider;
 }

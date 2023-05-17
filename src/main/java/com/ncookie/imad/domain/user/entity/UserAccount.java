@@ -3,6 +3,8 @@ package com.ncookie.imad.domain.user.entity;
 import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Builder
@@ -25,10 +27,10 @@ public class UserAccount extends BaseTimeEntity {
     @Setter private String email;               // 이메일
     @Setter private String password;
 
-    @Setter @Column(nullable = false, length = 50) private String nickname;
+    @Setter @Column(length = 50)  private String nickname;
     @Setter private Gender gender;              // 성별, 0 : 남자, 1 : 여자
     @Setter private int ageRange;               // 연령대
-    @Setter private String profileImageUrl;     // 프로필 이미지(URL)
+    @Setter private int profileImage;     // 프로필 이미지(URL)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
