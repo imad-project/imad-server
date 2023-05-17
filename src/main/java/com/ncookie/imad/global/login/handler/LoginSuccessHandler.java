@@ -3,6 +3,8 @@ package com.ncookie.imad.global.login.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +45,9 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                             .authProvider(user.getAuthProvider()).build();
 
                     try {
-                        response.getWriter().write(mapper.writeValueAsString(userInfoResponse));
+                        response.setCharacterEncoding("UTF-8");
+                        response.getWriter().write(mapper.writeValueAsString(
+                                ApiResponse.createSuccess(ResponseCode.LOGIN_SUCCESS, userInfoResponse)));
                         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                     } catch (IOException e) {
                         throw new RuntimeException(e);

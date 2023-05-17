@@ -10,7 +10,5 @@ import lombok.Getter;
 @Getter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SignUpResponse {
-    private ResponseStatus code;
-    private int statusCode;
-    private String message;
+    private Long userId;
 }

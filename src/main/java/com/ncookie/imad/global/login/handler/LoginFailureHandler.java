@@ -1,5 +1,8 @@
 package com.ncookie.imad.global.login.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +24,11 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain;charset=UTF-8");
-        response.getWriter().write("로그인 실패! 이메일이나 비밀번호를 확인해주세요.");
+
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType("application/json");
+        response.getWriter().write(mapper.writeValueAsString(ApiResponse.createError(ResponseCode.LOGIN_FAILURE)));
+
         log.info("로그인에 실패했습니다. 메시지 : {}", exception.getMessage());
     }
 }

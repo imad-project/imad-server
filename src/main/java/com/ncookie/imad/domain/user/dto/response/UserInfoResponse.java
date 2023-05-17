@@ -16,4 +16,5 @@ public class UserInfoResponse {
     private AuthProvider authProvider;
     private Gender gender;
     private int ageRange;
+//    private int profileImage;
 }
