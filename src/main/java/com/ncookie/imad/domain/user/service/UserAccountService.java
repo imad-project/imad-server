@@ -1,7 +1,6 @@
 package com.ncookie.imad.domain.user.service;
 
 import com.ncookie.imad.domain.user.dto.request.UserUpdateRequest;
-import com.ncookie.imad.domain.user.dto.response.SignUpResponse;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
@@ -104,7 +103,8 @@ public class UserAccountService {
     public void deleteUserAccount(String accessToken) {
 
         jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken)
-                .ifPresentOrElse(email -> userAccountRepository.findByEmail(email)
+                .ifPresentOrElse(email ->
+                                userAccountRepository.findByEmail(email)
                                 .ifPresentOrElse(userAccountRepository::delete,
                                         () -> {
                                             throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
@@ -113,6 +113,18 @@ public class UserAccountService {
                             throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
                         }
                 );
+    }
+
+    public void modifyUserPassword(String accessToken, String password) {
+        jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken)
+                .ifPresentOrElse(email -> {
+                    userAccountRepository.findByEmail(email)
+                            .ifPresentOrElse(user -> {
+                                user.setPassword(password);
+                                user.passwordEncode(passwordEncoder);
+                                userAccountRepository.save(user);
+                            }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
+                }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
     }
 
 }

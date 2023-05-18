@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.user.controller;
 
+import com.ncookie.imad.domain.user.dto.request.ModifyUserPasswordRequest;
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
 import com.ncookie.imad.domain.user.dto.request.UserUpdateRequest;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
@@ -27,7 +28,7 @@ public class UserAccountController {
 
     @PatchMapping("/api/user")
     public ApiResponse<UserInfoResponse> updateUserAccountInfo(@RequestHeader("Authorization") String accessToken,
-                                                @RequestBody UserUpdateRequest userUpdateRequest) {
+                                                               @RequestBody UserUpdateRequest userUpdateRequest) {
         return ApiResponse.createSuccess(
                 ResponseCode.USER_INFO_UPDATE_SUCCESS,
                 userAccountService.updateUserAccountInfo(accessToken, userUpdateRequest));
@@ -37,5 +38,12 @@ public class UserAccountController {
     public ApiResponse<?> deleteUserAccountInfo(@RequestHeader("Authorization") String accessToken) {
         userAccountService.deleteUserAccount(accessToken);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_DELETE_SUCCESS);
+    }
+
+    @PatchMapping("/api/user/password")
+    public ApiResponse<?> modifyUserPassword(@RequestHeader("Authorization") String accessToken,
+                                             @RequestBody ModifyUserPasswordRequest modifyUserPasswordRequest) {
+        userAccountService.modifyUserPassword(accessToken, modifyUserPasswordRequest.getPassword());
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
     }
 }
