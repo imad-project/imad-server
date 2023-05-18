@@ -5,7 +5,6 @@ import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.oauth2.CustomOAuth2User;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,20 +30,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("OAuth2 Login 성공!");
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         loginSuccess(response, oAuth2User);     // 로그인에 성공한 경우 access, refresh 토큰 생성
-//            // User의 Role이 GUEST일 경우 처음 요청한 회원이므로 회원가입 페이지로 리다이렉트
-//            if(oAuth2User.getRole() == Role.GUEST) {
-//                String accessToken = jwtService.createAccessToken(oAuth2User.getEmail(), oAuth2User);
-//                response.addHeader(jwtService.getAccessHeader(), "Bearer " + accessToken);
-//                response.sendRedirect("oauth2/sign-up"); // 프론트의 회원가입 추가 정보 입력 폼으로 리다이렉트
-//
-//                jwtService.sendAccessAndRefreshToken(response, accessToken, null);
-////                User findUser = userRepository.findByEmail(oAuth2User.getEmail())
-////                                .orElseThrow(() -> new IllegalArgumentException("이메일에 해당하는 유저가 없습니다."));
-////                findUser.authorizeUser();
-//            } else {
-//                loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
-//            }
-
     }
 
 

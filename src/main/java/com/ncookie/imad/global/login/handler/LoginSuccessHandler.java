@@ -46,6 +46,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                             .gender(user.getGender())
                             .ageRange(user.getAgeRange())
                             .profileImage(user.getProfileImage())
+                            .role(user.getRole())
                             .build();
 
                     try {

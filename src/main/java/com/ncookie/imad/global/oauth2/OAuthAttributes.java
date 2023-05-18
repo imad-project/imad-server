@@ -1,7 +1,6 @@
 package com.ncookie.imad.global.oauth2;
 
 import com.ncookie.imad.domain.user.entity.AuthProvider;
-import com.ncookie.imad.domain.user.entity.Gender;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.oauth2.userinfo.GoogleOAuth2UserInfo;
@@ -77,13 +76,9 @@ public class OAuthAttributes {
      */
     public UserAccount toEntity(AuthProvider authProvider, OAuth2UserInfo oauth2UserInfo) {
         return UserAccount.builder()
-                .nickname(null)
                 .authProvider(authProvider)
                 .socialId(oauth2UserInfo.getId())
                 .email(UUID.randomUUID() + "@socialUser.com")
-                .ageRange(-1)
-                .gender(Gender.NONE)
-                .profileImage(-1)
                 .role(Role.GUEST)
                 .build();
     }

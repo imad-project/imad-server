@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Gender;
+import com.ncookie.imad.domain.user.entity.Role;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,4 +18,5 @@ public class UserInfoResponse {
     private Gender gender;
     private int ageRange;
     private int profileImage;
+    private Role role;
 }

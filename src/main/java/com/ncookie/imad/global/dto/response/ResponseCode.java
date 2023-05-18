@@ -12,9 +12,13 @@ public enum ResponseCode {
     // 유저
     SIGNUP_SUCCESS(201, "회원가입이 성공적으로 완료되었습니다."),
     LOGIN_SUCCESS(200, "정상적으로 로그인 되었습니다."),
+    USER_INFO_GET_SUCCESS(200, "정상적으로 회원 정보를 조회했습니다."),
+    USER_INFO_UPDATE_SUCCESS(201, "정상적으로 회원 정보를 수정했습니다"),
+    USER_DELETE_SUCCESS(204, "회원 탈퇴가 정상적으로 처리되었습니다."),
+
     LOGIN_FAILURE(400, "로그인 정보를 다시 확인해주세요."),
-    GETTING_USER_INFO_SUCCESS(200, "정상적으로 회원 정보를 조회했습니다."),
     SIGNUP_EMAIL_DUPLICATED(400, "이미 존재하는 이메일입니다."),
+    NICKNAME_DUPLICATED(400, "이미 사용 중인 닉네임입니다."),
     USER_NOT_FOUND(404,  "해당 계정을 찾을 수 없습니다."),
 
 
