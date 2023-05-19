@@ -21,6 +21,7 @@ public enum ResponseCode {
     SIGNUP_EMAIL_DUPLICATED(400, "이미 존재하는 이메일입니다."),
     NICKNAME_DUPLICATED(400, "이미 사용 중인 닉네임입니다."),
     USER_NOT_FOUND(404,  "해당 계정을 찾을 수 없습니다."),
+    USER_MODIFY_PASSWORD_FAILURE(404,  "기존 비밀번호를 다시 확인해주세요."),
 
 
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),

@@ -43,7 +43,7 @@ public class UserAccountController {
     @PatchMapping("/api/user/password")
     public ApiResponse<?> modifyUserPassword(@RequestHeader("Authorization") String accessToken,
                                              @RequestBody ModifyUserPasswordRequest modifyUserPasswordRequest) {
-        userAccountService.modifyUserPassword(accessToken, modifyUserPasswordRequest.getPassword());
+        userAccountService.modifyUserPassword(accessToken, modifyUserPasswordRequest);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
     }
 }

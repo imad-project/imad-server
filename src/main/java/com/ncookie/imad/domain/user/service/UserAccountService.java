@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.user.service;
 
+import com.ncookie.imad.domain.user.dto.request.ModifyUserPasswordRequest;
 import com.ncookie.imad.domain.user.dto.request.UserUpdateRequest;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.Role;
@@ -115,14 +116,18 @@ public class UserAccountService {
                 );
     }
 
-    public void modifyUserPassword(String accessToken, String password) {
+    public void modifyUserPassword(String accessToken, ModifyUserPasswordRequest modifyUserPasswordRequest) {
         jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken)
                 .ifPresentOrElse(email -> {
                     userAccountRepository.findByEmail(email)
                             .ifPresentOrElse(user -> {
-                                user.setPassword(password);
-                                user.passwordEncode(passwordEncoder);
-                                userAccountRepository.save(user);
+                                if (passwordEncoder.matches(modifyUserPasswordRequest.getOldPassword(), user.getPassword())) {
+                                    user.setPassword(modifyUserPasswordRequest.getNewPassword());
+                                    user.passwordEncode(passwordEncoder);
+                                    userAccountRepository.save(user);
+                                } else {
+                                    throw new BadRequestException(ResponseCode.USER_MODIFY_PASSWORD_FAILURE);
+                                }
                             }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
                 }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
     }
