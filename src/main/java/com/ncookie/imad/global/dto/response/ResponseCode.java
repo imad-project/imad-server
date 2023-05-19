@@ -13,8 +13,8 @@ public enum ResponseCode {
     SIGNUP_SUCCESS(201, "회원가입이 성공적으로 완료되었습니다."),
     LOGIN_SUCCESS(200, "정상적으로 로그인 되었습니다."),
     USER_INFO_GET_SUCCESS(200, "정상적으로 회원 정보를 조회했습니다."),
-    USER_INFO_UPDATE_SUCCESS(201, "정상적으로 회원 정보를 수정했습니다"),
-    USER_MODIFY_PASSWORD_SUCCESS(201, "정상적으로 비밀번호를 수정했습니다"),
+    USER_INFO_UPDATE_SUCCESS(201, "정상적으로 회원 정보를 수정했습니다."),
+    USER_MODIFY_PASSWORD_SUCCESS(201, "정상적으로 비밀번호를 수정했습니다."),
     USER_DELETE_SUCCESS(204, "회원 탈퇴가 정상적으로 처리되었습니다."),
 
     LOGIN_FAILURE(400, "로그인 정보를 다시 확인해주세요."),
@@ -25,10 +25,10 @@ public enum ResponseCode {
 
 
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
-    INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요"),
-    NOTEQUAL_INPUT_PASSWORD(400,  "비밀번호가 일치하지 않습니다"),
-    INVALID_PASSWORD(400,  "비밀번호를 4자 이상 입력하세요"),
-    INVALID_USERNAME(400,  "알파벳 대소문자와 숫자로만 입력하세요"),
+    INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),
+    NOTEQUAL_INPUT_PASSWORD(400,  "비밀번호가 일치하지 않습니다."),
+    INVALID_PASSWORD(400,  "비밀번호를 4자 이상 입력하세요."),
+    INVALID_USERNAME(400,  "알파벳 대소문자와 숫자로만 입력하세요."),
     NOT_AUTHORIZED(403, "작성자만 수정 및 삭제를 할 수 있습니다."),
     USERNAME_DUPLICATION(400, "이미 등록된 아이디입니다."),
 
