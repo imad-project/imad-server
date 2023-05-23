@@ -75,9 +75,12 @@ public class UserAccountService {
         Optional<String> email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken);
 
         // 닉네임 중복 불가
-        if (userAccountRepository.findByNickname(userUpdateRequest.getNickname()).isPresent()) {
-            throw new BadRequestException(ResponseCode.NICKNAME_DUPLICATED);
-        }
+        userAccountRepository.findByNickname(userUpdateRequest.getNickname())
+                .ifPresent(user -> {
+                    if (!user.getEmail().equals(email.get())) {
+                        throw new BadRequestException(ResponseCode.NICKNAME_DUPLICATED);
+                    }
+                });
 
         email.flatMap(userAccountRepository::findByEmail)
                 .ifPresent(user -> {
