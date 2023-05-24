@@ -10,10 +10,13 @@ import com.ncookie.imad.global.dto.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 public class UserAccountController {
     private final UserAccountService userAccountService;
+
 
     @PostMapping("/api/signup")
     public ApiResponse<?> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
@@ -45,5 +48,15 @@ public class UserAccountController {
                                              @RequestBody ModifyUserPasswordRequest modifyUserPasswordRequest) {
         userAccountService.modifyUserPassword(accessToken, modifyUserPasswordRequest);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
+    }
+
+    /**
+     * =============================================================================
+     * 테스트용 코드
+     * =============================================================================
+     */
+    @GetMapping("/api/test/email")
+    public ApiResponse<List<String>> getEmailList() {
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserEmailList());
     }
 }

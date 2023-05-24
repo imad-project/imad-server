@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -30,7 +32,7 @@ public class UserAccountService {
     private final PasswordEncoder passwordEncoder;
 
 
-    @Description("일반회원 회원가입")
+    // 일반회원 회원가입
     public void signUp(SignUpRequest signUpRequest) {
         if (userAccountRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             throw new BadRequestException(ResponseCode.SIGNUP_EMAIL_DUPLICATED);
@@ -133,6 +135,21 @@ public class UserAccountService {
                                 }
                             }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
                 }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
+    }
+
+
+    /**
+     * =============================================================================
+     * 테스트용 코드
+     * =============================================================================
+     */
+    // 회원 DB에서 이메일 리스트 조회
+    public List<String> getUserEmailList() {
+        List<String> emailList = new ArrayList<>();
+        userAccountRepository.findAll()
+                .forEach(user -> emailList.add(user.getEmail()));
+
+        return emailList;
     }
 
 }
