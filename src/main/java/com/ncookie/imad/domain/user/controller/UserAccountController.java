@@ -24,6 +24,16 @@ public class UserAccountController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.SIGNUP_SUCCESS);
     }
 
+    @GetMapping("/api/email/list")
+    public ApiResponse<List<String>> getNicknameList() {
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserEmailList());
+    }
+
+    @GetMapping("/api/nickname/list")
+    public ApiResponse<List<String>> getEmailList() {
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserNicknameList());
+    }
+
     @GetMapping("/api/user")
     public ApiResponse<UserInfoResponse> getUserAccountInfo(@RequestHeader("Authorization") String accessToken) {
         return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserInfo(accessToken));
@@ -50,13 +60,4 @@ public class UserAccountController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
     }
 
-    /**
-     * =============================================================================
-     * 테스트용 코드
-     * =============================================================================
-     */
-    @GetMapping("/api/test/email")
-    public ApiResponse<List<String>> getEmailList() {
-        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserEmailList());
-    }
 }

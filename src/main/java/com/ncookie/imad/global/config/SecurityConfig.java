@@ -98,8 +98,10 @@ public class SecurityConfig {
                 //== URL별 권한 관리 옵션 ==//
                 .authorizeHttpRequests()
                 .requestMatchers(
+                        "/api/**",
                         "/api/signup",
-                        "/api/test/email",
+                        "/api/email/list",
+                        "/api/nickname/list",
                         "/oauth2/**",
                         "/auth/**",
                         "/h2-console/**")

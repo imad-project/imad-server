@@ -49,6 +49,24 @@ public class UserAccountService {
         userAccountRepository.save(user);
     }
 
+    // 이메일 리스트 조회
+    public List<String> getUserEmailList() {
+        List<String> emailList = new ArrayList<>();
+        userAccountRepository.findAll()
+                .forEach(user -> emailList.add(user.getEmail()));
+
+        return emailList;
+    }
+
+    // 닉네임 리스트 조회
+    public List<String> getUserNicknameList() {
+        List<String> nicknameList = new ArrayList<>();
+        userAccountRepository.findAll()
+                .forEach(user -> nicknameList.add(user.getNickname()));
+
+        return nicknameList;
+    }
+
     public UserInfoResponse getUserInfo(String accessToken) {
         UserInfoResponse userInfoResponse;
 
@@ -135,21 +153,6 @@ public class UserAccountService {
                                 }
                             }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
                 }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
-    }
-
-
-    /**
-     * =============================================================================
-     * 테스트용 코드
-     * =============================================================================
-     */
-    // 회원 DB에서 이메일 리스트 조회
-    public List<String> getUserEmailList() {
-        List<String> emailList = new ArrayList<>();
-        userAccountRepository.findAll()
-                .forEach(user -> emailList.add(user.getEmail()));
-
-        return emailList;
     }
 
 }
