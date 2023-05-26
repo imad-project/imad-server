@@ -2,6 +2,8 @@ package com.ncookie.imad.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.filter.JwtAuthenticationFilter;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
@@ -14,6 +16,8 @@ import com.ncookie.imad.global.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -22,8 +26,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+
+import java.io.PrintWriter;
 
 
 /**
@@ -32,7 +40,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
  */
 @Configuration
 @RequiredArgsConstructor
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
     private final LoginService loginService;
@@ -45,6 +53,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        AuthenticationEntryPoint unauthorizedEntryPoint =
+                (request, response, authException) -> {
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    String json = mapper.writeValueAsString(ApiResponse.createError(ResponseCode.UNAUTHORIZED_REQUEST));
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setCharacterEncoding("UTF-8");
+                    PrintWriter writer = response.getWriter();
+                    writer.write(json);
+                    writer.flush();
+                };
+
+        AccessDeniedHandler accessDeniedHandler =
+                (request, response, accessDeniedException) -> {
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    String json = mapper.writeValueAsString(ApiResponse.createError(ResponseCode.INVALID_REQUEST));
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setCharacterEncoding("UTF-8");
+                    PrintWriter writer = response.getWriter();
+                    writer.write(json);
+                    writer.flush();
+                };
+
         http
                 .formLogin().disable()
                 .httpBasic().disable()
@@ -52,13 +84,26 @@ public class SecurityConfig {
                 .headers().frameOptions().disable()
                 .and()
 
-                .sessionManagement()        //세션 정책 설정
+                // 세션 정책 설정
+                .sessionManagement()        
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+
+                //== Unauthorized, Forbidden 처리 ==//
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(unauthorizedEntryPoint)
                 .and()
 
                 //== URL별 권한 관리 옵션 ==//
                 .authorizeHttpRequests()
-                .requestMatchers("/api/**", "/oauth2/**", "/auth/**", "/h2-console/**").permitAll()
+                .requestMatchers(
+                        "/api/signup",
+                        "/api/test/email",
+                        "/oauth2/**",
+                        "/auth/**",
+                        "/h2-console/**")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
 

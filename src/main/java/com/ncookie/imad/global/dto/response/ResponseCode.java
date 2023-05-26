@@ -9,6 +9,10 @@ public enum ResponseCode {
     INTERNAL_SERVER_ERROR(500, "Server Error"),
     INVALID_TYPE_VALUE(400, " Invalid Type Value"),
 
+    // spring security 예외
+    UNAUTHORIZED_REQUEST(401, "잘못된 요청이거나 올바르지 않은 인증정보입니다"),
+    INVALID_REQUEST(403, "잘못된 접근입니다"),
+
     // 유저
     SIGNUP_SUCCESS(201, "회원가입이 성공적으로 완료되었습니다."),
     LOGIN_SUCCESS(200, "정상적으로 로그인 되었습니다."),
