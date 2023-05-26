@@ -10,8 +10,8 @@ public enum ResponseCode {
     INVALID_TYPE_VALUE(400, " Invalid Type Value"),
 
     // spring security 예외
-    UNAUTHORIZED_REQUEST(401, "잘못된 요청이거나 올바르지 않은 인증정보입니다"),
-    INVALID_REQUEST(403, "잘못된 접근입니다"),
+    UNAUTHORIZED_REQUEST(401, "잘못된 요청이거나 올바르지 않은 인증정보입니다."),
+    INVALID_REQUEST(403, "잘못된 접근입니다."),
 
     // 유저
     SIGNUP_SUCCESS(201, "회원가입이 성공적으로 완료되었습니다."),
