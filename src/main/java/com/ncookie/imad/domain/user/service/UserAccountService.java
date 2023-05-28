@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.ncookie.imad.global.Utils.extractToken;
+
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
@@ -71,7 +73,7 @@ public class UserAccountService {
         UserInfoResponse userInfoResponse;
 
         // token에 데이터가 들어있는 것은 이미 filter에서 검증했기 떄문에 추가로 검사하지는 않음
-        String email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken).get();
+        String email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken)).get();
 
         Optional<UserAccount> user = userAccountRepository.findByEmail(email);
         if (user.isPresent()) {
@@ -92,7 +94,7 @@ public class UserAccountService {
     }
 
     public UserInfoResponse updateUserAccountInfo(String accessToken, UserUpdateRequest userUpdateRequest) {
-        Optional<String> email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken);
+        Optional<String> email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken));
 
         // 닉네임 중복 불가
         userAccountRepository.findByNickname(userUpdateRequest.getNickname())
@@ -126,7 +128,7 @@ public class UserAccountService {
 
     public void deleteUserAccount(String accessToken) {
 
-        jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken)
+        jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken))
                 .ifPresentOrElse(email ->
                                 userAccountRepository.findByEmail(email)
                                 .ifPresentOrElse(userAccountRepository::delete,
@@ -140,7 +142,7 @@ public class UserAccountService {
     }
 
     public void modifyUserPassword(String accessToken, ModifyUserPasswordRequest modifyUserPasswordRequest) {
-        jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, accessToken)
+        jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken))
                 .ifPresentOrElse(email -> {
                     userAccountRepository.findByEmail(email)
                             .ifPresentOrElse(user -> {

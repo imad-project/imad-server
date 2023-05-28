@@ -2,6 +2,7 @@ package com.ncookie.imad.global.jwt.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -61,17 +62,6 @@ public class JwtService {
                 .withClaim(CLAIM_EMAIL, email)
                 .sign(Algorithm.HMAC512(secretKey)); // HMAC512 알고리즘 사용, application-jwt.yml 에서 지정한 secret 키로 암호화
     }
-//    public String createAccessToken(String email, AuthProvider authProvider) {
-//        Date now = new Date();
-//        return JWT.create()
-//                .withSubject(ACCESS_TOKEN_SUBJECT) // JWT 의 Subject 지정 -> AccessToken 이므로 AccessToken
-//                .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod)) // 토큰 만료 시간 설정
-//
-//                // claim 으로 user id와 auth provider 사용
-//                .withClaim(CLAIM_EMAIL, email)
-//                .withClaim(CLAIM_AUTH_PROVIDER, authProvider.getAuthProvider())
-//                .sign(Algorithm.HMAC512(secretKey)); // HMAC512 알고리즘 사용, application-jwt.yml 에서 지정한 secret 키로 암호화
-//    }
 
     /**
      * RefreshToken 생성
@@ -103,6 +93,7 @@ public class JwtService {
 
         response.setHeader(accessHeader, accessToken);
         response.setHeader(refreshHeader, refreshToken);
+
         log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
 
@@ -163,6 +154,9 @@ public class JwtService {
         try {
             JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
             return true;
+        } catch (TokenExpiredException e) {
+            log.error("유효기간이 만료된 토큰입니다. {}", e.getMessage());
+            throw new TokenExpiredException(e.getMessage(), e.getExpiredOn());
         } catch (Exception e) {
             log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
             return false;

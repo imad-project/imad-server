@@ -11,6 +11,7 @@ public enum ResponseCode {
 
     // spring security 예외
     UNAUTHORIZED_REQUEST(401, "잘못된 요청이거나 올바르지 않은 인증정보입니다."),
+    TOKEN_EXPIRED(401, "토큰의 기한이 만료되었습니다."),
     INVALID_REQUEST(403, "잘못된 접근입니다."),
 
     // 유저

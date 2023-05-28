@@ -40,6 +40,7 @@ import static com.ncookie.imad.global.jwt.service.JwtService.CLAIM_EMAIL;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String NO_CHECK_URL = "/api/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
+    private static final String REISSUE_TOKEN_URL = "/api/token";
 
     private final JwtService jwtService;
     private final UserAccountRepository userRepository;
@@ -64,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 리프레시 토큰이 요청 헤더에 존재했다면, 사용자가 AccessToken이 만료되어서
         // RefreshToken까지 보낸 것이므로 리프레시 토큰이 DB의 리프레시 토큰과 일치하는지 판단 후,
         // 일치한다면 AccessToken을 재발급해준다.
-        if (refreshToken != null) {
+        if (request.getRequestURI().equals(REISSUE_TOKEN_URL) && refreshToken != null) {
             checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
             return; // RefreshToken을 보낸 경우에는 AccessToken을 재발급 하고 인증 처리는 하지 않게 하기위해 바로 return으로 필터 진행 막기
         }
@@ -85,11 +86,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      *  그 후 JwtService.sendAccessTokenAndRefreshToken()으로 응답 헤더에 보내기
      */
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
+        jwtService.isTokenValid(refreshToken);
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
-                    String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
-                            reIssuedRefreshToken);
+                    jwtService.sendAccessAndRefreshToken(
+                            response,
+                            jwtService.createAccessToken(user.getEmail()),
+                            reIssueRefreshToken(user));
                 });
     }
 
@@ -119,7 +122,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .flatMap(accessToken -> jwtService.extractClaimFromJWT(CLAIM_EMAIL, accessToken))
-                .flatMap(userRepository::findById)
+                .flatMap(userRepository::findByEmail)
                 .ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);

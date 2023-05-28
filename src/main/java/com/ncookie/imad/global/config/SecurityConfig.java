@@ -5,6 +5,7 @@ import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.filter.JwtAuthenticationFilter;
+import com.ncookie.imad.global.jwt.filter.JwtExceptionFilter;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import com.ncookie.imad.global.login.handler.LoginFailureHandler;
@@ -47,6 +48,7 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final UserAccountRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final JwtExceptionFilter jwtExceptionFilter;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -98,7 +100,6 @@ public class SecurityConfig {
                 //== URL별 권한 관리 옵션 ==//
                 .authorizeHttpRequests()
                 .requestMatchers(
-                        "/api/**",
                         "/api/signup",
                         "/api/email/list",
                         "/api/nickname/list",
@@ -119,6 +120,7 @@ public class SecurityConfig {
         // 따라서, LogoutFilter 이후에 우리가 만든 필터 동작하도록 설정
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
         http.addFilterAfter(jwtAuthenticationProcessingFilter(), LogoutFilter.class);
+        http.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
         http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), JwtAuthenticationFilter.class);
 
         return http.getOrBuild();
