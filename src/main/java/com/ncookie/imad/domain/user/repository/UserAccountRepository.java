@@ -15,7 +15,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, String
      * 일반 유저의 경우 직접 입력한 id, 소셜 유저의 경우 provider에서 제공받은 id와
      * auth provider를 함께 식별자로 사용함
      */
-    boolean existsByIdAndAuthProvider(Long id, AuthProvider authProvider);
+    boolean existsByEmail(String email);
+    boolean existsByNickname(String nickname);
     Optional<UserAccount> findByAuthProviderAndSocialId(AuthProvider authProvider, String socialId);
     Optional<UserAccount> findByIdAndEmail(Long id, String email);
 }

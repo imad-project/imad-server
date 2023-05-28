@@ -18,6 +18,7 @@ public enum ResponseCode {
     SIGNUP_SUCCESS(201, "회원가입이 성공적으로 완료되었습니다."),
     LOGIN_SUCCESS(200, "정상적으로 로그인 되었습니다."),
     USER_INFO_GET_SUCCESS(200, "정상적으로 회원 정보를 조회했습니다."),
+    USER_INFO_VALIDATION(200, "정상적으로 중복 검사를 수행했습니다."),
     USER_INFO_UPDATE_SUCCESS(201, "정상적으로 회원 정보를 수정했습니다."),
     USER_MODIFY_PASSWORD_SUCCESS(201, "정상적으로 비밀번호를 수정했습니다."),
     USER_DELETE_SUCCESS(204, "회원 탈퇴가 정상적으로 처리되었습니다."),

@@ -1,8 +1,10 @@
 package com.ncookie.imad.domain.user.service;
 
 import com.ncookie.imad.domain.user.dto.request.ModifyUserPasswordRequest;
+import com.ncookie.imad.domain.user.dto.request.UserInfoDuplicationRequest;
 import com.ncookie.imad.domain.user.dto.request.UserUpdateRequest;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
+import com.ncookie.imad.domain.user.dto.response.UserInfoDuplicationResponse;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -10,7 +12,6 @@ import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.jwt.service.JwtService;
-import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,24 +50,6 @@ public class UserAccountService {
 
         user.passwordEncode(passwordEncoder);
         userAccountRepository.save(user);
-    }
-
-    // 이메일 리스트 조회
-    public List<String> getUserEmailList() {
-        List<String> emailList = new ArrayList<>();
-        userAccountRepository.findAll()
-                .forEach(user -> emailList.add(user.getEmail()));
-
-        return emailList;
-    }
-
-    // 닉네임 리스트 조회
-    public List<String> getUserNicknameList() {
-        List<String> nicknameList = new ArrayList<>();
-        userAccountRepository.findAll()
-                .forEach(user -> nicknameList.add(user.getNickname()));
-
-        return nicknameList;
     }
 
     public UserInfoResponse getUserInfo(String accessToken) {
@@ -157,4 +140,40 @@ public class UserAccountService {
                 }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
     }
 
+    public UserInfoDuplicationResponse checkUserEmailDuplicated(UserInfoDuplicationRequest userInfoDuplicationRequest) {
+        return UserInfoDuplicationResponse.builder()
+                .validation(!userAccountRepository.existsByEmail(userInfoDuplicationRequest.getInfo()))
+                .build();
+    }
+
+    public UserInfoDuplicationResponse checkUserNicknameDuplicated(UserInfoDuplicationRequest userInfoDuplicationRequest) {
+        return UserInfoDuplicationResponse.builder()
+                .validation(!userAccountRepository.existsByNickname(userInfoDuplicationRequest.getInfo()))
+                .build();
+    }
+
+
+    /**
+     * ==================================================================
+     * 개발 중 테스트용
+     * ==================================================================
+     */
+
+    // 이메일 리스트 조회
+    public List<String> getUserEmailList() {
+        List<String> emailList = new ArrayList<>();
+        userAccountRepository.findAll()
+                .forEach(user -> emailList.add(user.getEmail()));
+
+        return emailList;
+    }
+
+    // 닉네임 리스트 조회
+    public List<String> getUserNicknameList() {
+        List<String> nicknameList = new ArrayList<>();
+        userAccountRepository.findAll()
+                .forEach(user -> nicknameList.add(user.getNickname()));
+
+        return nicknameList;
+    }
 }

@@ -101,8 +101,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/api/signup",
-                        "/api/email/list",
-                        "/api/nickname/list",
+                        "/api/user/validation/**",
+                        "/api/test/**",
                         "/oauth2/**",
                         "/auth/**",
                         "/h2-console/**")

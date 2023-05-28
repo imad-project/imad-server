@@ -2,8 +2,10 @@ package com.ncookie.imad.domain.user.controller;
 
 import com.ncookie.imad.domain.user.dto.request.ModifyUserPasswordRequest;
 import com.ncookie.imad.domain.user.dto.request.SignUpRequest;
+import com.ncookie.imad.domain.user.dto.request.UserInfoDuplicationRequest;
 import com.ncookie.imad.domain.user.dto.request.UserUpdateRequest;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
+import com.ncookie.imad.domain.user.dto.response.UserInfoDuplicationResponse;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -22,16 +24,6 @@ public class UserAccountController {
     public ApiResponse<?> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
         userAccountService.signUp(signUpRequest);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.SIGNUP_SUCCESS);
-    }
-
-    @GetMapping("/api/email/list")
-    public ApiResponse<List<String>> getNicknameList() {
-        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserEmailList());
-    }
-
-    @GetMapping("/api/nickname/list")
-    public ApiResponse<List<String>> getEmailList() {
-        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserNicknameList());
     }
 
     @GetMapping("/api/user")
@@ -60,4 +52,29 @@ public class UserAccountController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
     }
 
+    @PostMapping("/api/user/validation/email")
+    public ApiResponse<UserInfoDuplicationResponse> validateUserAccountEmail(@RequestBody UserInfoDuplicationRequest email) {
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_VALIDATION , userAccountService.checkUserEmailDuplicated(email));
+    }
+
+    @PostMapping("/api/user/validation/nickname")
+    public ApiResponse<UserInfoDuplicationResponse> validateUserAccountNickname(@RequestBody UserInfoDuplicationRequest nickname) {
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_VALIDATION , userAccountService.checkUserNicknameDuplicated(nickname));
+    }
+
+
+    /*
+     * ==================================================================
+     * 개발 중 테스트용
+     * ==================================================================
+     */
+    @GetMapping("/api/test/email/list")
+    public ApiResponse<List<String>> getNicknameList() {
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserEmailList());
+    }
+
+    @GetMapping("/api/test/nickname/list")
+    public ApiResponse<List<String>> getEmailList() {
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserNicknameList());
+    }
 }
