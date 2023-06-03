@@ -1,10 +1,3 @@
 spring:
   profiles:
-    active: local
-    include: db, oauth2, app, jwt
-#    include: db, oauth3
-    group:
-      local:
-        - db-local
-      heroku:
-        - db-heroku
+    include: db, oauth2, jwt, aws

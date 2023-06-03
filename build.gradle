@@ -31,8 +31,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
 
+	// DB 관련 설정
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
@@ -49,6 +52,7 @@ tasks.named('test') {
 
 // Heroku 설정
 jar {
+	enabled = false
 	manifest {
 		attributes('Main-Class': 'com.ncookie.imad.ImadServerApplication')
 	}
