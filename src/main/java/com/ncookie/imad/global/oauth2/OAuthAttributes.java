@@ -3,10 +3,7 @@ package com.ncookie.imad.global.oauth2;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.global.oauth2.userinfo.GoogleOAuth2UserInfo;
-import com.ncookie.imad.global.oauth2.userinfo.KakaoOAuth2UserInfo;
-import com.ncookie.imad.global.oauth2.userinfo.NaverOAuth2UserInfo;
-import com.ncookie.imad.global.oauth2.userinfo.OAuth2UserInfo;
+import com.ncookie.imad.global.oauth2.userinfo.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -44,7 +41,17 @@ public class OAuthAttributes {
         if (socialType == AuthProvider.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
         }
+        if (socialType == AuthProvider.APPLE) {
+            return ofApple(userNameAttributeName, attributes);
+        }
         return ofGoogle(userNameAttributeName, attributes);
+    }
+
+    private static OAuthAttributes ofApple(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2UserInfo(new AppleOAuth2UserInfo(attributes))
+                .build();
     }
 
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
