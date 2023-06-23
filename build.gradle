@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	implementation 'com.auth0:java-jwt:4.2.1'
+	implementation 'com.nimbusds:nimbus-jose-jwt:3.1.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
