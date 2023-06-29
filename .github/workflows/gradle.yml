@@ -53,6 +53,21 @@ jobs:
           echo "copy properties"
           echo "${{ secrets.PROPERTIES }}" > ./application-aws.yml
         shell: bash
+        
+      # create key.p8 file
+      - name: make apple key.p8 file
+        if: contains(github.ref, 'master')
+        run: |
+          # spring의 resources 경로로 이동
+          cd ./src/main/resources/key
+          
+          ls -al
+          touch ./AuthKey.p8
+          
+          # GitHub-Actions에서 설정한 값 파일에 쓰기
+          echo "copy APPLE_SECRET_KEY"
+          echo "${{ secrets.APPLE_SECRET_KEY }}" > ./AuthKey.p8
+        shell: bash
 
       # gradlew 파일 실행권한 설정
       - name: Grant execute permission for gradlew
