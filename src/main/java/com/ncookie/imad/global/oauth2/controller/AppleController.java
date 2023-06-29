@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.user.controller;
+package com.ncookie.imad.global.oauth2.controller;
 
 import com.ncookie.imad.global.oauth2.dto.AppleDTO;
 import com.ncookie.imad.global.oauth2.dto.MsgEntity;
