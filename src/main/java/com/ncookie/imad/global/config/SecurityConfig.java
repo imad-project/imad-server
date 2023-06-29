@@ -102,7 +102,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/api/signup",
                         "/api/user/validation/**",
-                        "api/callback/**",
+                        "/api/callback/**",
                         "/api/test/**",
                         "/oauth2/**",
                         "/auth/**",
