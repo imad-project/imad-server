@@ -15,8 +15,6 @@ import org.bouncycastle.util.io.pem.PemReader;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,19 +34,19 @@ import java.util.Date;
 @Service
 public class AppleService {
 
-    @Value("${apple.team.id}")
+    @Value("${apple.team-id}")
     private String APPLE_TEAM_ID;
 
-    @Value("${apple.login.key}")
+    @Value("${apple.login-key}")
     private String APPLE_LOGIN_KEY;
 
-    @Value("${apple.client.id}")
+    @Value("${apple.client-id}")
     private String APPLE_CLIENT_ID;
 
-    @Value("${apple.redirect.url}")
+    @Value("${apple.redirect-url}")
     private String APPLE_REDIRECT_URL;
 
-    @Value("${apple.key.path}")
+    @Value("${apple.key-path}")
     private String APPLE_KEY_PATH;
 
     private final static String APPLE_AUTH_URL = "https://appleid.apple.com";
@@ -64,9 +62,9 @@ public class AppleService {
         if (code == null) throw new Exception("Failed get authorization code");
 
         String clientSecret = createClientSecret();
-        String userId = "";
-        String email  = "";
-        String accessToken = "";
+        String userId;
+        String email;
+        String accessToken;
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -147,6 +145,7 @@ public class AppleService {
 
         URL res = getClass().getResource(APPLE_KEY_PATH);
 
+        assert res != null;
         if ("jar".equals(res.getProtocol())) {
             try {
                 InputStream input = getClass().getResourceAsStream(APPLE_KEY_PATH);
@@ -169,6 +168,7 @@ public class AppleService {
             file = new File(res.getFile());
         }
 
+        assert file != null;
         if (file.exists()) {
             try (FileReader keyReader = new FileReader(file);
                  PemReader pemReader = new PemReader(keyReader))
