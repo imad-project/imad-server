@@ -59,6 +59,7 @@ jobs:
         if: contains(github.ref, 'master')
         run: |
           # spring의 resources 경로로 이동
+          mkdir ./src/main/resources/key
           cd ./src/main/resources/key
           
           ls -al
