@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AppleController {
     private final AppleService appleService;
 
-    @PostMapping("/callback/apple")
+    @PostMapping("/api/callback/apple")
     public ResponseEntity<MsgEntity> callback(HttpServletRequest request) throws Exception {
         AppleDTO appleInfo = appleService.getAppleInfo(request.getParameter("code"));
 
