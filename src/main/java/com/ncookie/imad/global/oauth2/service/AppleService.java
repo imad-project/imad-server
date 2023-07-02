@@ -2,19 +2,17 @@ package com.ncookie.imad.global.oauth2.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.global.oauth2.dto.AppleDTO;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.crypto.ECDSASigner;
-import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,11 +23,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
-import java.net.URL;
-import java.security.KeyFactory;
-import java.security.interfaces.ECPrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.PrivateKey;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AppleService {
@@ -61,7 +60,7 @@ public class AppleService {
     public AppleDTO getAppleInfo(String code) throws Exception {
         if (code == null) throw new Exception("Failed get authorization code");
 
-        String clientSecret = createClientSecret();
+        String clientSecret = createClientSecretKey();
         String userId;
         String email;
         String accessToken;
@@ -71,11 +70,11 @@ public class AppleService {
             headers.add("Content-type", "application/x-www-form-urlencoded");
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("grant_type"   , "authorization_code");
-            params.add("client_id"    , APPLE_CLIENT_ID);
+            params.add("grant_type", "authorization_code");
+            params.add("client_id", APPLE_CLIENT_ID);
             params.add("client_secret", clientSecret);
-            params.add("code"         , code);
-            params.add("redirect_uri" , APPLE_REDIRECT_URL);
+            params.add("code", code);
+            params.add("redirect_uri", APPLE_REDIRECT_URL);
 
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
@@ -111,79 +110,34 @@ public class AppleService {
                 .email(email).build();
     }
 
-    private String createClientSecret() throws Exception {
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(APPLE_LOGIN_KEY).build();
-        JWTClaimsSet claimsSet = new JWTClaimsSet();
+    private String createClientSecretKey() throws IOException {
+        // headerParams 적재
+        Map<String, Object> headerParamsMap = new HashMap<>();
+        headerParamsMap.put("kid", APPLE_LOGIN_KEY);
+        headerParamsMap.put("alg", "ES256");
 
-        Date now = new Date();
-        claimsSet.setIssuer(APPLE_TEAM_ID);
-        claimsSet.setIssueTime(now);
-        claimsSet.setExpirationTime(new Date(now.getTime() + 3600000));
-        claimsSet.setAudience(APPLE_AUTH_URL);
-        claimsSet.setSubject(APPLE_CLIENT_ID);
-
-        SignedJWT jwt = new SignedJWT(header, claimsSet);
-
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(getPrivateKey());
-        KeyFactory kf = KeyFactory.getInstance("EC");
-
-        try {
-            ECPrivateKey ecPrivateKey = (ECPrivateKey) kf.generatePrivate(spec);
-            JWSSigner jwsSigner = new ECDSASigner(ecPrivateKey.getS());
-
-            jwt.sign(jwsSigner);
-        } catch (JOSEException e) {
-            throw new Exception("Failed create client secret");
-        }
-
-        return jwt.serialize();
+        // clientSecretKey 생성
+        return Jwts
+                .builder()
+                .setHeaderParams(headerParamsMap)
+                .setIssuer(APPLE_TEAM_ID)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 30)) // 만료 시간 (30초)
+                .setAudience(APPLE_AUTH_URL)
+                .setSubject(APPLE_CLIENT_ID)
+                .signWith(SignatureAlgorithm.ES256, getPrivateKey())
+                .compact();
     }
 
-    private byte[] getPrivateKey() throws Exception {
-        byte[] content = null;
-        File file = null;
+    private PrivateKey getPrivateKey() throws IOException {
+        ClassPathResource resource = new ClassPathResource(APPLE_KEY_PATH);
+        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
 
-        URL res = getClass().getResource(APPLE_KEY_PATH);
+        Reader pemReader = new StringReader(privateKey);
+        PEMParser pemParser = new PEMParser(pemReader);
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
 
-        assert res != null;
-        if ("jar".equals(res.getProtocol())) {
-            try {
-                InputStream input = getClass().getResourceAsStream(APPLE_KEY_PATH);
-                file = File.createTempFile("tempfile", ".tmp");
-                OutputStream out = new FileOutputStream(file);
-
-                int read;
-                byte[] bytes = new byte[1024];
-
-                while ((read = input.read(bytes)) != -1) {
-                    out.write(bytes, 0, read);
-                }
-
-                out.close();
-                file.deleteOnExit();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            file = new File(res.getFile());
-        }
-
-        assert file != null;
-        if (file.exists()) {
-            try (FileReader keyReader = new FileReader(file);
-                 PemReader pemReader = new PemReader(keyReader))
-            {
-                PemObject pemObject = pemReader.readPemObject();
-                content = pemObject.getContent();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            throw new Exception("File " + file + " not found");
-        }
-
-        return content;
+        return converter.getPrivateKey(object);
     }
-
-
 }
