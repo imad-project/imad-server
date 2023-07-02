@@ -131,7 +131,8 @@ public class AppleService {
 
     private PrivateKey getPrivateKey() throws IOException {
         ClassPathResource resource = new ClassPathResource(APPLE_KEY_PATH);
-        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+//        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+        String privateKey = new String(resource.getInputStream().readAllBytes());
 
         Reader pemReader = new StringReader(privateKey);
         PEMParser pemParser = new PEMParser(pemReader);
