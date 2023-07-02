@@ -13,6 +13,7 @@
 
 ### Apple clinet secret file
 /src/main/resources/key/AuthKey.p8
+/src/main/resources/ssl/keystore.p12
 
 
 ### Intellij+all ###
