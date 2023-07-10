@@ -94,6 +94,10 @@ public class JwtService {
         response.setHeader(accessHeader, accessToken);
         response.setHeader(refreshHeader, refreshToken);
 
+        // aws 서버에서 refresh 토큰을 받아오지 못하는 에러가 있어 테스트용으로 추가
+        log.info("refresh token : " + response.getHeader(refreshHeader));
+        log.info(response.getHeaderNames().toString());
+
         log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
 
