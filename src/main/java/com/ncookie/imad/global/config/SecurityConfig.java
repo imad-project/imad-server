@@ -106,6 +106,7 @@ public class SecurityConfig {
                         "/api/test/**",
                         "/oauth2/**",
                         "/auth/**",
+                        "/actuator/logfile",     // 브라우저에서
                         "/h2-console/**")
                 .permitAll()
                 .anyRequest().authenticated()
