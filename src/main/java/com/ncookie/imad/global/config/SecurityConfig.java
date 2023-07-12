@@ -44,14 +44,22 @@ import java.io.PrintWriter;
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
-    private final LoginService loginService;
-    private final JwtService jwtService;
+    // 로그인을 위한 유저 repository
     private final UserAccountRepository userRepository;
-    private final ObjectMapper objectMapper;
+
+    // JWT 관련
+    private final JwtService jwtService;
     private final JwtExceptionFilter jwtExceptionFilter;
+
+    // 자체 로그인 관련
+    private final LoginService loginService;
+    private final ObjectMapper objectMapper;
+
+    // 소셜 로그인 관련
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
