@@ -40,6 +40,8 @@ import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 import java.io.PrintWriter;
 
+import static com.ncookie.imad.global.Utils.getClientIP;
+
 
 /**
  * 인증은 CustomJsonUsernamePasswordAuthenticationFilter에서 authenticate()로 인증된 사용자로 처리
@@ -72,8 +74,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println("IP ADDRESS : " + myLocalIpAddress);
-
         ObjectMapper mapper = new ObjectMapper();
 
         AuthenticationEntryPoint unauthorizedEntryPoint =
@@ -209,7 +209,7 @@ public class SecurityConfig {
         IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(ipAddress);
         return (authentication, context) -> {
             HttpServletRequest request = context.getRequest();
-            return new AuthorizationDecision(ipAddressMatcher.matches(request));
+            return new AuthorizationDecision(ipAddressMatcher.matches(getClientIP(request)));
         };
     }
 }
