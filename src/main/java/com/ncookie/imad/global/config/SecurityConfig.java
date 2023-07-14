@@ -14,7 +14,9 @@ import com.ncookie.imad.global.login.service.LoginService;
 import com.ncookie.imad.global.oauth2.handler.OAuth2LoginFailureHandler;
 import com.ncookie.imad.global.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.ncookie.imad.global.oauth2.service.CustomOAuth2UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,7 +34,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 import java.io.PrintWriter;
 
@@ -59,6 +65,9 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+
+    @Value("${ip.local.address}")
+    private String myLocalIpAddress;
 
 
     @Bean
@@ -114,9 +123,9 @@ public class SecurityConfig {
                         "/api/test/**",
                         "/oauth2/**",
                         "/auth/**",
-                        "/actuator/logfile",     // 브라우저에서
                         "/h2-console/**")
                 .permitAll()
+                .requestMatchers("/actuator/**").access(hasIpAddress(myLocalIpAddress))
                 .anyRequest().authenticated()
                 .and()
 
@@ -192,5 +201,13 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationProcessingFilter() {
         return new JwtAuthenticationFilter(jwtService, userRepository);
+    }
+
+    private static AuthorizationManager<RequestAuthorizationContext> hasIpAddress(String ipAddress) {
+        IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(ipAddress);
+        return (authentication, context) -> {
+            HttpServletRequest request = context.getRequest();
+            return new AuthorizationDecision(ipAddressMatcher.matches(request));
+        };
     }
 }
