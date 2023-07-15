@@ -92,11 +92,11 @@ public class JwtService {
         response.setStatus(HttpServletResponse.SC_OK);
 
 
-        response.setHeader(accessHeader, accessToken);
-        response.setHeader(refreshHeader, refreshToken);
-
         response.setHeader("authorization", accessToken);
         response.setHeader("authorization-refresh", refreshToken);
+
+//        response.setHeader(accessHeader, accessToken);
+//        response.setHeader(refreshHeader, refreshToken);
 
         // aws 서버에서 refresh 토큰을 받아오지 못하는 에러가 있어 테스트용으로 추가
         log.info("refresh token : " + response.getHeader("authorization-refresh"));
