@@ -1,5 +1,7 @@
 package com.ncookie.imad.global.oauth2.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.global.oauth2.dto.AppleDTO;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
@@ -11,19 +13,20 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.security.PrivateKey;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,28 +58,24 @@ public class AppleService {
                 + "&response_type=code%20id_token&scope=name%20email&response_mode=form_post";
     }
 
-    public AppleDTO getAppleInfo(String code) throws Exception {
-        if (code == null) throw new Exception("Failed get authorization code");
+    public String generateAuthToken(String code) throws IOException {
+        if (code == null) throw new IllegalArgumentException("Failed get authorization code");
 
-        String clientSecret = createClientSecretKey();
-        String userId;
-        String email;
-        String accessToken;
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", APPLE_CLIENT_ID);
+        params.add("client_secret", createClientSecretKey());
+        params.add("code", code);
+        params.add("redirect_uri", APPLE_REDIRECT_URL);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
 
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-type", "application/x-www-form-urlencoded");
-
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("grant_type", "authorization_code");
-            params.add("client_id", APPLE_CLIENT_ID);
-            params.add("client_secret", clientSecret);
-            params.add("code", code);
-            params.add("redirect_uri", APPLE_REDIRECT_URL);
-
-            RestTemplate restTemplate = new RestTemplate();
-            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
-
             ResponseEntity<String> response = restTemplate.exchange(
                     APPLE_AUTH_URL + "/auth/token",
                     HttpMethod.POST,
@@ -84,12 +83,24 @@ public class AppleService {
                     String.class
             );
 
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new IllegalArgumentException("Apple Auth Token Error");
+        }
+    }
+
+    public AppleDTO getAppleInfo(String code) throws java.text.ParseException {
+        String userId;
+        String email;
+        String accessToken;
+
+        try {
             JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(generateAuthToken(code));
 
             accessToken = String.valueOf(jsonObj.get("access_token"));
 
-            //ID TOKEN을 통해 회원 고유 식별자 받기
+            // ID TOKEN을 통해 회원 고유 식별자 받기
             SignedJWT signedJWT = SignedJWT.parse(String.valueOf(jsonObj.get("id_token")));
             ReadOnlyJWTClaimsSet getPayload = signedJWT.getJWTClaimsSet();
 
@@ -97,15 +108,17 @@ public class AppleService {
             JSONObject payload = objectMapper.readValue(getPayload.toJSONObject().toJSONString(), JSONObject.class);
 
             userId = String.valueOf(payload.get("sub"));
-            email  = String.valueOf(payload.get("email"));
-        } catch (Exception e) {
-            throw new Exception("API call failed");
-        }
+            email = String.valueOf(payload.get("email"));
 
-        return AppleDTO.builder()
-                .id(userId)
-                .token(accessToken)
-                .email(email).build();
+            return AppleDTO.builder()
+                    .id(userId)
+                    .token(accessToken)
+                    .email(email).build();
+        } catch (ParseException | JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse json data");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String createClientSecretKey() throws IOException {
