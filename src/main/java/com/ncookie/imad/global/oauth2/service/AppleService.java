@@ -1,7 +1,6 @@
 package com.ncookie.imad.global.oauth2.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.global.oauth2.dto.AppleDTO;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
@@ -17,7 +16,6 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
