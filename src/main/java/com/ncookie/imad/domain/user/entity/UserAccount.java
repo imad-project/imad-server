@@ -40,7 +40,8 @@ public class UserAccount extends BaseTimeEntity {
     @Column(nullable = false)
     private AuthProvider authProvider;
 
-    private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
+    private String socialId;            // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
+    @Setter private String oauth2AccessToken;   // oauth2 업체와의 연결 해제, 발급받은 토큰 revoke 등을 처리할 때 사용
     private String refreshToken;
 
     // 유저 권한 설정 메소드
