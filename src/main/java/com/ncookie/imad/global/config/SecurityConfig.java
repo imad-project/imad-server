@@ -120,6 +120,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/api/signup",
+                        "/login/**",        // 소셜 로그인 redirect url
                         "/api/user/validation/**",
                         "/api/callback/**",
                         "/api/test/**",
