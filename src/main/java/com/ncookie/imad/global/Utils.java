@@ -41,7 +41,7 @@ public class Utils {
         return ip;
     }
 
-    public static String logStringWithOauthProvider(AuthProvider provider) {
-        return "[" + provider.getAuthProvider() + "] ";
+    public static void logWithOauthProvider(AuthProvider provider, String msg) {
+        log.info("[" + provider.getAuthProvider() + "] " + msg);
     }
 }
