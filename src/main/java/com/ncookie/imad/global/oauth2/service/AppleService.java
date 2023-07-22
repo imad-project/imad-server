@@ -6,11 +6,12 @@ import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
-import com.ncookie.imad.global.oauth2.dto.AppleDTO;
+import com.ncookie.imad.global.jwt.service.JwtService;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -38,6 +39,7 @@ import java.util.*;
 public class AppleService {
 
     private final UserAccountRepository userRepository;
+    private final JwtService jwtService;
 
     @Value("${apple.team-id}")
     private String APPLE_TEAM_ID;
@@ -63,10 +65,12 @@ public class AppleService {
                 + "&response_type=code%20id_token&scope=name%20email&response_mode=form_post";
     }
 
-    public UserAccount login(String code) {
+    public UserAccount login(String code, HttpServletResponse response) {
         String userId;
         String email;
         String accessToken;
+
+        UserAccount user;
 
         try {
             JSONParser jsonParser = new JSONParser();
@@ -88,10 +92,10 @@ public class AppleService {
                     .findByAuthProviderAndSocialId(AuthProvider.APPLE, userId)
                     .orElse(null);
 
-            // 신규 회원가입의 경우 DB에 저장
             if (findUser == null) {
+                // 신규 회원가입의 경우 DB에 저장
                 log.info("[" + AuthProvider.APPLE.getAuthProvider() + "]" + "신규 회원가입 DB 저장");
-                return userRepository.save(
+                user = userRepository.save(
                         UserAccount.builder()
                                 .authProvider(AuthProvider.APPLE)
                                 .socialId(userId)
@@ -100,17 +104,29 @@ public class AppleService {
                                 .oauth2AccessToken(accessToken)
                                 .build()
                 );
+            } else {
+                // 기존 회원의 경우 access token 업데이트를 위해 DB에 저장
+                log.info("[" + AuthProvider.APPLE.getAuthProvider() + "]" + "기존 회원 DB 업데이트");
+                findUser.setOauth2AccessToken(accessToken);
+                user = userRepository.save(findUser);
             }
 
-            // 기존 회원의 경우 access token 업데이트를 위해 DB에 저장
-            log.info("[" + AuthProvider.APPLE.getAuthProvider() + "]" + "기존 회원 DB 업데이트");
-            findUser.setOauth2AccessToken(accessToken);
-            return userRepository.save(findUser);
+            loginSuccess(user, response);
+            return user;
+
         } catch (ParseException | JsonProcessingException e) {
             throw new RuntimeException("Failed to parse json data");
         } catch (IOException | java.text.ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void loginSuccess(UserAccount user, HttpServletResponse response) {
+        String accessToken = jwtService.createAccessToken(user.getEmail());
+        String refreshToken = jwtService.createRefreshToken();
+
+        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        jwtService.updateRefreshToken(user.getEmail(), refreshToken);
     }
 
     public String generateAuthToken(String code) throws IOException {
