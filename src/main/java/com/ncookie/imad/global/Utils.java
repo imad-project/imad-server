@@ -1,5 +1,6 @@
 package com.ncookie.imad.global;
 
+import com.ncookie.imad.domain.user.entity.AuthProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,5 +39,9 @@ public class Utils {
         log.info("> Result : IP Address : "+ip);
 
         return ip;
+    }
+
+    public static String logStringWithOauthProvider(AuthProvider provider) {
+        return "[" + provider.getAuthProvider() + "] ";
     }
 }
