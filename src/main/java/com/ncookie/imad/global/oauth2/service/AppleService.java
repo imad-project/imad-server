@@ -34,6 +34,8 @@ import java.io.*;
 import java.security.PrivateKey;
 import java.util.*;
 
+import static com.ncookie.imad.global.Utils.logStringWithOauthProvider;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -96,7 +98,7 @@ public class AppleService {
 
             if (findUser == null) {
                 // 신규 회원가입의 경우 DB에 저장
-                log.info("[" + AuthProvider.APPLE.getAuthProvider() + "]" + "신규 회원가입 DB 저장");
+                log.info(logStringWithOauthProvider(AuthProvider.APPLE) + "신규 회원가입 DB 저장");
                 user = userRepository.save(
                         UserAccount.builder()
                                 .authProvider(AuthProvider.APPLE)
@@ -108,7 +110,7 @@ public class AppleService {
                 );
             } else {
                 // 기존 회원의 경우 access token 업데이트를 위해 DB에 저장
-                log.info("[" + AuthProvider.APPLE.getAuthProvider() + "]" + "기존 회원 DB 업데이트");
+                log.info(logStringWithOauthProvider(AuthProvider.APPLE) + "기존 회원 DB 업데이트");
                 findUser.setOauth2AccessToken(accessToken);
                 user = userRepository.save(findUser);
             }
