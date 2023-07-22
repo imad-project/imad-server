@@ -2,11 +2,17 @@ package com.ncookie.imad.global.oauth2.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncookie.imad.domain.user.entity.AuthProvider;
+import com.ncookie.imad.domain.user.entity.Role;
+import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.oauth2.dto.AppleDTO;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -24,13 +30,14 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.security.PrivateKey;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class AppleService {
+
+    private final UserAccountRepository userRepository;
 
     @Value("${apple.team-id}")
     private String APPLE_TEAM_ID;
@@ -49,11 +56,61 @@ public class AppleService {
 
     private final static String APPLE_AUTH_URL = "https://appleid.apple.com";
 
-    public String getAppleLogin() {
+    public String getAppleLoginUrl() {
         return APPLE_AUTH_URL + "/auth/authorize"
                 + "?client_id=" + APPLE_CLIENT_ID
                 + "&redirect_uri=" + APPLE_REDIRECT_URL
                 + "&response_type=code%20id_token&scope=name%20email&response_mode=form_post";
+    }
+
+    public UserAccount login(String code) {
+        String userId;
+        String email;
+        String accessToken;
+
+        try {
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(generateAuthToken(code));
+
+            accessToken = String.valueOf(jsonObj.get("access_token"));
+
+            // ID TOKEN을 통해 회원 고유 식별자 받기
+            SignedJWT signedJWT = SignedJWT.parse(String.valueOf(jsonObj.get("id_token")));
+            ReadOnlyJWTClaimsSet getPayload = signedJWT.getJWTClaimsSet();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JSONObject payload = objectMapper.readValue(getPayload.toJSONObject().toJSONString(), JSONObject.class);
+
+            userId = String.valueOf(payload.get("sub"));
+            email = String.valueOf(payload.get("email"));
+
+            UserAccount findUser = userRepository
+                    .findByAuthProviderAndSocialId(AuthProvider.APPLE, userId)
+                    .orElse(null);
+
+            // 신규 회원가입의 경우 DB에 저장
+            if (findUser == null) {
+                log.info("[" + AuthProvider.APPLE.getAuthProvider() + "]" + "신규 회원가입 DB 저장");
+                return userRepository.save(
+                        UserAccount.builder()
+                                .authProvider(AuthProvider.APPLE)
+                                .socialId(userId)
+                                .email(email)
+                                .role(Role.GUEST)
+                                .oauth2AccessToken(accessToken)
+                                .build()
+                );
+            }
+
+            // 기존 회원의 경우 access token 업데이트를 위해 DB에 저장
+            log.info("[" + AuthProvider.APPLE.getAuthProvider() + "]" + "기존 회원 DB 업데이트");
+            findUser.setOauth2AccessToken(accessToken);
+            return userRepository.save(findUser);
+        } catch (ParseException | JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse json data");
+        } catch (IOException | java.text.ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String generateAuthToken(String code) throws IOException {
@@ -84,38 +141,6 @@ public class AppleService {
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new IllegalArgumentException("Apple Auth Token Error");
-        }
-    }
-
-    public AppleDTO getAppleInfo(String code) throws java.text.ParseException {
-        String userId;
-        String email;
-        String accessToken;
-
-        try {
-            JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObj = (JSONObject) jsonParser.parse(generateAuthToken(code));
-
-            accessToken = String.valueOf(jsonObj.get("access_token"));
-
-            // ID TOKEN을 통해 회원 고유 식별자 받기
-            SignedJWT signedJWT = SignedJWT.parse(String.valueOf(jsonObj.get("id_token")));
-            ReadOnlyJWTClaimsSet getPayload = signedJWT.getJWTClaimsSet();
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            JSONObject payload = objectMapper.readValue(getPayload.toJSONObject().toJSONString(), JSONObject.class);
-
-            userId = String.valueOf(payload.get("sub"));
-            email = String.valueOf(payload.get("email"));
-
-            return AppleDTO.builder()
-                    .id(userId)
-                    .token(accessToken)
-                    .email(email).build();
-        } catch (ParseException | JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse json data");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

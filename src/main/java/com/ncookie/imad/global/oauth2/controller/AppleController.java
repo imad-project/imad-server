@@ -1,5 +1,7 @@
 package com.ncookie.imad.global.oauth2.controller;
 
+import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.oauth2.dto.AppleDTO;
 import com.ncookie.imad.global.oauth2.dto.MsgEntity;
 import com.ncookie.imad.global.oauth2.service.AppleService;
@@ -15,10 +17,11 @@ public class AppleController {
     private final AppleService appleService;
 
     @PostMapping("/api/callback/apple")
-    public ResponseEntity<MsgEntity> callback(HttpServletRequest request) throws Exception {
-        AppleDTO appleInfo = appleService.getAppleInfo(request.getParameter("code"));
+    public ApiResponse<?> callback(HttpServletRequest request) {
+        if (appleService.login(request.getParameter("code")) != null) {
+            return ApiResponse.createSuccessWithNoContent(ResponseCode.LOGIN_SUCCESS);
+        }
 
-        return ResponseEntity.ok()
-                .body(new MsgEntity("Success", appleInfo));
+        return ApiResponse.createError(ResponseCode.LOGIN_FAILURE);
     }
 }
