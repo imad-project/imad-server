@@ -20,4 +20,22 @@ public class RevokeController {
         revokeService.deleteAppleAccount(accessToken);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_DELETE_SUCCESS);
     }
+
+    @DeleteMapping("/api/oauth2/revoke/google")
+    public ApiResponse<?> revokeGoogleAccount(@RequestHeader("Authorization") String accessToken) {
+        revokeService.deleteGoogleAccount(accessToken);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_DELETE_SUCCESS);
+    }
+
+    @DeleteMapping("/api/oauth2/revoke/naver")
+    public ApiResponse<?> revokeNaverAccount(@RequestHeader("Authorization") String accessToken) {
+        revokeService.deleteNaverAccount(accessToken);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_DELETE_SUCCESS);
+    }
+
+    @DeleteMapping("/api/oauth2/revoke/kakao")
+    public ApiResponse<?> revokeKakaoAccount(@RequestHeader("Authorization") String accessToken) {
+        revokeService.deleteKakaoAccount(accessToken);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_DELETE_SUCCESS);
+    }
 }
