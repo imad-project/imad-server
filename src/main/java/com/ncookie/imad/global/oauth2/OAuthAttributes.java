@@ -17,8 +17,8 @@ import java.util.UUID;
 @Getter
 public class OAuthAttributes {
 
-    private String nameAttributeKey; // OAuth2 로그인 진행 시 키가 되는 필드 값, PK와 같은 의미
-    private OAuth2UserInfo oauth2UserInfo; // 소셜 타입별 로그인 유저 정보(닉네임, 이메일, 프로필 사진 등등)
+    private final String nameAttributeKey; // OAuth2 로그인 진행 시 키가 되는 필드 값, PK와 같은 의미
+    private final OAuth2UserInfo oauth2UserInfo; // 소셜 타입별 로그인 유저 정보(닉네임, 이메일, 프로필 사진 등등)
 
     @Builder
     public OAuthAttributes(String nameAttributeKey, OAuth2UserInfo oauth2UserInfo) {
@@ -76,17 +76,19 @@ public class OAuthAttributes {
     }
 
     /**
+     * @param oauth2AccessToken : 토큰 revoke를 위해 사용되는 oauth2 업체 측의 access token
      * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태
      * OAuth2UserInfo에서 socialId(식별값), nickname, imageUrl을 가져와서 build
      * email에는 UUID로 중복 없는 랜덤 값 생성
      * role은 GUEST로 설정
      */
-    public UserAccount toEntity(AuthProvider authProvider, OAuth2UserInfo oauth2UserInfo) {
+    public UserAccount toEntity(AuthProvider authProvider, OAuth2UserInfo oauth2UserInfo, String oauth2AccessToken) {
         return UserAccount.builder()
                 .authProvider(authProvider)
                 .socialId(oauth2UserInfo.getId())
                 .email(UUID.randomUUID() + "@socialUser.com")
                 .role(Role.GUEST)
+                .oauth2AccessToken(oauth2AccessToken)
                 .build();
     }
 }

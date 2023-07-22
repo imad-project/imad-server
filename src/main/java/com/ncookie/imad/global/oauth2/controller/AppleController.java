@@ -1,13 +1,14 @@
 package com.ncookie.imad.global.oauth2.controller;
 
-import com.ncookie.imad.global.oauth2.dto.AppleDTO;
-import com.ncookie.imad.global.oauth2.dto.MsgEntity;
+import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.oauth2.service.AppleService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -15,10 +16,12 @@ public class AppleController {
     private final AppleService appleService;
 
     @PostMapping("/api/callback/apple")
-    public ResponseEntity<MsgEntity> callback(HttpServletRequest request) throws Exception {
-        AppleDTO appleInfo = appleService.getAppleInfo(request.getParameter("code"));
+    public ApiResponse<?> callback(HttpServletRequest request, HttpServletResponse response) {
+        // 애플 회원가입 또는 로그인 실패
+        if (appleService.login(request.getParameter("code"), response) == null) {
+            return ApiResponse.createError(ResponseCode.LOGIN_FAILURE);
+        }
 
-        return ResponseEntity.ok()
-                .body(new MsgEntity("Success", appleInfo));
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.LOGIN_SUCCESS);
     }
 }

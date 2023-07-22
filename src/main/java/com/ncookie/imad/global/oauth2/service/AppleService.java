@@ -1,35 +1,48 @@
 package com.ncookie.imad.global.oauth2.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ncookie.imad.global.oauth2.dto.AppleDTO;
+import com.ncookie.imad.domain.user.entity.AuthProvider;
+import com.ncookie.imad.domain.user.entity.Role;
+import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.jwt.service.JwtService;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.security.PrivateKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import static com.ncookie.imad.global.Utils.logWithOauthProvider;
+
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class AppleService {
+
+    private final UserAccountRepository userRepository;
+    private final JwtService jwtService;
 
     @Value("${apple.team-id}")
     private String APPLE_TEAM_ID;
@@ -37,6 +50,7 @@ public class AppleService {
     @Value("${apple.login-key}")
     private String APPLE_LOGIN_KEY;
 
+    @Getter
     @Value("${apple.client-id}")
     private String APPLE_CLIENT_ID;
 
@@ -48,48 +62,27 @@ public class AppleService {
 
     private final static String APPLE_AUTH_URL = "https://appleid.apple.com";
 
-    public String getAppleLogin() {
+    public String getAppleLoginUrl() {
         return APPLE_AUTH_URL + "/auth/authorize"
                 + "?client_id=" + APPLE_CLIENT_ID
                 + "&redirect_uri=" + APPLE_REDIRECT_URL
                 + "&response_type=code%20id_token&scope=name%20email&response_mode=form_post";
     }
 
-    public AppleDTO getAppleInfo(String code) throws Exception {
-        if (code == null) throw new Exception("Failed get authorization code");
-
-        String clientSecret = createClientSecretKey();
+    public UserAccount login(String code, HttpServletResponse response) {
         String userId;
         String email;
         String accessToken;
 
+        UserAccount user;
+
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-type", "application/x-www-form-urlencoded");
-
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("grant_type", "authorization_code");
-            params.add("client_id", APPLE_CLIENT_ID);
-            params.add("client_secret", clientSecret);
-            params.add("code", code);
-            params.add("redirect_uri", APPLE_REDIRECT_URL);
-
-            RestTemplate restTemplate = new RestTemplate();
-            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(
-                    APPLE_AUTH_URL + "/auth/token",
-                    HttpMethod.POST,
-                    httpEntity,
-                    String.class
-            );
-
             JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(generateAuthToken(code));
 
             accessToken = String.valueOf(jsonObj.get("access_token"));
 
-            //ID TOKEN을 통해 회원 고유 식별자 받기
+            // ID TOKEN을 통해 회원 고유 식별자 받기
             SignedJWT signedJWT = SignedJWT.parse(String.valueOf(jsonObj.get("id_token")));
             ReadOnlyJWTClaimsSet getPayload = signedJWT.getJWTClaimsSet();
 
@@ -97,18 +90,81 @@ public class AppleService {
             JSONObject payload = objectMapper.readValue(getPayload.toJSONObject().toJSONString(), JSONObject.class);
 
             userId = String.valueOf(payload.get("sub"));
-            email  = String.valueOf(payload.get("email"));
-        } catch (Exception e) {
-            throw new Exception("API call failed");
-        }
+            email = String.valueOf(payload.get("email"));
 
-        return AppleDTO.builder()
-                .id(userId)
-                .token(accessToken)
-                .email(email).build();
+            UserAccount findUser = userRepository
+                    .findByAuthProviderAndSocialId(AuthProvider.APPLE, userId)
+                    .orElse(null);
+
+            if (findUser == null) {
+                // 신규 회원가입의 경우 DB에 저장
+                logWithOauthProvider(AuthProvider.APPLE, "신규 회원가입 DB 저장");
+                user = userRepository.save(
+                        UserAccount.builder()
+                                .authProvider(AuthProvider.APPLE)
+                                .socialId(userId)
+                                .email(email)
+                                .role(Role.GUEST)
+                                .oauth2AccessToken(accessToken)
+                                .build()
+                );
+            } else {
+                // 기존 회원의 경우 access token 업데이트를 위해 DB에 저장
+                logWithOauthProvider(AuthProvider.APPLE, "기존 회원 DB 업데이트");
+                findUser.setOauth2AccessToken(accessToken);
+                user = userRepository.save(findUser);
+            }
+
+            loginSuccess(user, response);
+            return user;
+
+        } catch (ParseException | JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse json data");
+        } catch (IOException | java.text.ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private String createClientSecretKey() throws IOException {
+    public void loginSuccess(UserAccount user, HttpServletResponse response) {
+        String accessToken = jwtService.createAccessToken(user.getEmail());
+        String refreshToken = jwtService.createRefreshToken();
+
+        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        jwtService.updateRefreshToken(user.getEmail(), refreshToken);
+    }
+
+    public String generateAuthToken(String code) throws IOException {
+        if (code == null) throw new IllegalArgumentException("Failed get authorization code");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", APPLE_CLIENT_ID);
+        params.add("client_secret", createClientSecretKey());
+        params.add("code", code);
+        params.add("redirect_uri", APPLE_REDIRECT_URL);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    APPLE_AUTH_URL + "/auth/token",
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
+
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new IllegalArgumentException("Apple Auth Token Error");
+        }
+    }
+
+    public String createClientSecretKey() throws IOException {
         // headerParams 적재
         Map<String, Object> headerParamsMap = new HashMap<>();
         headerParamsMap.put("kid", APPLE_LOGIN_KEY);
