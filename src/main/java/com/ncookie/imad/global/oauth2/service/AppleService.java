@@ -12,6 +12,7 @@ import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -47,6 +48,7 @@ public class AppleService {
     @Value("${apple.login-key}")
     private String APPLE_LOGIN_KEY;
 
+    @Getter
     @Value("${apple.client-id}")
     private String APPLE_CLIENT_ID;
 
@@ -160,7 +162,7 @@ public class AppleService {
         }
     }
 
-    private String createClientSecretKey() throws IOException {
+    public String createClientSecretKey() throws IOException {
         // headerParams 적재
         Map<String, Object> headerParamsMap = new HashMap<>();
         headerParamsMap.put("kid", APPLE_LOGIN_KEY);

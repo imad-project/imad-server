@@ -121,10 +121,10 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/api/signup",
                         "/login/**",        // 소셜 로그인 redirect url
+                        "/api/oauth2/**",
                         "/api/user/validation/**",
                         "/api/callback/**",
                         "/api/test/**",
-                        "/oauth2/**",
                         "/auth/**",
                         "/h2-console/**")
                 .permitAll()
