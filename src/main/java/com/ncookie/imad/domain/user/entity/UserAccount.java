@@ -3,18 +3,16 @@ package com.ncookie.imad.domain.user.entity;
 import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Builder
-@Getter
-@ToString
 @Table(indexes = {
         @Index(columnList = "user_id"),
         @Index(columnList = "email", unique = true),
         @Index(columnList = "nickname", unique = true)
 })
+@Builder
+@Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
