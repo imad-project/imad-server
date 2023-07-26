@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Crew {
+public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long crewId;
+    private Long personId;
 
-    @OneToMany(mappedBy = "crew")
-    private List<ContentsCrew> contentsActors = new ArrayList<>();
+    @OneToMany(mappedBy = "person")
+    private List<Filmography> filmography = new ArrayList<>();
 }
