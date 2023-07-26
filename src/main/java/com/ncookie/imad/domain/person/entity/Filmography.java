@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.person.entity;
 
+import com.ncookie.imad.domain.contents.entity.Contents;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +18,11 @@ public class Filmography {
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person person;
+
+    @ManyToOne
+    @JoinColumn(name = "contents_id")
+    private Contents contents;
+
 
     @Setter
     // 담당부서
