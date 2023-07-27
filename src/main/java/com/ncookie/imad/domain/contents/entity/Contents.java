@@ -50,6 +50,6 @@ public class Contents {
     @Setter private String certification;
 
     @Setter private int reviewCnt;
-    @Setter private int articleCnt;
+    @Setter private int postingCnt;
     @Setter private float imadScore;
 }
