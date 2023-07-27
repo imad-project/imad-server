@@ -22,9 +22,9 @@ public class Contents {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "contents_id")
-    private Long id;
+    private Long contentsId;
 
-    @Setter private int tmdb_id;
+    @Setter private Long tmdbId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "contents_type", nullable = false)
@@ -33,7 +33,7 @@ public class Contents {
     @Setter private String translatedTitle;
     @Setter private String originalTitle;
     @Setter private String originalLanguage;
-    @Setter private String tagLine;
+    @Setter private String tagline;
 
     @Column(length = 1000)
     @Setter private String overview;

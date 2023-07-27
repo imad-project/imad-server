@@ -12,8 +12,7 @@ import lombok.*;
 public class Networks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "networks_id")
-    private Long networks_id;
+    private Long networksId;
 
     @Setter private String networksName;
     @Setter private String logoPath;

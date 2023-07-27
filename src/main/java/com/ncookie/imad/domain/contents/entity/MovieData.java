@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @DiscriminatorValue("movie")
