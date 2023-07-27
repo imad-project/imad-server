@@ -27,5 +27,5 @@ public class UserPreferredGenre {
 
     @Setter
     // 장르 선호 점수. 작품 추천 등을 할 때 사용됨
-    private int rate;
+    private int genreRate;
 }
