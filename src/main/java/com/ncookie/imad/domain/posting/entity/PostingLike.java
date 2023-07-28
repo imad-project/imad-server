@@ -26,5 +26,6 @@ public class PostingLike {
     private UserAccount userAccount;
 
     @Setter
+    // 추천이면 +1, 비추천이면 -1, 아무 상태도 아니면 해당 데이터 삭제
     private int likeStatus;
 }
