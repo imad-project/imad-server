@@ -1,14 +1,9 @@
 package com.ncookie.imad.domain.contents.entity;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @ToString
@@ -17,23 +12,18 @@ import java.util.List;
 @DiscriminatorValue("tv")
 @Entity
 public class TvProgramData extends Contents {
-    @Setter private LocalDate createdDate;
-    @Setter private LocalDate modifiedDate;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long tvProgramDataId;
 
-    @Setter private int numberOfEpisodes;
-    @Setter private int numberOfSeasons;
+    @Setter
+    private LocalDate firstAirDate;
 
-    @ManyToMany
-    @JoinTable(name = "broadcaster")
-    @ToString.Exclude
-    private List<Networks> networks = new ArrayList<>();
+    @Setter
+    private LocalDate lastAirDate;
 
-    @ManyToMany
-    @JoinTable(name = "season_collection")
-    @ToString.Exclude
-    private List<Season> seasonCollection = new ArrayList<>();
+    @Setter
+    private int numberOfEpisodes;
 
-    public void setNetworks(List<Networks> networks) {
-        this.networks = networks;
-    }
+    @Setter
+    private int numberOfSeasons;
 }

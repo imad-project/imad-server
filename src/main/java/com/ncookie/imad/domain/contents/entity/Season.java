@@ -14,10 +14,9 @@ import java.time.LocalDate;
 public class Season {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "networks_id")
-    private Long season_id;
+    private Long seasonId;
 
-    @Setter private String name;
+    @Setter private String seasonName;
     @Setter private LocalDate airDate;
     @Setter private int episodeCount;
     @Setter private String overview;

@@ -22,18 +22,20 @@ public class Contents {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "contents_id")
-    private Long id;
+    private Long contentsId;
 
-    @Setter private int tmdb_id;
+    @Setter private Long tmdbId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "contents_type", nullable = false)
+    // MOVIE, TV, ANIMATION으로 구성되어 있음
+    // TV와 ANIMATION은 사실상 같은 구조를 가지고 있지만 애니메이션을 따로 분류하기 위해 장르의 `animation`으로 구분함
     private ContentsType contentsType;
 
     @Setter private String translatedTitle;
     @Setter private String originalTitle;
     @Setter private String originalLanguage;
-    @Setter private String tagLine;
+    @Setter private String tagline;
 
     @Column(length = 1000)
     @Setter private String overview;
@@ -47,9 +49,11 @@ public class Contents {
     @Builder.Default
     private List<String> productionCountries = new ArrayList<>();
 
-    @Setter private String certification;
+    @Setter
+    // 시청 등급
+    private String certification;
 
     @Setter private int reviewCnt;
-    @Setter private int articleCnt;
+    @Setter private int postingCnt;
     @Setter private float imadScore;
 }
