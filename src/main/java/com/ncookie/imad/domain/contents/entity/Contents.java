@@ -28,6 +28,8 @@ public class Contents {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "contents_type", nullable = false)
+    // MOVIE, TV, ANIMATION으로 구성되어 있음
+    // TV와 ANIMATION은 사실상 같은 구조를 가지고 있지만 애니메이션을 따로 분류하기 위해 장르의 `animation`으로 구분함
     private ContentsType contentsType;
 
     @Setter private String translatedTitle;
@@ -47,7 +49,9 @@ public class Contents {
     @Builder.Default
     private List<String> productionCountries = new ArrayList<>();
 
-    @Setter private String certification;
+    @Setter
+    // 시청 등급
+    private String certification;
 
     @Setter private int reviewCnt;
     @Setter private int postingCnt;
