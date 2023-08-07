@@ -15,7 +15,7 @@ public interface TmdbFeignClient {
             @RequestHeader(value = "accept") String acceptHeader,
             @RequestParam(value = "query") String keyword,
             @RequestParam(value = "include_adult", defaultValue = "true", required = false) boolean includeAdult,
-            @RequestParam String language,
+            @RequestParam(value = "language") String language,
             @RequestParam(value = "page") int page
     );
 }
