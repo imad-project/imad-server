@@ -1,11 +1,13 @@
 package com.ncookie.imad.domain.contents.service;
 
+import com.ncookie.imad.domain.contents.dto.SearchResponse;
 import com.ncookie.imad.global.openfeign.TmdbFeignClient;
-import feign.Response;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+
 
 @RequiredArgsConstructor
 @Transactional
@@ -13,11 +15,12 @@ import org.springframework.stereotype.Service;
 public class ContentsService {
     private final TmdbFeignClient feignClient;
 
-    String apiKey = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4ODM2NWNmNmJkYzZjNDYwMTViZjg1YzczMWRmYWI4ZiIsInN1YiI6IjY0NTRlZmFhZDQ4Y2VlMDEzNmRhMWM1MyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.QZC-wgg4ipi9UgxmLjrTzUtrW6C8S5u_pINevgwr97k";
+    @Value("${tmdb.api.api-key}")
+    private String apiKey;
 
 
     public void searchKeywords() {
-        Response response = feignClient.searchByKeywords(
+        SearchResponse response = feignClient.searchMultiByQuery(
                 apiKey,
                 MediaType.APPLICATION_JSON_VALUE,
                 "breaking",
@@ -25,7 +28,5 @@ public class ContentsService {
                 "ko-kr",
                 1
         );
-        System.out.println(response.status());
-        System.out.println(response.body());
     }
 }
