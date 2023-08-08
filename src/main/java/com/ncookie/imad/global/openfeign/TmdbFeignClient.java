@@ -22,4 +22,24 @@ public interface TmdbFeignClient {
             @RequestParam(value = "language") String language,
             @RequestParam(value = "page") int page
     );
+
+    @GetMapping(value = "/search/tv")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    SearchResponse searchTvByQuery(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "query") String query,
+            @RequestParam(value = "include_adult") boolean includeAdult,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
+
+    @GetMapping(value = "/search/movie")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    SearchResponse searchMovieByQuery(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "query") String query,
+            @RequestParam(value = "include_adult") boolean includeAdult,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
 }

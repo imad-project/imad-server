@@ -1,6 +1,8 @@
 package com.ncookie.imad.global.openfeign;
 
 import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
+import com.ncookie.imad.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -15,13 +17,13 @@ public class TmdbApiClient {
 
     private final String language = "ko-kr";
 
-    public SearchResponse searchMultiByQuery(String query) {
-        return feignClient.searchMultiByQuery(
-                apiProperties.getApiKey(),
-                query,
-                true,
-                language,
-                1
-        );
+    // 쿼리로 작품 검색. 전체 / TV / 영화 별로 검색할 수 있음
+    public SearchResponse searchByQuery(String query, String type, int page) {
+        return switch (type) {
+            case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, true, language, page);
+            case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, true, language, page);
+            case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, true, language, page);
+            default -> throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
+        };
     }
 }
