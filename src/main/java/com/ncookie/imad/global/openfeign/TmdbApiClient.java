@@ -2,9 +2,11 @@ package com.ncookie.imad.global.openfeign;
 
 import com.ncookie.imad.domain.contents.dto.SearchResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 // TMDB API를 사용하기 위한 메소드들을 모아놓은 클래스
+@EnableConfigurationProperties({ TmdbApiProperties.class })
 @RequiredArgsConstructor
 @Component
 public class TmdbApiClient {
