@@ -1,5 +1,8 @@
 package com.ncookie.imad.global.dto.response;
 
+import lombok.Getter;
+
+@Getter
 public enum ResponseCode {
 
     // Common
@@ -29,6 +32,10 @@ public enum ResponseCode {
     USER_NOT_FOUND(404,  "해당 계정을 찾을 수 없습니다."),
     USER_MODIFY_PASSWORD_FAILURE(404,  "기존 비밀번호를 다시 확인해주세요."),
 
+    // 작품 관련
+    CONTENTS_SEARCH_SUCCESS(200, "성공적으로 작품 검색을 완료했습니다."),
+    CONTENTS_SEARCH_WRONG_TYPE(200, "잘못된 검색 타입입니다."),
+
 
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
     INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),
@@ -50,10 +57,4 @@ public enum ResponseCode {
         this.message = message;
     }
 
-    public String getMessage() {
-        return this.message;
-    }
-    public int getStatus() {
-        return status;
-    }
 }

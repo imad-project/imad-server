@@ -7,6 +7,9 @@
 ### JPA Buddy
 .jpb/
 
+### IntelliJ configuration file
+.run/*
+
 ### yml configuration file
 /src/main/resources/application-local.yml
 /src/main/resources/application-aws.yml
