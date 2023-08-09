@@ -1,5 +1,8 @@
 package com.ncookie.imad.global.dto.response;
 
+import lombok.Getter;
+
+@Getter
 public enum ResponseCode {
 
     // Common
@@ -54,10 +57,4 @@ public enum ResponseCode {
         this.message = message;
     }
 
-    public String getMessage() {
-        return this.message;
-    }
-    public int getStatus() {
-        return status;
-    }
 }
