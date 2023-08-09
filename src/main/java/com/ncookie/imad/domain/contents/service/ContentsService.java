@@ -17,4 +17,8 @@ public class ContentsService {
     public SearchResponse searchKeywords(String query, String type, int page) {
         return apiClient.searchByQuery(query, type, page);
     }
+
+    public void getContentsDetails(int id, String type) {
+        apiClient.getContentsDetails(id, type);
+    }
 }

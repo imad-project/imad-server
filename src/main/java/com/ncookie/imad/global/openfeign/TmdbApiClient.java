@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 // TMDB API를 사용하기 위한 메소드들을 모아놓은 클래스
 @EnableConfigurationProperties({ TmdbApiProperties.class })
 @RequiredArgsConstructor
@@ -16,6 +20,8 @@ public class TmdbApiClient {
     private final TmdbApiProperties apiProperties;
 
     private final String language = "ko-kr";
+    private final List<String> appendResponseForDetails = new ArrayList<>(Arrays.asList("credits", "images", "videos"));
+
 
     // 쿼리로 작품 검색. 전체 / TV / 영화 별로 검색할 수 있음
     public SearchResponse searchByQuery(String query, String type, int page) {
@@ -25,5 +31,29 @@ public class TmdbApiClient {
             case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, true, language, page);
             default -> throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
         };
+    }
+
+    public void getContentsDetails(int id, String type) {
+        if (type.equals("tv")) {
+            feignClient.getTvDetailsById(
+                    apiProperties.getApiKey(),
+                    id,
+                    language,
+                    listStringTocommaSeparatedString(appendResponseForDetails));
+        } else if (type.equals("movie")) {
+            feignClient.getMovieDetailsById(
+                    apiProperties.getApiKey(),
+                    id,
+                    language,
+                    listStringTocommaSeparatedString(appendResponseForDetails));
+        } else {
+            throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
+        }
+    }
+
+
+    // append_to_response에 들어갈 값을 List<String>에서 추출함
+    private String listStringTocommaSeparatedString(List<String> list) {
+        return String.join(",", list);
     }
 }

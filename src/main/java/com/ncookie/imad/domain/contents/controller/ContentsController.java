@@ -6,15 +6,17 @@ import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/contents")
 public class ContentsController {
     private final ContentsService contentsService;
 
-    @GetMapping("/api/contents/search")
+    @GetMapping("/search")
     public ApiResponse<SearchResponse> searchContentsByKeyword(@RequestParam(value = "query") String query,
                                                                @RequestParam(value = "type") String type,
                                                                @RequestParam(value = "page") int page) {
@@ -22,5 +24,12 @@ public class ContentsController {
                 ResponseCode.CONTENTS_SEARCH_SUCCESS,
                 contentsService.searchKeywords(query, type, page)
         );
+    }
+
+    @GetMapping("/details")
+    public ApiResponse<?> getContentsDetails(@RequestParam(value = "id") int id,
+                                             @RequestParam(value = "type") String type) {
+        contentsService.getContentsDetails(id, type);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.CONTENTS_GET_DETAILS_SUCCESS);
     }
 }

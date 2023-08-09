@@ -5,8 +5,11 @@ import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Map;
 
 
 @FeignClient(name = "tmdb", url = "${tmdb.api.api-url}")
@@ -41,5 +44,23 @@ public interface TmdbFeignClient {
             @RequestParam(value = "include_adult") boolean includeAdult,
             @RequestParam(value = "language") String language,
             @RequestParam(value = "page") int page
+    );
+
+    @GetMapping("/tv/{id}")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    Map<String, Object> getTvDetailsById(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @PathVariable(value = "id") int id,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "append_to_response") String appendToResponse
+    );
+
+    @GetMapping("/movie/{id}")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    Map<String, Object> getMovieDetailsById(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @PathVariable(value = "id") int id,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "append_to_response") String appendToResponse
     );
 }
