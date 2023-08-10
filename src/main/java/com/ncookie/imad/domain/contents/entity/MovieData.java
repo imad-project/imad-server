@@ -5,20 +5,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 
+@SuperBuilder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @DiscriminatorValue("movie")
 @Entity
 public class MovieData extends Contents {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long movieDataId;
+    @Setter
+    private LocalDate releaseDate;
 
-    @Setter private LocalDate releaseDate;
-    @Setter private int releaseStatus;
-    @Setter private int runtime;
+    @Setter
+    private int releaseStatus;
+
+    @Setter
+    private int runtime;
 }
