@@ -26,13 +26,14 @@ public class TmdbApiClient {
     // 쿼리로 작품 검색. 전체 / TV / 영화 별로 검색할 수 있음
     public SearchResponse searchByQuery(String query, String type, int page) {
         return switch (type) {
-            case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, true, language, page);
-            case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, true, language, page);
-            case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, true, language, page);
+            case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, false, language, page);
+            case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, false, language, page);
+            case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, false, language, page);
             default -> throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
         };
     }
 
+    // 작품 상세 정보 조회
     public void getContentsDetails(int id, String type) {
         if (type.equals("tv")) {
             feignClient.getTvDetailsById(
