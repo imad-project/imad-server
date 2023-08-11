@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 // TMDB API를 사용하기 위한 메소드들을 모아놓은 클래스
 @EnableConfigurationProperties({ TmdbApiProperties.class })
@@ -34,15 +35,15 @@ public class TmdbApiClient {
     }
 
     // 작품 상세 정보 조회
-    public void getContentsDetails(int id, String type) {
+    public Map<String, Object> getContentsDetails(int id, String type) {
         if (type.equals("tv")) {
-            feignClient.getTvDetailsById(
+            return feignClient.getTvDetailsById(
                     apiProperties.getApiKey(),
                     id,
                     language,
                     listStringTocommaSeparatedString(appendResponseForDetails));
         } else if (type.equals("movie")) {
-            feignClient.getMovieDetailsById(
+            return feignClient.getMovieDetailsById(
                     apiProperties.getApiKey(),
                     id,
                     language,
