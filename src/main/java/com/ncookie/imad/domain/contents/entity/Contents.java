@@ -5,7 +5,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Table(indexes = {
         @Index(columnList = "contents_id"),
@@ -47,9 +49,14 @@ public class Contents {
     // 여러 개의 데이터를 넣기 위해서 @ElementCollection 어노테이션 생성
     // JPA에서 자동으로 countries 테이블을 만들어줌
     @ElementCollection
-    @CollectionTable(name = "countries")
+    @CollectionTable(name = "countries", joinColumns = @JoinColumn(name = "contents_id", referencedColumnName = "contents_id"))
     @Builder.Default
-    private List<String> productionCountries = new ArrayList<>();
+    private Set<String> productionCountries = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "contents_genre", joinColumns = @JoinColumn(name = "contents_id", referencedColumnName = "contents_id"))
+    @Builder.Default
+    private Set<Integer> contentsGenres = new HashSet<>();
 
     @Setter
     // 시청 등급
