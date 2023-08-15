@@ -21,7 +21,7 @@ public class MovieData extends Contents {
     private LocalDate releaseDate;
 
     @Setter
-    private int releaseStatus;
+    private boolean releaseStatus;
 
     @Setter
     private int runtime;
