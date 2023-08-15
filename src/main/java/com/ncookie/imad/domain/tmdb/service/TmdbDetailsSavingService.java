@@ -1,20 +1,20 @@
 package com.ncookie.imad.domain.tmdb.service;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.contents.entity.ContentsType;
+import com.ncookie.imad.domain.contents.entity.MovieData;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.tmdb.dto.DetailsGenre;
 import com.ncookie.imad.domain.tmdb.dto.DetailsMovie;
+import com.ncookie.imad.domain.tmdb.dto.DetailsTv;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -35,31 +35,59 @@ public class TmdbDetailsSavingService {
          */
 
         ObjectMapper objectMapper = new ObjectMapper();
+        Set<Integer> contentsGenre = new HashSet<>();
+        Set<String> productionCountries = new HashSet<>();
 
         try {
-//            Set<DetailsGenre> genres = objectMapper.readValue(detailsJsonData.get("genres").toString(), new TypeReference<Set<DetailsGenre>>() {});
-            DetailsMovie detailsMovie = objectMapper.readValue(detailsJsonData, DetailsMovie.class);
-            System.out.println(detailsMovie);
+            if (type.equals("tv")) {
+                DetailsTv detailsTv = objectMapper.readValue(detailsJsonData, DetailsTv.class);
 
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
+            } else if (type.equals("movie")) {
+                DetailsMovie movieDataJsonObject = objectMapper.readValue(detailsJsonData, DetailsMovie.class);
+                ContentsType contentsType =
+                        extractAndCheckAnimationGenre(movieDataJsonObject.getGenres(), contentsGenre) ? ContentsType.ANIMATION : ContentsType.MOVIE;
+                movieDataJsonObject.getProductionCountries().forEach(country -> productionCountries.add(country.getName()));
+
+                MovieData movieData = MovieData.builder()
+                        .tmdbId(movieDataJsonObject.getId())
+                        .contentsType(contentsType)
+                        .contentsGenres(contentsGenre)
+
+                        .originalTitle(movieDataJsonObject.getOriginalTitle())
+                        .originalLanguage(movieDataJsonObject.getOriginalLanguage())
+                        .translatedTitle(movieDataJsonObject.getTitle())
+
+                        .overview(movieDataJsonObject.getOverview())
+                        .tagline(movieDataJsonObject.getTagline())
+                        .posterPath(movieDataJsonObject.getPosterPath())
+                        .productionCountries(productionCountries)
+
+                        // MOVIE 고유 데이터
+                        .releaseDate(LocalDate.parse(movieDataJsonObject.getReleaseDate()))
+                        .releaseStatus(movieDataJsonObject.getStatus().equals("Released"))
+                        .runtime(movieDataJsonObject.getRuntime())
+
+                        .build();
+
+                contentsService.saveMovieData(movieData);
+            }
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        List<Integer> genreList;
-        // 장르 테이블이 별도로 존재할 필요가 있는가?
-//        for (DetailsGenre genre : genres) {
-//
-//        }
+    }
 
-        if (type.equals("tv")) {
-//            Contents.builder()
-//                    .tmdbId((Long) detailsJsonData.get("id"))
-//                    .build();
-        } else if (type.equals("movie")) {
-
+    private boolean extractAndCheckAnimationGenre(Set<DetailsGenre> genres, Set<Integer> contentsGenre) {
+        boolean isAnimation = false;
+        for (DetailsGenre genre : genres) {
+            contentsGenre.add(genre.getId());
+            
+            // 장르에 애니메이션이 포함된 경우
+            if (genre.getId() == 16) {
+                isAnimation = true;
+            }
         }
 
-        System.out.println("hi");
+        return isAnimation;
     }
 }
