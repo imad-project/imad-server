@@ -48,7 +48,7 @@ public interface TmdbFeignClient {
 
     @GetMapping("/tv/{id}")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
-    Map<String, Object> getTvDetailsById(
+    String getTvDetailsById(
             @RequestHeader(value = "Authorization") String apiKey,
             @PathVariable(value = "id") int id,
             @RequestParam(value = "language") String language,
@@ -57,7 +57,7 @@ public interface TmdbFeignClient {
 
     @GetMapping("/movie/{id}")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
-    Map<String, Object> getMovieDetailsById(
+    String getMovieDetailsById(
             @RequestHeader(value = "Authorization") String apiKey,
             @PathVariable(value = "id") int id,
             @RequestParam(value = "language") String language,

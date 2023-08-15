@@ -33,7 +33,7 @@ public class ContentsController {
     @GetMapping("/details")
     public ApiResponse<?> getContentsDetails(@RequestParam(value = "id") int id,
                                              @RequestParam(value = "type") String type) {
-        Map<String, Object> contentsDetails = contentsService.getContentsDetails(id, type);
+        String contentsDetails = contentsService.getContentsDetails(id, type);
         detailsSavingService.saveContentsDetails(contentsDetails, type);
 
         return ApiResponse.createSuccessWithNoContent(ResponseCode.CONTENTS_GET_DETAILS_SUCCESS);

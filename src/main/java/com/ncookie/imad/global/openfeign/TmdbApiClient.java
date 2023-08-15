@@ -35,7 +35,7 @@ public class TmdbApiClient {
     }
 
     // 작품 상세 정보 조회
-    public Map<String, Object> getContentsDetails(int id, String type) {
+    public String getContentsDetails(int id, String type) {
         if (type.equals("tv")) {
             return feignClient.getTvDetailsById(
                     apiProperties.getApiKey(),
