@@ -4,17 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.entity.MovieData;
+import com.ncookie.imad.domain.contents.entity.TvProgramData;
 import com.ncookie.imad.domain.contents.service.ContentsService;
-import com.ncookie.imad.domain.tmdb.dto.DetailsGenre;
-import com.ncookie.imad.domain.tmdb.dto.DetailsMovie;
-import com.ncookie.imad.domain.tmdb.dto.DetailsTv;
+import com.ncookie.imad.domain.tmdb.dto.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -24,7 +22,7 @@ public class TmdbDetailsSavingService {
     public final ContentsService contentsService;
 
     @Transactional
-    public void saveContentsDetails(String detailsJsonData, String type) {
+    public DetailsResponse saveContentsDetails(String detailsJsonData, String type) {
         // TODO: Contents(MovieData, TvProgramData), Networks, Season, Person Entity 저장
         /*
          * JSON 데이터를 분리해야 함
@@ -33,45 +31,63 @@ public class TmdbDetailsSavingService {
          *
          * DTO 클래스를 구현한 builder 객체를 연결 테이블에 할당하여 관계 구축
          */
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        Set<Integer> contentsGenre = new HashSet<>();
-        Set<String> productionCountries = new HashSet<>();
+        // 장르 테이블 제거
+        // TODO: certification 데이터 추가
 
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            DetailsResponse detailsResponse = objectMapper.readValue(detailsJsonData, DetailsResponse.class);
+
             if (type.equals("tv")) {
-                DetailsTv detailsTv = objectMapper.readValue(detailsJsonData, DetailsTv.class);
+                TvProgramData tvProgramData = TvProgramData.builder()
+                        .tmdbId(detailsResponse.getId())
+                        .contentsType(checkAnimationGenre(detailsResponse.getGenres(), type))
+                        .contentsGenres(detailsResponse.getGenres())
 
+                        .originalTitle(detailsResponse.getOriginalName())
+                        .originalLanguage(detailsResponse.getOriginalLanguage())
+                        .translatedTitle(detailsResponse.getName())
+
+                        .overview(detailsResponse.getOverview())
+                        .tagline(detailsResponse.getTagline())
+                        .posterPath(detailsResponse.getPosterPath())
+                        .productionCountries(detailsResponse.getProductionCountries())
+
+                        // TV 고유 데이터
+                        .firstAirDate(LocalDate.parse(detailsResponse.getFirstAirDate()))
+                        .lastAirDate(LocalDate.parse(detailsResponse.getLastAirDate()))
+                        .numberOfEpisodes(detailsResponse.getNumberOfEpisodes())
+                        .numberOfSeasons(detailsResponse.getNumberOfSeasons())
+
+                        .build();
+
+                contentsService.saveTvData(tvProgramData);
             } else if (type.equals("movie")) {
-                DetailsMovie movieDataJsonObject = objectMapper.readValue(detailsJsonData, DetailsMovie.class);
-                ContentsType contentsType =
-                        extractAndCheckAnimationGenre(movieDataJsonObject.getGenres(), contentsGenre) ? ContentsType.ANIMATION : ContentsType.MOVIE;
-                movieDataJsonObject.getProductionCountries().forEach(country -> productionCountries.add(country.getName()));
-
                 MovieData movieData = MovieData.builder()
-                        .tmdbId(movieDataJsonObject.getId())
-                        .contentsType(contentsType)
-                        .contentsGenres(contentsGenre)
+                        .tmdbId(detailsResponse.getId())
+                        .contentsType(checkAnimationGenre(detailsResponse.getGenres(), type))
+                        .contentsGenres(detailsResponse.getGenres())
 
-                        .originalTitle(movieDataJsonObject.getOriginalTitle())
-                        .originalLanguage(movieDataJsonObject.getOriginalLanguage())
-                        .translatedTitle(movieDataJsonObject.getTitle())
+                        .originalTitle(detailsResponse.getOriginalTitle())
+                        .originalLanguage(detailsResponse.getOriginalLanguage())
+                        .translatedTitle(detailsResponse.getTitle())
 
-                        .overview(movieDataJsonObject.getOverview())
-                        .tagline(movieDataJsonObject.getTagline())
-                        .posterPath(movieDataJsonObject.getPosterPath())
-                        .productionCountries(productionCountries)
+                        .overview(detailsResponse.getOverview())
+                        .tagline(detailsResponse.getTagline())
+                        .posterPath(detailsResponse.getPosterPath())
+                        .productionCountries(detailsResponse.getProductionCountries())
 
                         // MOVIE 고유 데이터
-                        .releaseDate(LocalDate.parse(movieDataJsonObject.getReleaseDate()))
-                        .releaseStatus(movieDataJsonObject.getStatus().equals("Released"))
-                        .runtime(movieDataJsonObject.getRuntime())
+                        .releaseDate(LocalDate.parse(detailsResponse.getReleaseDate()))
+                        .releaseStatus(detailsResponse.getStatus().equals("Released"))
+                        .runtime(detailsResponse.getRuntime())
 
                         .build();
 
                 contentsService.saveMovieData(movieData);
             }
 
+            return detailsResponse;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -89,5 +105,15 @@ public class TmdbDetailsSavingService {
         }
 
         return isAnimation;
+    }
+
+    private ContentsType checkAnimationGenre(Set<Integer> genres, String type) {
+        boolean isAnimation = false;
+        
+        if (genres.contains(16)) {
+            return ContentsType.ANIMATION;
+        } else {
+            return type.equals("tv") ? ContentsType.TV : ContentsType.MOVIE;
+        }
     }
 }
