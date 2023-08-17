@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.contents.controller;
 
 import com.ncookie.imad.domain.contents.dto.SearchResponse;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.tmdb.dto.DetailsResponse;
 import com.ncookie.imad.domain.tmdb.service.TmdbDetailsSavingService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -31,11 +32,11 @@ public class ContentsController {
     }
 
     @GetMapping("/details")
-    public ApiResponse<?> getContentsDetails(@RequestParam(value = "id") int id,
-                                             @RequestParam(value = "type") String type) {
+    public ApiResponse<DetailsResponse> getContentsDetails(@RequestParam(value = "id") int id,
+                                                           @RequestParam(value = "type") String type) {
         String contentsDetails = contentsService.getContentsDetails(id, type);
-        detailsSavingService.saveContentsDetails(contentsDetails, type);
+        DetailsResponse detailsResponse = detailsSavingService.saveContentsDetails(contentsDetails, type);
 
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.CONTENTS_GET_DETAILS_SUCCESS);
+        return ApiResponse.createSuccess(ResponseCode.CONTENTS_GET_DETAILS_SUCCESS, detailsResponse);
     }
 }
