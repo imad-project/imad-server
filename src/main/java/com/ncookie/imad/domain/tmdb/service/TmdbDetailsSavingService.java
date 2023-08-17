@@ -38,10 +38,13 @@ public class TmdbDetailsSavingService {
             ObjectMapper objectMapper = new ObjectMapper();
             DetailsResponse detailsResponse = objectMapper.readValue(detailsJsonData, DetailsResponse.class);
 
+            ContentsType contentsType = checkAnimationGenre(detailsResponse.getGenres(), type);
+            detailsResponse.setContentsType(contentsType);
+
             if (type.equals("tv")) {
                 TvProgramData tvProgramData = TvProgramData.builder()
                         .tmdbId(detailsResponse.getId())
-                        .contentsType(checkAnimationGenre(detailsResponse.getGenres(), type))
+                        .contentsType(contentsType)
                         .contentsGenres(detailsResponse.getGenres())
 
                         .originalTitle(detailsResponse.getOriginalName())
@@ -65,7 +68,7 @@ public class TmdbDetailsSavingService {
             } else if (type.equals("movie")) {
                 MovieData movieData = MovieData.builder()
                         .tmdbId(detailsResponse.getId())
-                        .contentsType(checkAnimationGenre(detailsResponse.getGenres(), type))
+                        .contentsType(contentsType)
                         .contentsGenres(detailsResponse.getGenres())
 
                         .originalTitle(detailsResponse.getOriginalTitle())

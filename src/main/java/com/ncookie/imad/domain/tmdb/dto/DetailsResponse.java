@@ -3,6 +3,7 @@ package com.ncookie.imad.domain.tmdb.dto;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class DetailsResponse {
     private String posterPath;
     private String originalLanguage;
 
+    private ContentsType contentsType;
     private Set<Integer> genres;
     private Set<String> productionCountries;
 
