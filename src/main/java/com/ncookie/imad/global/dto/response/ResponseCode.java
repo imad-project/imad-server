@@ -34,7 +34,11 @@ public enum ResponseCode {
 
     // 작품 관련
     CONTENTS_SEARCH_SUCCESS(200, "성공적으로 작품 검색을 완료했습니다."),
-    CONTENTS_SEARCH_WRONG_TYPE(200, "잘못된 검색 타입입니다."),
+    CONTENTS_SEARCH_WRONG_TYPE(400, "잘못된 검색 타입입니다."),
+    CONTENTS_PARSING_CERTIFICATION_ERROR(500, "데이터 파싱 중 문제가 발생했습니다."),
+
+    CONTENTS_GET_DETAILS_SUCCESS(200, "작품 상세 정보 조회를 완료했습니다."),
+    CONTENTS_GET_DETAILS_WRONG_TYPE(400, "잘못된 작품 타입입니다. (TV / MOVIE만 가능)"),
 
 
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),

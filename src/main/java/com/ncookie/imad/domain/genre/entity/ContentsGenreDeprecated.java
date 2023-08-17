@@ -1,6 +1,5 @@
 package com.ncookie.imad.domain.genre.entity;
 
-import com.ncookie.imad.domain.contents.entity.Contents;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.context.annotation.Description;
@@ -12,7 +11,7 @@ import org.springframework.context.annotation.Description;
 @AllArgsConstructor
 @Entity
 @Description("작품 별 장르")
-public class ContentsGenre {
+public class ContentsGenreDeprecated {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long contentsGenreId;
@@ -21,7 +20,7 @@ public class ContentsGenre {
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
-    @ManyToOne
-    @JoinColumn(name = "contents_id")
-    private Contents contents;
+//    @ManyToOne
+//    @JoinColumn(name = "contents_id")
+//    private Contents contents;
 }

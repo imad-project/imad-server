@@ -2,9 +2,11 @@ package com.ncookie.imad.domain.contents.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
+@SuperBuilder
 @Getter
 @ToString
 @NoArgsConstructor
@@ -12,9 +14,6 @@ import java.time.LocalDate;
 @DiscriminatorValue("tv")
 @Entity
 public class TvProgramData extends Contents {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tvProgramDataId;
-
     @Setter
     private LocalDate firstAirDate;
 
