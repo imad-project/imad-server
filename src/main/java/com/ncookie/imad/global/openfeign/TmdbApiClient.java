@@ -1,5 +1,8 @@
 package com.ncookie.imad.global.openfeign;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.contents.dto.SearchResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
@@ -51,6 +54,56 @@ public class TmdbApiClient {
         } else {
             throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
         }
+    }
+
+    public String getContentsCertification(int id, String type) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String certification = "";
+        
+        // TV와 MOVIE의 시청등급을 얻어오는 방법이 다름  
+        try {
+            if (type.equals("tv")) {
+                JsonNode rootNode = objectMapper.readTree(
+                        feignClient.getTvCertification(apiProperties.getApiKey(), id));
+                JsonNode resultsNode = rootNode.get("results");
+
+                for (JsonNode resultNode : resultsNode) {
+                    JsonNode isoNode = resultNode.get("iso_3166_1");
+                    if (isoNode != null && "KR".equals(isoNode.asText())) {
+                        certification = resultNode.get("rating").asText();
+                        break;
+                    }
+                }
+
+            } else if (type.equals("movie")) {
+                JsonNode rootNode = objectMapper.readTree(
+                        feignClient.getMovieCertification(apiProperties.getApiKey(), id));
+                JsonNode resultsNode = rootNode.get("results");
+
+                firstLoop:  // 중첩 for문을 탈출하기 위한 라벨
+                for (JsonNode resultNode : resultsNode) {
+                    JsonNode isoNode = resultNode.get("iso_3166_1");
+                    if (isoNode != null && "KR".equals(isoNode.asText())) {
+                        JsonNode releaseDatesNode = resultNode.get("release_dates");
+                        if (releaseDatesNode != null && releaseDatesNode.isArray()) {
+                            for (JsonNode releaseDateNode : releaseDatesNode) {
+                                JsonNode certificationNode = releaseDateNode.get("certification");
+                                if (certificationNode != null) {
+                                    certification = certificationNode.asText();
+                                    break firstLoop;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
+            }
+        } catch (JsonProcessingException e) {
+            throw new BadRequestException(ResponseCode.CONTENTS_PARSING_CERTIFICATION_ERROR);
+        }
+
+        return certification.isEmpty() ? "NONE" : certification;
     }
 
 

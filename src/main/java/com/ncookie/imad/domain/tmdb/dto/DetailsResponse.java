@@ -17,17 +17,21 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DetailsResponse {
-    private String tmdbType;
-
     private long id;
+
     private String overview;
     private String tagline;
     private String posterPath;
     private String originalLanguage;
+    private String certification;
 
-    private ContentsType contentsType;
     private Set<Integer> genres;
     private Set<String> productionCountries;
+
+
+    // IMAD Data
+    private ContentsType contentsType;
+
 
     // Movie Data
     private String title;
@@ -38,6 +42,7 @@ public class DetailsResponse {
 
     private String status;
 
+
     // TV Data
     private String name;
     private String originalName;
@@ -47,6 +52,7 @@ public class DetailsResponse {
 
     private int numberOfEpisodes;
     private int numberOfSeasons;
+
 
     @JsonCreator
     public DetailsResponse(@JsonProperty("genres") Set<DetailsGenre> genreSet,

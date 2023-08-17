@@ -35,7 +35,8 @@ public class ContentsController {
     public ApiResponse<DetailsResponse> getContentsDetails(@RequestParam(value = "id") int id,
                                                            @RequestParam(value = "type") String type) {
         String contentsDetails = contentsService.getContentsDetails(id, type);
-        DetailsResponse detailsResponse = detailsSavingService.saveContentsDetails(contentsDetails, type);
+        String contentsCertification = contentsService.getContentsCertification(id, type);
+        DetailsResponse detailsResponse = detailsSavingService.saveContentsDetails(contentsDetails, type, contentsCertification);
 
         return ApiResponse.createSuccess(ResponseCode.CONTENTS_GET_DETAILS_SUCCESS, detailsResponse);
     }

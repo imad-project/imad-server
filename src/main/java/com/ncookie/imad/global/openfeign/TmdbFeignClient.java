@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Map;
-
 
 @FeignClient(name = "tmdb", url = "${tmdb.api.api-url}")
 public interface TmdbFeignClient {
@@ -62,5 +60,19 @@ public interface TmdbFeignClient {
             @PathVariable(value = "id") int id,
             @RequestParam(value = "language") String language,
             @RequestParam(value = "append_to_response") String appendToResponse
+    );
+
+    @GetMapping("/tv/{id}/content_ratings")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    String getTvCertification(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @PathVariable(value = "id") int id
+    );
+
+    @GetMapping("/movie/{id}/release_dates")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    String getMovieCertification(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @PathVariable(value = "id") int id
     );
 }

@@ -28,6 +28,10 @@ public class ContentsService {
         return apiClient.getContentsDetails(id, type);
     }
 
+    public String getContentsCertification(int id, String type) {
+        return apiClient.getContentsCertification(id, type);
+    }
+
     public void saveMovieData(MovieData movieData) {
         movieDataRepository.save(movieData);
     }

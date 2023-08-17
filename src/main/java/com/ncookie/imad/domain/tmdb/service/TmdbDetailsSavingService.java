@@ -22,7 +22,7 @@ public class TmdbDetailsSavingService {
     public final ContentsService contentsService;
 
     @Transactional
-    public DetailsResponse saveContentsDetails(String detailsJsonData, String type) {
+    public DetailsResponse saveContentsDetails(String detailsJsonData, String type, String certification) {
         // TODO: Contents(MovieData, TvProgramData), Networks, Season, Person Entity 저장
         /*
          * JSON 데이터를 분리해야 함
@@ -38,14 +38,18 @@ public class TmdbDetailsSavingService {
             ObjectMapper objectMapper = new ObjectMapper();
             DetailsResponse detailsResponse = objectMapper.readValue(detailsJsonData, DetailsResponse.class);
 
+            // 애니메이션 장르가 포함되어 있으면 contents_type을 "ANIMATION"으로 설정
             ContentsType contentsType = checkAnimationGenre(detailsResponse.getGenres(), type);
+
             detailsResponse.setContentsType(contentsType);
+            detailsResponse.setCertification(certification);
 
             if (type.equals("tv")) {
                 TvProgramData tvProgramData = TvProgramData.builder()
                         .tmdbId(detailsResponse.getId())
                         .contentsType(contentsType)
                         .contentsGenres(detailsResponse.getGenres())
+                        .certification(detailsResponse.getCertification())
 
                         .originalTitle(detailsResponse.getOriginalName())
                         .originalLanguage(detailsResponse.getOriginalLanguage())
@@ -70,6 +74,7 @@ public class TmdbDetailsSavingService {
                         .tmdbId(detailsResponse.getId())
                         .contentsType(contentsType)
                         .contentsGenres(detailsResponse.getGenres())
+                        .certification(detailsResponse.getCertification())
 
                         .originalTitle(detailsResponse.getOriginalTitle())
                         .originalLanguage(detailsResponse.getOriginalLanguage())
