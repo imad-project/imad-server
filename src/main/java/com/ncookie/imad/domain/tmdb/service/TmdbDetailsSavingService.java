@@ -22,7 +22,7 @@ public class TmdbDetailsSavingService {
 
     @Transactional
     public DetailsResponse saveContentsDetails(String detailsJsonData, String type, String certification) {
-        // TODO: Contents(MovieData, TvProgramData), Networks, Season, Person Entity 저장
+        // TODO: Networks, Season, Person Entity 저장
         /*
          * JSON 데이터를 분리해야 함
          * builder로 각 DTO 생성해주고, 해당하는 도메인의 service에 값을 전달하여 DB에 저장하도록 해야함
@@ -31,7 +31,6 @@ public class TmdbDetailsSavingService {
          * DTO 클래스를 구현한 builder 객체를 연결 테이블에 할당하여 관계 구축
          */
         // 장르 테이블 제거
-        // TODO: certification 데이터 추가
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
