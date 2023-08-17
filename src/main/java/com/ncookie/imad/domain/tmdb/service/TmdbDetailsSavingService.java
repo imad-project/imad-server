@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -101,23 +100,7 @@ public class TmdbDetailsSavingService {
         }
     }
 
-    private boolean extractAndCheckAnimationGenre(Set<DetailsGenre> genres, Set<Integer> contentsGenre) {
-        boolean isAnimation = false;
-        for (DetailsGenre genre : genres) {
-            contentsGenre.add(genre.getId());
-            
-            // 장르에 애니메이션이 포함된 경우
-            if (genre.getId() == 16) {
-                isAnimation = true;
-            }
-        }
-
-        return isAnimation;
-    }
-
     private ContentsType checkAnimationGenre(Set<Integer> genres, String type) {
-        boolean isAnimation = false;
-        
         if (genres.contains(16)) {
             return ContentsType.ANIMATION;
         } else {

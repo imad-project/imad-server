@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
 
 // TMDB API를 사용하기 위한 메소드들을 모아놓은 클래스
 @EnableConfigurationProperties({ TmdbApiProperties.class })
@@ -60,7 +60,7 @@ public class TmdbApiClient {
         ObjectMapper objectMapper = new ObjectMapper();
         String certification = "";
         
-        // TV와 MOVIE의 시청등급을 얻어오는 방법이 다름  
+        // TV와 MOVIE의 시청등급을 얻어오는 방법이 다름
         try {
             if (type.equals("tv")) {
                 JsonNode rootNode = objectMapper.readTree(
