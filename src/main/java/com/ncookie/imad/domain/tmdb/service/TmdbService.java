@@ -114,7 +114,7 @@ public class TmdbService {
 
 
     @Transactional
-    public TmdbDetails saveAndGetContentsDetails(TmdbDetails tmdbDetails, String type, String certification) {
+    public TmdbDetails saveContentsDetails(TmdbDetails tmdbDetails, ContentsType type, String certification) {
         // TODO: Person Entity 저장
         // TODO: TMDB 404 에러 발생했을 때 예외처리도 해줘야 함
         // DB 변경점 : 장르 관련 테이블 제거, Contents에 공통 필드로 status 추가
@@ -126,7 +126,7 @@ public class TmdbService {
             tmdbDetails.setContentsType(contentsType);
             tmdbDetails.setCertification(certification);
 
-            if (type.equals("tv")) {
+            if (type.equals(ContentsType.TV)) {
 
                 // TV 데이터 DB 저장 및 contetns_id 설정
                 log.info("TV 데이터 저장 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getName());
@@ -176,7 +176,7 @@ public class TmdbService {
                     Networks savedNetworksInfo = networksService.saveNetworksInfo(Networks.toEntity(n));
                     networksService.saveBroadcaster(savedNetworksInfo, savedTvProgramData);
                 }
-            } else if (type.equals("movie")) {
+            } else if (type.equals(ContentsType.MOVIE)) {
 
                 // MOVIE 데이터 DB 저장 및 contetns_id 설정
                 log.info("MOVIE 데이터 저장 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getTitle());
@@ -215,11 +215,11 @@ public class TmdbService {
         }
     }
 
-    private ContentsType checkAnimationGenre(Set<Integer> genres, String type) {
+    private ContentsType checkAnimationGenre(Set<Integer> genres, ContentsType type) {
         if (genres.contains(16)) {
             return ContentsType.ANIMATION;
         } else {
-            return type.equals("tv") ? ContentsType.TV : ContentsType.MOVIE;
+            return type.equals(ContentsType.TV) ? ContentsType.TV : ContentsType.MOVIE;
         }
     }
 }
