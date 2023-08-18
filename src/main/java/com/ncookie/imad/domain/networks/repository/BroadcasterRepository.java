@@ -1,6 +1,6 @@
-package com.ncookie.imad.domain.contents.repository;
+package com.ncookie.imad.domain.networks.repository;
 
-import com.ncookie.imad.domain.contents.entity.Broadcaster;
+import com.ncookie.imad.domain.networks.entity.Broadcaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BroadcasterRepository extends JpaRepository<Broadcaster, Long> {
