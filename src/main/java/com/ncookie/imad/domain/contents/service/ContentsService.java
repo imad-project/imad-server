@@ -32,11 +32,11 @@ public class ContentsService {
         return apiClient.getContentsCertification(id, type);
     }
 
-    public void saveMovieData(MovieData movieData) {
-        movieDataRepository.save(movieData);
+    public long saveMovieData(MovieData movieData) {
+        return movieDataRepository.save(movieData).getContentsId();
     }
 
-    public void saveTvData(TvProgramData tvProgramData) {
-        tvProgramDataRepository.save(tvProgramData);
+    public long saveTvData(TvProgramData tvProgramData) {
+        return tvProgramDataRepository.save(tvProgramData).getContentsId();
     }
 }
