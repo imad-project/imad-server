@@ -28,6 +28,8 @@ public class TmdbDetails {
     private String originalLanguage;
     private String certification;
 
+    private String status;
+
     private Set<Integer> genres;
     private Set<String> productionCountries;
 
@@ -42,8 +44,6 @@ public class TmdbDetails {
 
     private String releaseDate;
     private int runtime;
-
-    private String status;
 
 
     // TV Data

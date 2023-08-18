@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Table(indexes = {
@@ -46,6 +44,8 @@ public class Contents {
     private String tagline;
     @Setter
     private String posterPath;
+    @Setter
+    private String status;
 
     // 여러 개의 데이터를 넣기 위해서 @ElementCollection 어노테이션 생성
     // JPA에서 자동으로 countries 테이블을 만들어줌

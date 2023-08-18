@@ -58,6 +58,7 @@ public class TmdbService {
                     .posterPath(tvProgramData.getPosterPath())
                     .originalLanguage(tvProgramData.getOriginalLanguage())
                     .certification(tvProgramData.getCertification())
+                    .status(tvProgramData.getStatus())
 
                     .genres(tvProgramData.getContentsGenres())
                     .productionCountries(tvProgramData.getProductionCountries())
@@ -92,6 +93,7 @@ public class TmdbService {
                     .posterPath(movieData.getPosterPath())
                     .originalLanguage(movieData.getOriginalLanguage())
                     .certification(movieData.getCertification())
+                    .status(movieData.getStatus())
 
                     .genres(movieData.getContentsGenres())
                     .productionCountries(movieData.getProductionCountries())
@@ -104,8 +106,6 @@ public class TmdbService {
                     .releaseDate(movieData.getReleaseDate().toString())
                     .runtime(movieData.getRuntime())
 
-                    .status(movieData.getReleaseStatus() ? "Released" : "Not yet")
-
                     .build();
         }
 
@@ -117,7 +117,6 @@ public class TmdbService {
     public TmdbDetails saveAndGetContentsDetails(TmdbDetails tmdbDetails, String type, String certification) {
         // TODO: Person Entity 저장
         // TODO: TMDB 404 에러 발생했을 때 예외처리도 해줘야 함
-        // TODO: status 필드 추가 및 값 설정
 
         // TODO: tmdb id와 type 사용하여 데이터베이스 중복 검사 선행
         // 중복이면 어떻게 처리하럭ㄴ데?
@@ -157,6 +156,7 @@ public class TmdbService {
                                 .tagline(tmdbDetails.getTagline())
                                 .posterPath(tmdbDetails.getPosterPath())
                                 .productionCountries(tmdbDetails.getProductionCountries())
+                                .status(tmdbDetails.getStatus())
 
                                 // TV 고유 데이터
                                 .firstAirDate(LocalDate.parse(tmdbDetails.getFirstAirDate()))
@@ -205,11 +205,12 @@ public class TmdbService {
                                 .overview(tmdbDetails.getOverview())
                                 .tagline(tmdbDetails.getTagline())
                                 .posterPath(tmdbDetails.getPosterPath())
+                                .status(tmdbDetails.getStatus())
+
                                 .productionCountries(tmdbDetails.getProductionCountries())
 
                                 // MOVIE 고유 데이터
                                 .releaseDate(LocalDate.parse(tmdbDetails.getReleaseDate()))
-                                .releaseStatus(tmdbDetails.getStatus().equals("Released"))
                                 .runtime(tmdbDetails.getRuntime())
 
                                 .build()
