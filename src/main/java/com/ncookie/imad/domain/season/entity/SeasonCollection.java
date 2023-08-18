@@ -1,5 +1,6 @@
-package com.ncookie.imad.domain.contents.entity;
+package com.ncookie.imad.domain.season.entity;
 
+import com.ncookie.imad.domain.contents.entity.TvProgramData;
 import jakarta.persistence.*;
 import lombok.*;
 
