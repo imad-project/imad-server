@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "tmdb_type")
+@DiscriminatorColumn(name = "dtype")
 @Entity
 public class Contents {
     @Id
@@ -27,6 +27,7 @@ public class Contents {
     private Long contentsId;
 
     @Setter private Long tmdbId;
+    @Setter private ContentsType tmdbType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "contents_type", nullable = false)

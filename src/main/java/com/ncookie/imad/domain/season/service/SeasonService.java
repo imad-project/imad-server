@@ -9,6 +9,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -27,5 +30,14 @@ public class SeasonService {
                 .build();
 
         seasonCollectionRepository.save(build);
+    }
+
+    public List<Season> getSeasonsEntities(TvProgramData tvProgramData) {
+        List<SeasonCollection> allByTvProgramData = seasonCollectionRepository.findAllByTvProgramData(tvProgramData);
+
+        List<Season> seasons = new ArrayList<>();
+        allByTvProgramData.forEach(seasonCollection -> seasons.add(seasonCollection.getSeason()));
+
+        return seasons;
     }
 }

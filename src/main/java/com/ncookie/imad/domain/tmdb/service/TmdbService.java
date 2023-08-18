@@ -1,7 +1,5 @@
 package com.ncookie.imad.domain.tmdb.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.entity.MovieData;
 import com.ncookie.imad.domain.contents.entity.TvProgramData;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -34,16 +33,94 @@ import java.util.Set;
  * 이 서비스는 컨트롤러에서만 호출되어야 하며, 순환참조 방지를 위해 다른 서비스에서는 호출되면 안 된다.
  * 또한 직접 repository를 참조하지 않도록 한다.
  */
-public class TmdbDetailsSavingService {
+public class TmdbService {
     private final ContentsService contentsService;
 
     private final SeasonService seasonService;
     private final NetworksService networksService;
 
+
     @Transactional
-    public TmdbDetails saveContentsDetails(String detailsJsonData, String type, String certification) {
+    public TmdbDetails getTmdbDetails(long id, ContentsType type) {
+        TmdbDetails tmdbDetails = TmdbDetails.builder().build();
+
+        if (type.equals(ContentsType.TV)) {
+            TvProgramData tvProgramData = contentsService.getTvProgramDataByTmdbIdAndTmdbType(id, type);
+            List<Season> seasonsEntities = seasonService.getSeasonsEntities(tvProgramData);
+            List<Networks> networksEntities = networksService.getNetworksEntities(tvProgramData);
+
+            tmdbDetails = TmdbDetails.builder()
+                    .contentsId(tvProgramData.getContentsId())
+                    .tmdbId(tvProgramData.getTmdbId())
+
+                    .overview(tvProgramData.getOverview())
+                    .tagline(tvProgramData.getTagline())
+                    .posterPath(tvProgramData.getPosterPath())
+                    .originalLanguage(tvProgramData.getOriginalLanguage())
+                    .certification(tvProgramData.getCertification())
+
+                    .genres(tvProgramData.getContentsGenres())
+                    .productionCountries(tvProgramData.getProductionCountries())
+
+                    .contentsType(tvProgramData.getContentsType())
+
+                    .name(tvProgramData.getTranslatedTitle())
+                    .originalName(tvProgramData.getOriginalTitle())
+                    .firstAirDate(tvProgramData.getFirstAirDate().toString())
+                    .lastAirDate(tvProgramData.getLastAirDate().toString())
+
+                    .numberOfEpisodes(tvProgramData.getNumberOfEpisodes())
+                    .numberOfSeasons(tvProgramData.getNumberOfSeasons())
+
+                    .seasons(seasonsEntities.stream()
+                            .map(DetailsSeason::toDTO)
+                            .collect(Collectors.toList()))
+                    .networks(networksEntities.stream()
+                            .map(DetailsNetworks::toDTO)
+                            .collect(Collectors.toList()))
+                    .build();
+
+        } else if (type.equals(ContentsType.MOVIE)) {
+            MovieData movieData = contentsService.getMovieDataByTmdbIdAndTmdbType(id, type);
+
+            tmdbDetails = TmdbDetails.builder()
+                    .contentsId(movieData.getContentsId())
+                    .tmdbId(movieData.getTmdbId())
+
+                    .overview(movieData.getOverview())
+                    .tagline(movieData.getTagline())
+                    .posterPath(movieData.getPosterPath())
+                    .originalLanguage(movieData.getOriginalLanguage())
+                    .certification(movieData.getCertification())
+
+                    .genres(movieData.getContentsGenres())
+                    .productionCountries(movieData.getProductionCountries())
+
+                    .contentsType(movieData.getContentsType())
+
+                    .title(movieData.getTranslatedTitle())
+                    .originalTitle(movieData.getOriginalTitle())
+
+                    .releaseDate(movieData.getReleaseDate().toString())
+                    .runtime(movieData.getRuntime())
+
+                    .status(movieData.getReleaseStatus() ? "Released" : "Not yet")
+
+                    .build();
+        }
+
+        return tmdbDetails;
+    }
+
+
+    @Transactional
+    public TmdbDetails saveAndGetContentsDetails(TmdbDetails tmdbDetails, String type, String certification) {
         // TODO: Person Entity 저장
+        // TODO: TMDB 404 에러 발생했을 때 예외처리도 해줘야 함
+        // TODO: status 필드 추가 및 값 설정
+
         // TODO: tmdb id와 type 사용하여 데이터베이스 중복 검사 선행
+        // 중복이면 어떻게 처리하럭ㄴ데?
         /*
          * JSON 데이터를 분리해야 함
          * builder로 각 DTO 생성해주고, 해당하는 도메인의 service에 값을 전달하여 DB에 저장하도록 해야함
@@ -51,12 +128,9 @@ public class TmdbDetailsSavingService {
          *
          * DTO 클래스를 구현한 builder 객체를 연결 테이블에 할당하여 관계 구축
          */
-        // DB 변경점 : 장르 관련 테이블 제거
+        // DB 변경점 : 장르 관련 테이블 제거, Contents에 공통 필드로 status 추가
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            TmdbDetails tmdbDetails = objectMapper.readValue(detailsJsonData, TmdbDetails.class);
-
             // 애니메이션 장르가 포함되어 있으면 contents_type을 "ANIMATION"으로 설정
             ContentsType contentsType = checkAnimationGenre(tmdbDetails.getGenres(), type);
 
@@ -70,6 +144,7 @@ public class TmdbDetailsSavingService {
                 TvProgramData savedTvProgramData = contentsService.saveTvData(
                         TvProgramData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
+                                .tmdbType(ContentsType.TV)
                                 .contentsType(contentsType)
                                 .contentsGenres(tmdbDetails.getGenres())
                                 .certification(tmdbDetails.getCertification())
@@ -133,6 +208,7 @@ public class TmdbDetailsSavingService {
                 tmdbDetails.setContentsId(contentsService.saveMovieData(
                         MovieData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
+                                .tmdbType(ContentsType.MOVIE)
                                 .contentsType(contentsType)
                                 .contentsGenres(tmdbDetails.getGenres())
                                 .certification(tmdbDetails.getCertification())
@@ -158,7 +234,7 @@ public class TmdbDetailsSavingService {
             log.info("TMDB API details 및 credits 정보 DB 저장 완료");
             return tmdbDetails;
 
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

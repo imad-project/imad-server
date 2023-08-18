@@ -6,22 +6,21 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.networks.dto.DetailsNetworks;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class TmdbDetails {
-    private long tmdbId;
     private long contentsId;
+    private long tmdbId;
 
     private String overview;
     private String tagline;
