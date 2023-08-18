@@ -10,6 +10,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -27,5 +30,14 @@ public class NetworksService {
                     .networks(networks)
                     .tvProgramData(tvProgramData)
                     .build());
+    }
+
+    public List<Networks> getNetworksEntities(TvProgramData tvProgramData) {
+        List<Broadcaster> allByTvProgramData1 = broadcasterRepository.findAllByTvProgramData(tvProgramData);
+
+        List<Networks> networksList = new ArrayList<>();
+        allByTvProgramData1.forEach(broadcaster -> networksList.add(broadcaster.getNetworks()));
+
+        return networksList;
     }
 }
