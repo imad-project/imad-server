@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Entity
 public class Season {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seasonId;
 
     @Setter private String seasonName;
