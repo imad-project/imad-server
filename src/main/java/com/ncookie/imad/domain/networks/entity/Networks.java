@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.contents.entity;
+package com.ncookie.imad.domain.networks.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
