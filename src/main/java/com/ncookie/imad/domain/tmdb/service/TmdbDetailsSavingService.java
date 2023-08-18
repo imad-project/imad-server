@@ -30,7 +30,6 @@ public class TmdbDetailsSavingService {
     @Transactional
     public TmdbDetails saveContentsDetails(String detailsJsonData, String type, String certification) {
         // TODO: Networks, Season, Person Entity 저장
-        // TODO: IMAD contents id 추가 필요
         /*
          * JSON 데이터를 분리해야 함
          * builder로 각 DTO 생성해주고, 해당하는 도메인의 service에 값을 전달하여 DB에 저장하도록 해야함
