@@ -36,7 +36,9 @@ public class ContentsService {
         return movieDataRepository.save(movieData).getContentsId();
     }
 
-    public long saveTvData(TvProgramData tvProgramData) {
-        return tvProgramDataRepository.save(tvProgramData).getContentsId();
+    // SeasonCollection, Broadcast 같은 연결테이블에 데이터를 추가하기 위해서는 save 이후의 entity 객체가 필요함
+    // 때문에 위의 saveMovieData() 메소드와 다르게 TvProgramData entity를 리턴함
+    public TvProgramData saveTvData(TvProgramData tvProgramData) {
+        return tvProgramDataRepository.save(tvProgramData);
     }
 }

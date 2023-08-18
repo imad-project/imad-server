@@ -30,6 +30,7 @@ public class TmdbDetailsSavingService {
     @Transactional
     public TmdbDetails saveContentsDetails(String detailsJsonData, String type, String certification) {
         // TODO: Networks, Season, Person Entity 저장
+        // TODO: tmdb id와 type 사용하여 데이터베이스 중복 검사 선행
         /*
          * JSON 데이터를 분리해야 함
          * builder로 각 DTO 생성해주고, 해당하는 도메인의 service에 값을 전달하여 DB에 저장하도록 해야함
@@ -50,32 +51,34 @@ public class TmdbDetailsSavingService {
             tmdbDetails.setCertification(certification);
 
             if (type.equals("tv")) {
-                TvProgramData tvProgramData = TvProgramData.builder()
-                        .tmdbId(tmdbDetails.getTmdbId())
-                        .contentsType(contentsType)
-                        .contentsGenres(tmdbDetails.getGenres())
-                        .certification(tmdbDetails.getCertification())
-
-                        .originalTitle(tmdbDetails.getOriginalName())
-                        .originalLanguage(tmdbDetails.getOriginalLanguage())
-                        .translatedTitle(tmdbDetails.getName())
-
-                        .overview(tmdbDetails.getOverview())
-                        .tagline(tmdbDetails.getTagline())
-                        .posterPath(tmdbDetails.getPosterPath())
-                        .productionCountries(tmdbDetails.getProductionCountries())
-
-                        // TV 고유 데이터
-                        .firstAirDate(LocalDate.parse(tmdbDetails.getFirstAirDate()))
-                        .lastAirDate(LocalDate.parse(tmdbDetails.getLastAirDate()))
-                        .numberOfEpisodes(tmdbDetails.getNumberOfEpisodes())
-                        .numberOfSeasons(tmdbDetails.getNumberOfSeasons())
-
-                        .build();
 
                 // TV 데이터 DB 저장 및 contetns_id 설정
                 log.info("TV 데이터 저장 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getName());
-                tmdbDetails.setContentsId(contentsService.saveTvData(tvProgramData));
+                TvProgramData savedTvProgramData = contentsService.saveTvData(
+                        TvProgramData.builder()
+                                .tmdbId(tmdbDetails.getTmdbId())
+                                .contentsType(contentsType)
+                                .contentsGenres(tmdbDetails.getGenres())
+                                .certification(tmdbDetails.getCertification())
+
+                                .originalTitle(tmdbDetails.getOriginalName())
+                                .originalLanguage(tmdbDetails.getOriginalLanguage())
+                                .translatedTitle(tmdbDetails.getName())
+
+                                .overview(tmdbDetails.getOverview())
+                                .tagline(tmdbDetails.getTagline())
+                                .posterPath(tmdbDetails.getPosterPath())
+                                .productionCountries(tmdbDetails.getProductionCountries())
+
+                                // TV 고유 데이터
+                                .firstAirDate(LocalDate.parse(tmdbDetails.getFirstAirDate()))
+                                .lastAirDate(LocalDate.parse(tmdbDetails.getLastAirDate()))
+                                .numberOfEpisodes(tmdbDetails.getNumberOfEpisodes())
+                                .numberOfSeasons(tmdbDetails.getNumberOfSeasons())
+
+                                .build()
+                );
+                tmdbDetails.setContentsId(savedTvProgramData.getContentsId());
 
                 // 시즌 데이터 DB 저장
                 List<DetailsSeason> seasons = tmdbDetails.getSeasons();
@@ -91,40 +94,42 @@ public class TmdbDetailsSavingService {
                             .build();
 
                     log.info("SEASON 정보 DB 저장 시작");
-                    seasonService.saveSeasonInfo(seasonBuild);
-//                    seasonService.saveSeasonCollection(seasonBuild, tvProgramData);
+                    Season savedSeason = seasonService.saveSeasonInfo(seasonBuild);
+                    seasonService.saveSeasonCollection(savedSeason, savedTvProgramData);
                     log.info("SEASON 정보 DB 저장 완료");
                 }
             } else if (type.equals("movie")) {
-                MovieData movieData = MovieData.builder()
-                        .tmdbId(tmdbDetails.getTmdbId())
-                        .contentsType(contentsType)
-                        .contentsGenres(tmdbDetails.getGenres())
-                        .certification(tmdbDetails.getCertification())
 
-                        .originalTitle(tmdbDetails.getOriginalTitle())
-                        .originalLanguage(tmdbDetails.getOriginalLanguage())
-                        .translatedTitle(tmdbDetails.getTitle())
-
-                        .overview(tmdbDetails.getOverview())
-                        .tagline(tmdbDetails.getTagline())
-                        .posterPath(tmdbDetails.getPosterPath())
-                        .productionCountries(tmdbDetails.getProductionCountries())
-
-                        // MOVIE 고유 데이터
-                        .releaseDate(LocalDate.parse(tmdbDetails.getReleaseDate()))
-                        .releaseStatus(tmdbDetails.getStatus().equals("Released"))
-                        .runtime(tmdbDetails.getRuntime())
-
-                        .build();
-                
                 // MOVIE 데이터 DB 저장 및 contetns_id 설정
                 log.info("MOVIE 데이터 저장 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getTitle());
-                tmdbDetails.setContentsId(contentsService.saveMovieData(movieData));
+                tmdbDetails.setContentsId(contentsService.saveMovieData(
+                        MovieData.builder()
+                                .tmdbId(tmdbDetails.getTmdbId())
+                                .contentsType(contentsType)
+                                .contentsGenres(tmdbDetails.getGenres())
+                                .certification(tmdbDetails.getCertification())
+
+                                .originalTitle(tmdbDetails.getOriginalTitle())
+                                .originalLanguage(tmdbDetails.getOriginalLanguage())
+                                .translatedTitle(tmdbDetails.getTitle())
+
+                                .overview(tmdbDetails.getOverview())
+                                .tagline(tmdbDetails.getTagline())
+                                .posterPath(tmdbDetails.getPosterPath())
+                                .productionCountries(tmdbDetails.getProductionCountries())
+
+                                // MOVIE 고유 데이터
+                                .releaseDate(LocalDate.parse(tmdbDetails.getReleaseDate()))
+                                .releaseStatus(tmdbDetails.getStatus().equals("Released"))
+                                .runtime(tmdbDetails.getRuntime())
+
+                                .build()
+                ));
             }
 
             log.info("TMDB API details 및 credits 정보 DB 저장 완료");
             return tmdbDetails;
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
