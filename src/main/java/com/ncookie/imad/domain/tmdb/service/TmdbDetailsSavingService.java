@@ -6,6 +6,9 @@ import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.entity.MovieData;
 import com.ncookie.imad.domain.contents.entity.TvProgramData;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.networks.dto.DetailsNetworks;
+import com.ncookie.imad.domain.networks.entity.Networks;
+import com.ncookie.imad.domain.networks.service.NetworksService;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import com.ncookie.imad.domain.season.entity.Season;
 import com.ncookie.imad.domain.season.service.SeasonService;
@@ -33,11 +36,13 @@ import java.util.Set;
  */
 public class TmdbDetailsSavingService {
     private final ContentsService contentsService;
+
     private final SeasonService seasonService;
+    private final NetworksService networksService;
 
     @Transactional
     public TmdbDetails saveContentsDetails(String detailsJsonData, String type, String certification) {
-        // TODO: Networks, Season, Person Entity 저장
+        // TODO: Person Entity 저장
         // TODO: tmdb id와 type 사용하여 데이터베이스 중복 검사 선행
         /*
          * JSON 데이터를 분리해야 함
@@ -108,6 +113,19 @@ public class TmdbDetailsSavingService {
                 }
 
                 log.info("SEASON 정보 DB 저장 완료");
+
+                // 방송사 데이터 DB 저장
+                List<DetailsNetworks> networks = tmdbDetails.getNetworks();
+                for (DetailsNetworks n : networks) {
+                    Networks savedNetworksInfo = networksService.saveNetworksInfo(
+                            Networks.builder()
+                                    .networksId(n.getId())
+                                    .networksName(n.getName())
+                                    .logoPath(n.getLogoPath())
+                                    .originCountry(n.getOriginCountry())
+                                    .build());
+                    networksService.saveBroadcaster(savedNetworksInfo, savedTvProgramData);
+                }
             } else if (type.equals("movie")) {
 
                 // MOVIE 데이터 DB 저장 및 contetns_id 설정
