@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.contents.entity;
+package com.ncookie.imad.domain.season.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,5 +21,5 @@ public class Season {
     @Setter private int episodeCount;
     @Setter private String overview;
     @Setter private String posterPath;
-    @Setter private String seasonNumber;
+    @Setter private int seasonNumber;
 }
