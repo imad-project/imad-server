@@ -33,8 +33,11 @@ public class ContentsController {
     @GetMapping("/details")
     public ApiResponse<TmdbDetails> getContentsDetails(@RequestParam(value = "id") int id,
                                                        @RequestParam(value = "type") String type) {
+        // TMDB API 사용하여 details 및 certification 정보 받아옴
         String contentsDetails = contentsService.getContentsDetails(id, type);
         String contentsCertification = contentsService.getContentsCertification(id, type);
+        
+        // 받아온 데이터를 DTO 클래스에 매핑하고, 데이터베이스에 저장함
         TmdbDetails tmdbDetails = detailsSavingService.saveContentsDetails(contentsDetails, type, contentsCertification);
 
         return ApiResponse.createSuccess(ResponseCode.CONTENTS_GET_DETAILS_SUCCESS, tmdbDetails);
