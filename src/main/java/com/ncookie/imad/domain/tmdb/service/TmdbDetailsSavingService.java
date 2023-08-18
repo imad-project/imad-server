@@ -81,6 +81,8 @@ public class TmdbDetailsSavingService {
                 tmdbDetails.setContentsId(savedTvProgramData.getContentsId());
 
                 // 시즌 데이터 DB 저장
+                log.info("SEASON 정보 DB 저장 시작");
+
                 List<DetailsSeason> seasons = tmdbDetails.getSeasons();
                 for (DetailsSeason s : seasons) {
                     Season seasonBuild = Season.builder()
@@ -93,11 +95,11 @@ public class TmdbDetailsSavingService {
                             .seasonNumber(s.getSeasonNumber())
                             .build();
 
-                    log.info("SEASON 정보 DB 저장 시작");
                     Season savedSeason = seasonService.saveSeasonInfo(seasonBuild);
                     seasonService.saveSeasonCollection(savedSeason, savedTvProgramData);
-                    log.info("SEASON 정보 DB 저장 완료");
                 }
+
+                log.info("SEASON 정보 DB 저장 완료");
             } else if (type.equals("movie")) {
 
                 // MOVIE 데이터 DB 저장 및 contetns_id 설정
