@@ -11,7 +11,6 @@ import lombok.*;
 @Entity
 public class Networks {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long networksId;
 
     @Setter private String networksName;
