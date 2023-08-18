@@ -173,17 +173,8 @@ public class TmdbService {
 
                 List<DetailsSeason> seasons = tmdbDetails.getSeasons();
                 for (DetailsSeason s : seasons) {
-                    Season seasonBuild = Season.builder()
-                            .seasonId(s.getId())
-                            .seasonName(s.getName())
-                            .airDate(s.getAirDate())
-                            .episodeCount(s.getEpisodeCount())
-                            .overview(s.getOverview())
-                            .posterPath(s.getPosterPath())
-                            .seasonNumber(s.getSeasonNumber())
-                            .build();
 
-                    Season savedSeason = seasonService.saveSeasonInfo(seasonBuild);
+                    Season savedSeason = seasonService.saveSeasonInfo(Season.toEntity(s));
                     seasonService.saveSeasonCollection(savedSeason, savedTvProgramData);
                 }
 
@@ -192,13 +183,7 @@ public class TmdbService {
                 // 방송사 데이터 DB 저장
                 List<DetailsNetworks> networks = tmdbDetails.getNetworks();
                 for (DetailsNetworks n : networks) {
-                    Networks savedNetworksInfo = networksService.saveNetworksInfo(
-                            Networks.builder()
-                                    .networksId(n.getId())
-                                    .networksName(n.getName())
-                                    .logoPath(n.getLogoPath())
-                                    .originCountry(n.getOriginCountry())
-                                    .build());
+                    Networks savedNetworksInfo = networksService.saveNetworksInfo(Networks.toEntity(n));
                     networksService.saveBroadcaster(savedNetworksInfo, savedTvProgramData);
                 }
             } else if (type.equals("movie")) {
