@@ -117,16 +117,6 @@ public class TmdbService {
     public TmdbDetails saveAndGetContentsDetails(TmdbDetails tmdbDetails, String type, String certification) {
         // TODO: Person Entity 저장
         // TODO: TMDB 404 에러 발생했을 때 예외처리도 해줘야 함
-
-        // TODO: tmdb id와 type 사용하여 데이터베이스 중복 검사 선행
-        // 중복이면 어떻게 처리하럭ㄴ데?
-        /*
-         * JSON 데이터를 분리해야 함
-         * builder로 각 DTO 생성해주고, 해당하는 도메인의 service에 값을 전달하여 DB에 저장하도록 해야함
-         * 이를 위해 도메인 별 서비스에 repository save 메소드 추가
-         *
-         * DTO 클래스를 구현한 builder 객체를 연결 테이블에 할당하여 관계 구축
-         */
         // DB 변경점 : 장르 관련 테이블 제거, Contents에 공통 필드로 status 추가
 
         try {
