@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.ncookie.imad.domain.season.entity.Season;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,5 +32,17 @@ public class DetailsSeason {
     @JsonCreator
     public DetailsSeason(@JsonProperty("air_date") String airDateString) {
         this.airDate = LocalDate.parse(airDateString);
+    }
+
+    public static DetailsSeason toDTO(Season season) {
+        return  DetailsSeason.builder()
+                .id(season.getSeasonId())
+                .name(season.getSeasonName())
+                .airDate(season.getAirDate())
+                .episodeCount(season.getEpisodeCount())
+                .overview(season.getOverview())
+                .posterPath(season.getPosterPath())
+                .seasonNumber(season.getSeasonNumber())
+                .build();
     }
 }
