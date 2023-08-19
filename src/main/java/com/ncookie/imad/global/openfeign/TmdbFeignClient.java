@@ -1,6 +1,7 @@
 package com.ncookie.imad.global.openfeign;
 
 import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -46,7 +47,7 @@ public interface TmdbFeignClient {
 
     @GetMapping("/tv/{id}")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
-    String getTvDetailsById(
+    TmdbDetails getTvDetailsById(
             @RequestHeader(value = "Authorization") String apiKey,
             @PathVariable(value = "id") int id,
             @RequestParam(value = "language") String language,
@@ -55,7 +56,7 @@ public interface TmdbFeignClient {
 
     @GetMapping("/movie/{id}")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
-    String getMovieDetailsById(
+    TmdbDetails getMovieDetailsById(
             @RequestHeader(value = "Authorization") String apiKey,
             @PathVariable(value = "id") int id,
             @RequestParam(value = "language") String language,

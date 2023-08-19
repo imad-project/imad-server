@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class TmdbApiClient {
     }
 
     // 작품 상세 정보 조회
-    public String getContentsDetails(int id, String type) {
+    public TmdbDetails getContentsDetails(int id, String type) {
         if (type.equals("tv")) {
             return feignClient.getTvDetailsById(
                     apiProperties.getApiKey(),
