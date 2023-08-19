@@ -37,7 +37,7 @@ public class Contents {
     @Setter private String originalTitle;
     @Setter private String originalLanguage;
 
-    @Column(length = 1000)
+    @Column(length = 5000)
     @Setter
     private String overview;
     @Setter

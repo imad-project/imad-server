@@ -19,7 +19,10 @@ public class Season {
     @Setter private String seasonName;
     @Setter private LocalDate airDate;
     @Setter private int episodeCount;
+
+    @Column(length = 5000)
     @Setter private String overview;
+
     @Setter private String posterPath;
     @Setter private int seasonNumber;
 
