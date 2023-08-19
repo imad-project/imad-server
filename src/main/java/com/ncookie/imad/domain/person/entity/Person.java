@@ -18,7 +18,7 @@ public class Person {
     private Long personId;
 
     @OneToMany(mappedBy = "person")
-    private List<Filmography> filmography = new ArrayList<>();
+    private List<Credit> credit = new ArrayList<>();
 
     private String original_name;
     @Setter private String translated_name;

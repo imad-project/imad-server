@@ -10,10 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Filmography {
+public class Credit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long filmographyId;
+    private String creditId;
 
     @ManyToOne
     @JoinColumn(name = "person_id")
