@@ -31,7 +31,11 @@ public class DetailsSeason {
 
     @JsonCreator
     public DetailsSeason(@JsonProperty("air_date") String airDateString) {
-        this.airDate = LocalDate.parse(airDateString);
+        if (airDateString == null) {
+            this.airDate = null;
+        } else {
+            this.airDate = LocalDate.parse(airDateString);
+        }
     }
 
     public static DetailsSeason toDTO(Season season) {
