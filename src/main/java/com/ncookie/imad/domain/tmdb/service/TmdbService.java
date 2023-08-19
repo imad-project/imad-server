@@ -7,6 +7,7 @@ import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.networks.dto.DetailsNetworks;
 import com.ncookie.imad.domain.networks.entity.Networks;
 import com.ncookie.imad.domain.networks.service.NetworksService;
+import com.ncookie.imad.domain.person.dto.DetailsPerson;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import com.ncookie.imad.domain.season.entity.Season;
 import com.ncookie.imad.domain.season.service.SeasonService;
@@ -17,8 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -118,6 +118,7 @@ public class TmdbService {
         // TODO: Person Entity 저장
         // TODO: TMDB 404 에러 발생했을 때 예외처리도 해줘야 함
         // DB 변경점 : 장르 관련 테이블 제거, Contents에 공통 필드로 status 추가
+        // 필모그래피에 credit_id 추가, Filmography -> Credit으로 테이블 이름 변경, TMDB에서 제공하는 String 형식의 기본키 사용
 
         try {
             // 애니메이션 장르가 포함되어 있으면 contents_type을 "ANIMATION"으로 설정
@@ -125,6 +126,46 @@ public class TmdbService {
 
             tmdbDetails.setContentsType(contentsType);
             tmdbDetails.setCertification(certification);
+
+            // TODO: credits TmdbDetails에 가공 및 DB 저장
+            // Cast(배우)의 경우, 최대 10명 분의 데이터만 저장한다.
+            List<DetailsPerson> castList = new ArrayList<>();
+            List<DetailsPerson> originalCastList = tmdbDetails.getCredits().getCast();
+            castList = originalCastList.subList(0, Math.min(originalCastList.size(), 10));
+
+            List<DetailsPerson> originalCrewList = tmdbDetails.getCredits().getCrew();
+            Map<Long, DetailsPerson> crewDuplicationMap = new HashMap<>();
+
+            // Crew(감독, 작가, PD 등)의 경우, 중복되는 인물이라면 knowForDepartment, department, job을 컴마로 구분하여 한 객체에 저장한다
+            for (DetailsPerson person : originalCrewList) {
+                if (isValidCrewJob(person.getJob())) {
+                    long id = person.getId();
+
+                    // id로 중복검사 시행
+                    if (crewDuplicationMap.containsKey(id)) {
+                        DetailsPerson existingCrew = crewDuplicationMap.get(id);
+                        existingCrew.setKnownForDepartment(existingCrew.getKnownForDepartment() + "," + person.getKnownForDepartment());
+                        existingCrew.setDepartment(existingCrew.getDepartment() + "," + person.getDepartment());
+                        existingCrew.setJob(existingCrew.getJob() + "," + person.getJob());
+
+                        // 인물 중요도 +1
+                        existingCrew.setImportanceOrder(existingCrew.getImportanceOrder() + 1);
+                    } else {
+                        crewDuplicationMap.put(id, person);
+                    }
+                }
+            }
+
+            // 통합한 문자열에 중복되는 데이터가 있다면 중복제거
+            List<DetailsPerson> crewList = new ArrayList<>(crewDuplicationMap.values());
+            for (DetailsPerson crew : crewList) {
+                crew.setKnownForDepartment(removeDuplicatesAndJoin(crew.getKnownForDepartment()));
+                crew.setDepartment(removeDuplicatesAndJoin(crew.getDepartment()));
+                crew.setJob(removeDuplicatesAndJoin(crew.getJob()));
+            }
+
+            tmdbDetails.getCredits().setCast(castList);
+            tmdbDetails.getCredits().setCrew(crewList);
 
             if (type.equals(ContentsType.TV)) {
 
@@ -221,5 +262,17 @@ public class TmdbService {
         } else {
             return type.equals(ContentsType.TV) ? ContentsType.TV : ContentsType.MOVIE;
         }
+    }
+
+    private boolean isValidCrewJob(String job) {
+        return job.equals("Producer") || job.equals("Executive Producer")  || job.equals("Director")
+                || job.equals("Writer") || job.equals("Story") || job.equals("Screenplay");
+    }
+
+    private String removeDuplicatesAndJoin(String input) {
+        String[] items = input.split(",");
+        Set<String> uniqueItems = new LinkedHashSet<>(Arrays.asList(items));  // 중복 제거하면서 순서 유지
+
+        return String.join(",", uniqueItems);
     }
 }

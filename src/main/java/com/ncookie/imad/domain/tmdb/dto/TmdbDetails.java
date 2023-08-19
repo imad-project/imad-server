@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.networks.dto.DetailsNetworks;
+import com.ncookie.imad.domain.person.dto.DetailsCredits;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import lombok.*;
 
@@ -58,6 +59,11 @@ public class TmdbDetails {
 
     private List<DetailsSeason> seasons;
     private List<DetailsNetworks> networks;
+
+
+    // Credits
+    @JsonProperty("credits")
+    private DetailsCredits credits;
 
 
     @JsonCreator
