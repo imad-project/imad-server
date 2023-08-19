@@ -45,9 +45,11 @@ public class TmdbService {
         TmdbDetails tmdbDetails = TmdbDetails.builder().build();
 
         if (type.equals(ContentsType.TV)) {
+            log.info("TV 데이터를 DB로부터 조회 시작");
             TvProgramData tvProgramData = contentsService.getTvProgramDataByTmdbIdAndTmdbType(id, type);
             List<Season> seasonsEntities = seasonService.getSeasonsEntities(tvProgramData);
             List<Networks> networksEntities = networksService.getNetworksEntities(tvProgramData);
+            log.info("TV 데이터를 DB로부터 조회 완료 : [" + tvProgramData.getContentsId() + "] " + tvProgramData.getTranslatedTitle());
 
             tmdbDetails = TmdbDetails.builder()
                     .contentsId(tvProgramData.getContentsId())
@@ -82,7 +84,9 @@ public class TmdbService {
                     .build();
 
         } else if (type.equals(ContentsType.MOVIE)) {
+            log.info("영화 데이터를 DB로부터 조회 시작");
             MovieData movieData = contentsService.getMovieDataByTmdbIdAndTmdbType(id, type);
+            log.info("영화 데이터를 DB로부터 조회 완료 : [" + movieData.getContentsId() + "] " + movieData.getTranslatedTitle());
 
             tmdbDetails = TmdbDetails.builder()
                     .contentsId(movieData.getContentsId())
@@ -170,7 +174,7 @@ public class TmdbService {
             if (type.equals(ContentsType.TV)) {
 
                 // TV 데이터 DB 저장 및 contetns_id 설정
-                log.info("TV 데이터 저장 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getName());
+                log.info("TV 데이터 DB 저장 시작 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getName());
                 TvProgramData savedTvProgramData = contentsService.saveTvData(
                         TvProgramData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
@@ -198,6 +202,7 @@ public class TmdbService {
                                 .build()
                 );
                 tmdbDetails.setContentsId(savedTvProgramData.getContentsId());
+                log.info("TV 데이터 DB 저장 완료 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getName());
 
                 // 시즌 데이터 DB 저장
                 log.info("SEASON 정보 DB 저장 시작");
@@ -208,19 +213,21 @@ public class TmdbService {
                     Season savedSeason = seasonService.saveSeasonInfo(Season.toEntity(s));
                     seasonService.saveSeasonCollection(savedSeason, savedTvProgramData);
                 }
-
                 log.info("SEASON 정보 DB 저장 완료");
 
                 // 방송사 데이터 DB 저장
+                log.info("방송자 정보 DB 저장 시작");
                 List<DetailsNetworks> networks = tmdbDetails.getNetworks();
                 for (DetailsNetworks n : networks) {
                     Networks savedNetworksInfo = networksService.saveNetworksInfo(Networks.toEntity(n));
                     networksService.saveBroadcaster(savedNetworksInfo, savedTvProgramData);
                 }
+                log.info("방송자 정보 DB 저장 완료");
+                
             } else if (type.equals(ContentsType.MOVIE)) {
 
                 // MOVIE 데이터 DB 저장 및 contetns_id 설정
-                log.info("MOVIE 데이터 저장 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getTitle());
+                log.info("MOVIE 데이터 DB 저장 시작 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getTitle());
                 tmdbDetails.setContentsId(contentsService.saveMovieData(
                         MovieData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
@@ -246,12 +253,14 @@ public class TmdbService {
 
                                 .build()
                 ));
+                log.info("MOVIE 데이터 DB 저장 완료 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getTitle());
             }
 
             log.info("TMDB API details 및 credits 정보 DB 저장 완료");
             return tmdbDetails;
 
         } catch (Exception e) {
+            log.error("에러가 발생하여 정상적으로 작품 DB 저장을 완료하지 못했습니다. 이전의 상태로 롤백합니다.");
             throw new RuntimeException(e);
         }
     }
