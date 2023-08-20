@@ -181,7 +181,6 @@ public class TmdbService {
 
     @Transactional
     public TmdbDetails saveContentsDetails(TmdbDetails tmdbDetails, ContentsType type, String certification) {
-        // TODO: TMDB 404 에러 발생했을 때 예외처리도 해줘야 함
         // DB 변경점 : 장르 관련 테이블 제거, Contents에 공통 필드로 status 추가
         // 필모그래피에 credit_id 추가, Filmography -> Credit으로 테이블 이름 변경, TMDB에서 제공하는 String 형식의 기본키 사용
 
