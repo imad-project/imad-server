@@ -37,8 +37,8 @@ public class ContentsService {
         return apiClient.getContentsCertification(id, type);
     }
 
-    public long saveMovieData(MovieData movieData) {
-        return movieDataRepository.save(movieData).getContentsId();
+    public MovieData saveMovieData(MovieData movieData) {
+        return movieDataRepository.save(movieData);
     }
 
     // SeasonCollection, Broadcast 같은 연결테이블에 데이터를 추가하기 위해서는 save 이후의 entity 객체가 필요함

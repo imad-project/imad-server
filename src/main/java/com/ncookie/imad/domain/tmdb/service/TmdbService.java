@@ -8,6 +8,8 @@ import com.ncookie.imad.domain.networks.dto.DetailsNetworks;
 import com.ncookie.imad.domain.networks.entity.Networks;
 import com.ncookie.imad.domain.networks.service.NetworksService;
 import com.ncookie.imad.domain.person.dto.DetailsPerson;
+import com.ncookie.imad.domain.person.entity.Person;
+import com.ncookie.imad.domain.person.service.PersonService;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import com.ncookie.imad.domain.season.entity.Season;
 import com.ncookie.imad.domain.season.service.SeasonService;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RequiredArgsConstructor
@@ -38,6 +41,8 @@ public class TmdbService {
 
     private final SeasonService seasonService;
     private final NetworksService networksService;
+
+    private final PersonService personService;
 
 
     @Transactional
@@ -119,23 +124,24 @@ public class TmdbService {
 
     @Transactional
     public TmdbDetails saveContentsDetails(TmdbDetails tmdbDetails, ContentsType type, String certification) {
-        // TODO: Person Entity 저장
         // TODO: TMDB 404 에러 발생했을 때 예외처리도 해줘야 함
         // DB 변경점 : 장르 관련 테이블 제거, Contents에 공통 필드로 status 추가
         // 필모그래피에 credit_id 추가, Filmography -> Credit으로 테이블 이름 변경, TMDB에서 제공하는 String 형식의 기본키 사용
 
+        // 애니메이션 장르가 포함되어 있으면 contents_type을 "ANIMATION"으로 설정
+        ContentsType contentsType = checkAnimationGenre(tmdbDetails.getGenres(), type);
+
+        tmdbDetails.setContentsType(contentsType);
+        tmdbDetails.setCertification(certification);
+
+        // repository save 이후 반환될 entity를 저장할 변수들 선언
+        TvProgramData savedTvProgramData = null;
+        MovieData savedMovieData = null;
+
         try {
-            // 애니메이션 장르가 포함되어 있으면 contents_type을 "ANIMATION"으로 설정
-            ContentsType contentsType = checkAnimationGenre(tmdbDetails.getGenres(), type);
-
-            tmdbDetails.setContentsType(contentsType);
-            tmdbDetails.setCertification(certification);
-
-            // TODO: credits TmdbDetails에 가공 및 DB 저장
             // Cast(배우)의 경우, 최대 10명 분의 데이터만 저장한다.
-            List<DetailsPerson> castList = new ArrayList<>();
             List<DetailsPerson> originalCastList = tmdbDetails.getCredits().getCast();
-            castList = originalCastList.subList(0, Math.min(originalCastList.size(), 10));
+            List<DetailsPerson> castList = originalCastList.subList(0, Math.min(originalCastList.size(), 10));
 
             List<DetailsPerson> originalCrewList = tmdbDetails.getCredits().getCrew();
             Map<Long, DetailsPerson> crewDuplicationMap = new HashMap<>();
@@ -168,6 +174,7 @@ public class TmdbService {
                 crew.setJob(removeDuplicatesAndJoin(crew.getJob()));
             }
 
+            // TmdbDetails Credits에 가공한 데이터 세팅
             tmdbDetails.getCredits().setCast(castList);
             tmdbDetails.getCredits().setCrew(crewList);
 
@@ -175,7 +182,7 @@ public class TmdbService {
 
                 // TV 데이터 DB 저장 및 contetns_id 설정
                 log.info("TV 데이터 DB 저장 시작 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getName());
-                TvProgramData savedTvProgramData = contentsService.saveTvData(
+                savedTvProgramData = contentsService.saveTvData(
                         TvProgramData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
                                 .tmdbType(ContentsType.TV)
@@ -223,12 +230,12 @@ public class TmdbService {
                     networksService.saveBroadcaster(savedNetworksInfo, savedTvProgramData);
                 }
                 log.info("방송자 정보 DB 저장 완료");
-                
+
             } else if (type.equals(ContentsType.MOVIE)) {
 
                 // MOVIE 데이터 DB 저장 및 contetns_id 설정
                 log.info("MOVIE 데이터 DB 저장 시작 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getTitle());
-                tmdbDetails.setContentsId(contentsService.saveMovieData(
+                savedMovieData = contentsService.saveMovieData(
                         MovieData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
                                 .tmdbType(ContentsType.MOVIE)
@@ -252,9 +259,23 @@ public class TmdbService {
                                 .runtime(tmdbDetails.getRuntime())
 
                                 .build()
-                ));
+                );
+                tmdbDetails.setContentsId(savedMovieData.getContentsId());
                 log.info("MOVIE 데이터 DB 저장 완료 : [" + tmdbDetails.getTmdbId() + "] " + tmdbDetails.getTitle());
             }
+
+            // Credits 데이터 DB 저장
+            // castList와 crewList 데이터를 합쳐서 하나의 리스트에서 루프
+            log.info("Credits 정보 DB 저장 시작");
+            for (DetailsPerson person : Stream.concat(castList.stream(), crewList.stream()).toList()) {
+                Person savedPersonEntity = personService.savePersonEntity(Person.toEntity(person));
+                if (type.equals(ContentsType.TV)) {
+                    personService.saveCredit(person, savedPersonEntity, savedTvProgramData);
+                } else if (type.equals(ContentsType.MOVIE)) {
+                    personService.saveCredit(person, savedPersonEntity, savedMovieData);
+                }
+            }
+            log.info("Credits 정보 DB 저장 완료");
 
             log.info("TMDB API details 및 credits 정보 DB 저장 완료");
             return tmdbDetails;
