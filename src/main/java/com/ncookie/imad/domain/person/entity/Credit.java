@@ -42,4 +42,8 @@ public class Credit {
     @Setter
     // 배역명. 배우들만 해당됨
     private String characterName;
+    
+    @Setter
+    // credit의 타입이 cast(배우)인지, crew(스태프)인지 구분하기 위한 칼럼
+    private CreditType creditType;
 }

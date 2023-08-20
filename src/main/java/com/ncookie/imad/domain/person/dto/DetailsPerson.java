@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.ncookie.imad.domain.person.entity.CreditType;
 import com.ncookie.imad.domain.user.entity.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +37,8 @@ public class DetailsPerson {
     // 클라이언트 화면에서 작품정보의 상단에 표시되는 인물을 구분하기 위해서 이 변수를 만들었다.
     // crew 데이터의 리스트에서 중복될수록 카운트를 +1 한다.
     private int importanceOrder;
+
+    private CreditType creditType;
 
     @JsonCreator
     public DetailsPerson(@JsonProperty("gender") int gender) {

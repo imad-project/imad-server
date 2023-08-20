@@ -8,6 +8,7 @@ import com.ncookie.imad.domain.networks.dto.DetailsNetworks;
 import com.ncookie.imad.domain.networks.entity.Networks;
 import com.ncookie.imad.domain.networks.service.NetworksService;
 import com.ncookie.imad.domain.person.dto.DetailsPerson;
+import com.ncookie.imad.domain.person.entity.CreditType;
 import com.ncookie.imad.domain.person.entity.Person;
 import com.ncookie.imad.domain.person.service.PersonService;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
@@ -44,6 +45,8 @@ public class TmdbService {
 
     private final PersonService personService;
 
+    // 데이터 가공 시 캐스팅된 배우를 최대 몇 명까지 저장할지 지정
+    private final int MAX_CAST_LIST_SIZE = 10;
 
     @Transactional
     public TmdbDetails getTmdbDetails(long id, ContentsType type) {
@@ -139,42 +142,11 @@ public class TmdbService {
         MovieData savedMovieData = null;
 
         try {
-            // Cast(배우)의 경우, 최대 10명 분의 데이터만 저장한다.
-            List<DetailsPerson> originalCastList = tmdbDetails.getCredits().getCast();
-            List<DetailsPerson> castList = originalCastList.subList(0, Math.min(originalCastList.size(), 10));
+            // credits 데이터 가공
+            List<DetailsPerson> castList = getCastListWithMaximumSize(tmdbDetails.getCredits().getCast());
+            List<DetailsPerson> crewList = mergeAndCleanDuplicateCrew(tmdbDetails.getCredits().getCrew());
 
-            List<DetailsPerson> originalCrewList = tmdbDetails.getCredits().getCrew();
-            Map<Long, DetailsPerson> crewDuplicationMap = new HashMap<>();
-
-            // Crew(감독, 작가, PD 등)의 경우, 중복되는 인물이라면 knowForDepartment, department, job을 컴마로 구분하여 한 객체에 저장한다
-            for (DetailsPerson person : originalCrewList) {
-                if (isValidCrewJob(person.getJob())) {
-                    long id = person.getId();
-
-                    // id로 중복검사 시행
-                    if (crewDuplicationMap.containsKey(id)) {
-                        DetailsPerson existingCrew = crewDuplicationMap.get(id);
-                        existingCrew.setKnownForDepartment(existingCrew.getKnownForDepartment() + "," + person.getKnownForDepartment());
-                        existingCrew.setDepartment(existingCrew.getDepartment() + "," + person.getDepartment());
-                        existingCrew.setJob(existingCrew.getJob() + "," + person.getJob());
-
-                        // 인물 중요도 +1
-                        existingCrew.setImportanceOrder(existingCrew.getImportanceOrder() + 1);
-                    } else {
-                        crewDuplicationMap.put(id, person);
-                    }
-                }
-            }
-
-            // 통합한 문자열에 중복되는 데이터가 있다면 중복제거
-            List<DetailsPerson> crewList = new ArrayList<>(crewDuplicationMap.values());
-            for (DetailsPerson crew : crewList) {
-                crew.setKnownForDepartment(removeDuplicatesAndJoin(crew.getKnownForDepartment()));
-                crew.setDepartment(removeDuplicatesAndJoin(crew.getDepartment()));
-                crew.setJob(removeDuplicatesAndJoin(crew.getJob()));
-            }
-
-            // TmdbDetails Credits에 가공한 데이터 세팅
+            // TmdbDetails의 credits에 가공한 데이터 세팅
             tmdbDetails.getCredits().setCast(castList);
             tmdbDetails.getCredits().setCrew(crewList);
 
@@ -286,12 +258,54 @@ public class TmdbService {
         }
     }
 
+
     private ContentsType checkAnimationGenre(Set<Integer> genres, ContentsType type) {
         if (genres.contains(16)) {
             return ContentsType.ANIMATION;
         } else {
             return type.equals(ContentsType.TV) ? ContentsType.TV : ContentsType.MOVIE;
         }
+    }
+
+    private List<DetailsPerson> getCastListWithMaximumSize(List<DetailsPerson> originalCastList) {
+        // Cast(배우)의 경우, 최대 N명 분의 데이터만 저장한다.
+        originalCastList.forEach(person -> person.setCreditType(CreditType.CAST));
+        return originalCastList.subList(0, Math.min(originalCastList.size(), MAX_CAST_LIST_SIZE));
+    }
+
+    private List<DetailsPerson> mergeAndCleanDuplicateCrew(List<DetailsPerson> originalCrewList) {
+        Map<Long, DetailsPerson> crewDuplicationMap = new HashMap<>();
+
+        // Crew(감독, 작가, PD 등)의 경우, 중복되는 인물이라면 knowForDepartment, department, job을 컴마로 구분하여 한 객체에 저장한다
+        for (DetailsPerson person : originalCrewList) {
+            if (isValidCrewJob(person.getJob())) {
+                long id = person.getId();
+
+                // id로 중복검사 시행
+                if (crewDuplicationMap.containsKey(id)) {
+                    DetailsPerson existingCrew = crewDuplicationMap.get(id);
+                    existingCrew.setKnownForDepartment(existingCrew.getKnownForDepartment() + "," + person.getKnownForDepartment());
+                    existingCrew.setDepartment(existingCrew.getDepartment() + "," + person.getDepartment());
+                    existingCrew.setJob(existingCrew.getJob() + "," + person.getJob());
+
+                    // 인물 중요도 +1
+                    existingCrew.setImportanceOrder(existingCrew.getImportanceOrder() + 1);
+                } else {
+                    person.setCreditType(CreditType.CREW);
+                    crewDuplicationMap.put(id, person);
+                }
+            }
+        }
+
+        // 통합한 문자열에 중복되는 데이터가 있다면 중복제거
+        List<DetailsPerson> crewList = new ArrayList<>(crewDuplicationMap.values());
+        for (DetailsPerson crew : crewList) {
+            crew.setKnownForDepartment(removeDuplicatesAndJoin(crew.getKnownForDepartment()));
+            crew.setDepartment(removeDuplicatesAndJoin(crew.getDepartment()));
+            crew.setJob(removeDuplicatesAndJoin(crew.getJob()));
+        }
+
+        return crewList;
     }
 
     private boolean isValidCrewJob(String job) {

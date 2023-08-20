@@ -2,7 +2,6 @@ package com.ncookie.imad.domain.person.service;
 
 import com.ncookie.imad.domain.contents.entity.MovieData;
 import com.ncookie.imad.domain.contents.entity.TvProgramData;
-import com.ncookie.imad.domain.person.dto.DetailsCredits;
 import com.ncookie.imad.domain.person.dto.DetailsPerson;
 import com.ncookie.imad.domain.person.entity.Credit;
 import com.ncookie.imad.domain.person.entity.Person;
@@ -33,6 +32,7 @@ public class PersonService {
                         .department(credit.getDepartment())
                         .job(credit.getJob())
                         .characterName(credit.getCharacter())
+                        .creditType(credit.getCreditType())
                         .build());
     }
 
@@ -46,6 +46,7 @@ public class PersonService {
                         .department(credit.getDepartment())
                         .job(credit.getJob())
                         .characterName(credit.getCharacter())
+                        .creditType(credit.getCreditType())
                         .build());
     }
 }
