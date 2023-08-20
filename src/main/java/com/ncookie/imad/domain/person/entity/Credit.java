@@ -10,10 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Filmography {
+public class Credit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long filmographyId;
+    private String creditId;
 
     @ManyToOne
     @JoinColumn(name = "person_id")
@@ -43,4 +42,8 @@ public class Filmography {
     @Setter
     // 배역명. 배우들만 해당됨
     private String characterName;
+    
+    @Setter
+    // credit의 타입이 cast(배우)인지, crew(스태프)인지 구분하기 위한 칼럼
+    private CreditType creditType;
 }

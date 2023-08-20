@@ -39,6 +39,7 @@ public enum ResponseCode {
 
     CONTENTS_GET_DETAILS_SUCCESS(200, "작품 상세 정보 조회를 완료했습니다."),
     CONTENTS_GET_DETAILS_WRONG_TYPE(400, "잘못된 작품 타입입니다. (TV / MOVIE만 가능)"),
+    CONTENTS_NOT_EXIST_TMDB_ID(404, "유효하지 않은 id이거나 TMDB API 서버에 문제가 발생했습니다."),
 
 
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),

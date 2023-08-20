@@ -7,6 +7,7 @@ import com.ncookie.imad.domain.contents.dto.SearchResponse;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -40,20 +41,25 @@ public class TmdbApiClient {
 
     // 작품 상세 정보 조회
     public TmdbDetails getContentsDetails(int id, String type) {
-        if (type.equals("tv")) {
-            return feignClient.getTvDetailsById(
-                    apiProperties.getApiKey(),
-                    id,
-                    language,
-                    listStringTocommaSeparatedString(appendResponseForDetails));
-        } else if (type.equals("movie")) {
-            return feignClient.getMovieDetailsById(
-                    apiProperties.getApiKey(),
-                    id,
-                    language,
-                    listStringTocommaSeparatedString(appendResponseForDetails));
-        } else {
-            throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
+        try {
+
+            if (type.equals("tv")) {
+                return feignClient.getTvDetailsById(
+                        apiProperties.getApiKey(),
+                        id,
+                        language,
+                        listStringTocommaSeparatedString(appendResponseForDetails));
+            } else if (type.equals("movie")) {
+                return feignClient.getMovieDetailsById(
+                        apiProperties.getApiKey(),
+                        id,
+                        language,
+                        listStringTocommaSeparatedString(appendResponseForDetails));
+            } else {
+                throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
+            }
+        } catch (FeignException e) {
+            throw new BadRequestException(ResponseCode.CONTENTS_NOT_EXIST_TMDB_ID);
         }
     }
 

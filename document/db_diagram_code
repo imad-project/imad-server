@@ -1,0 +1,382 @@
+/*
+ * ==================================================
+ * https://dbdiagram.io/ 에서 편집하는 DB UML의 코드
+ * ==================================================
+ */
+
+Table User {
+  user_id integer [primary key]
+
+  email varchar
+  password varchar
+
+  user_nickname varchar
+  gender varchar
+  age_range integer
+  profile_image varchar
+
+  role varchar
+  auth_provider varchar
+
+  social_id varchar
+  oauth2_access_token varchar
+  refresh_token varchar
+}
+
+/*
+ * Movie / TV Program 상위 테이블
+ * ===============================================
+ */
+Table Contents {
+  contents_id integer [primary key]
+
+  contents_type varchar [note: "MOIVE, TV, ANIMATINO으로 임의로 구분함"]
+
+  tmdb_id integer
+  tmdb_type varchar [note: "TMDB의 분류 기준으로, TV와 MOVIE가 있음"]
+
+  translated_title varchar
+  origianl_title varchar
+  origianl_language varchar
+  tagline varchar
+
+  overview varchar
+  poster_path varchar
+  production_countries varchar
+  certifications varchar [note: "시청 등급"]
+
+  status varchar
+
+  review_cnt integer [note: "작품 리뷰 수"]
+  article_cnt integer [note: "작품 게시글 수"]
+  imad_score float [note: "IMAD 자체 평점"]
+}
+
+/*
+ * Movie 관련 테이블
+ * ===============================================
+ */
+Table MovieData {
+  contents_id integer [primary key]
+
+  release_date date [note: "국내 개봉일 기준"]
+  release_status integer [note: "개봉 여부"]
+  runtime integer
+}
+
+/*
+ * TV Program 관련 테이블
+ * ===============================================
+ */
+Table TvProgramData {
+  contents_id integer [primary key]
+
+  first_air_date date
+  last_air_date date
+  number_of_episodes integer
+  number_of_seasons integer
+}
+
+Table Networks [note: "방송사, OTT 등"] {
+  networks_id integer [primary key]
+
+  networks_name varchar
+  logo_path varchar
+  origin_country varchar
+}
+
+Table Broadcaster {
+  broadcaster_id integer [primary key]
+  contents_id integer
+
+  networks_id integer [primary key]
+}
+
+Table Season {
+  season_id integer [primary key]
+
+  name varchar
+  air_date date
+  episode_count integer
+  overview varchar
+  poster_path varchar
+  season_number integer
+}
+
+Table SeasonCollection {
+  season_collection_id integer [primary key]
+
+  contents_id integer
+  season_id integer [primary key]
+}
+
+
+/*
+ * 배우 및 스태프 관련 테이블
+ * ===============================================
+ */
+ Table Person {
+  person_id integer [primary key]
+
+  original_name varchar
+  translated_name varchar
+  gender integer
+  profile_path varchar
+ }
+
+ Table Credit {
+  credit_id varchar [primary key]
+
+  contents_id integer
+  person_id integer
+
+  department varchar [note: "Ex) Writing"]
+  job varchar [note: "Ex) Story"]
+  known_for_department varchar [note: "유명분야"]
+  character varchar [note: "스태프가 연기도 겸한 경우"]
+
+  credit_type varchar [note: "credit의 타입이 cast(배우)인지, crew(스태프)인지 구분하기 위한 칼럼"]
+ }
+
+
+/*
+ * 장르 관련 테이블
+ * ===============================================
+ */
+Table Genre {
+  genre_id integer [primary key]
+
+  name varchar
+}
+
+Table UserPreferredGenre {
+  user_preferred_genre_id integer [primary key]
+
+  genre_id integer
+  user_id integer
+
+  rate integer [note: "장르 선호점수"]
+}
+
+Table ContentsGenre {
+  contents_genre_id integer [primary key]
+
+  genre_id integer
+  contents_id integer
+}
+
+
+/*
+ * 리뷰 관련 테이블
+ * ===============================================
+ */
+Table Review {
+  review_id integer [primary key]
+
+  user_id integer
+  contents_id integer
+
+  title varchar
+  content varchar
+  rate float [note: "작품 평점"]
+  is_spoiler boolean
+
+  like_cnt integer
+  dislike_cnt integer
+
+  created_at datetime
+  modified_at datetime
+}
+
+
+/*
+ * 게시글 관련 테이블
+ * ===============================================
+ */
+Table Posting {
+  posting_id integer [primary key]
+
+  user_id integer
+  contents_id integer
+
+  category integer
+  title varchar
+  content varchar
+  is_spoiler boolean
+
+  view_cnt integer
+  comment_cnt integer
+  like_cnt integer
+  dislike_cnt integer
+
+  created_at datetime
+  modified_at datetime
+}
+
+Table Comment {
+  comment_id integer [primary key]
+
+  user_id integer
+  posting_id integer
+
+  content text
+  comment_order integer
+  created_at datetime
+  modified_at datetime
+}
+
+
+/*
+ * 리뷰 및 게시글 추천/비추천 관련 테이블
+ * ===============================================
+ * 추천이면 +1, 비추천이면 -1, 아무 상태도 아니면 0이므로 해당 데이터 삭제
+ */
+Table ReviewLike {
+  review_like_id integer [primary key]
+
+  user_id integer
+  review_id integer
+
+  like_status integer [note: "추천이면 +1, 비추천이면 -1, 아무 상태도 아니면 해당 데이터 삭제"]
+}
+
+Table PostingLike {
+  posting_like_id integer [primary key]
+
+  user_id integer
+  posting_id integer
+
+  like_status integer [note: "추천이면 +1, 비추천이면 -1, 아무 상태도 아니면 해당 데이터 삭제"]
+}
+
+
+/*
+ * 북마크 관련 테이블
+ * ===============================================
+ * 추천이면 +1, 비추천이면 -1, 아무 상태도 아니면 0이므로 해당 데이터 삭제
+ */
+ Table PostingBookmark {
+  posting_bookmark_id integer [primary key]
+
+  user_id integer
+  posting_id integer
+
+  bookmark_status integer
+ }
+
+ Table ContentsBookmark {
+  contents_bookmark_id integer [primary key]
+
+  user_id integer
+  contents_id integer
+
+  bookmark_status integer
+ }
+
+
+/*
+ * 랭킹 관련 테이블
+ * ===============================================
+ */
+Table AllTimeScore {
+  all_time_score_id integer [primary key]
+
+  contents_id integer
+
+  ranking_score integer
+}
+
+Table AllTimeRanking {
+  all_time_ranking_id integer [primary key]
+
+  contents_id integer
+
+  all_time_rank integer
+  rank_changed integer
+}
+
+Table WeeklyScore {
+  weekly_score_id integer [primary key]
+
+  contents_id integer
+
+  ranking_score integer
+  ref_date date
+}
+
+Table WeeklyRanking {
+  weekly_ranking_id integer [primary key]
+
+  contents_id integer
+
+  weekly_rank integer
+  rank_changed integer
+}
+
+
+
+/*
+ * 참조 관계
+ * ===============================================
+ */
+// Contents : Movie / TV Program
+Ref: Contents.contents_id < MovieData.contents_id
+Ref: Contents.contents_id < TvProgramData.contents_id
+
+Ref: TvProgramData.contents_id < Broadcaster.contents_id
+Ref: Networks.networks_id < Broadcaster.networks_id
+
+Ref: TvProgramData.contents_id < SeasonCollection.contents_id
+Ref: Season.season_id < SeasonCollection.season_id
+
+
+// Contents : Crew / Actor
+Ref: Contents.contents_id < Credit.contents_id
+Ref: Person.person_id < Credit.person_id
+
+
+// Genre : User / Contents
+Ref: Genre.genre_id < UserPreferredGenre.genre_id
+Ref: User.user_id < UserPreferredGenre.user_id
+
+Ref: Genre.genre_id < ContentsGenre.genre_id
+Ref: Contents.contents_id < ContentsGenre.contents_id
+
+
+// Review : User / Contents
+Ref: User.user_id < Review.user_id
+Ref: Contents.contents_id < Review.contents_id
+
+
+// Posting : Comment
+Ref: User.user_id < Posting.user_id
+Ref: Contents.contents_id < Posting.contents_id
+
+Ref: User.user_id < Comment.user_id
+Ref: Posting.posting_id < Comment.posting_id
+
+
+// Contetns : Score / Ranking
+Ref: Contents.contents_id < AllTimeScore.contents_id
+
+Ref: Contents.contents_id < AllTimeRanking.contents_id
+
+Ref: Contents.contents_id < WeeklyScore.contents_id
+
+Ref: Contents.contents_id < WeeklyRanking.contents_id
+
+
+// Like : Review / Posting
+Ref: User.user_id < ReviewLike.user_id
+Ref: Review.review_id < ReviewLike.review_id
+
+Ref: User.user_id < PostingLike.user_id
+Ref: Posting.posting_id < PostingLike.posting_id
+
+
+// Bookmark : Aritlce / Contents / User
+Ref: User.user_id < PostingBookmark.user_id
+Ref: Posting.posting_id < PostingBookmark.posting_id
+
+Ref: User.user_id < ContentsBookmark.user_id
+Ref: Contents.contents_id < ContentsBookmark.contents_id
