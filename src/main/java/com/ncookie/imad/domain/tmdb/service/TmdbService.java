@@ -195,6 +195,14 @@ public class TmdbService {
 
         try {
             // credits 데이터 가공
+            /*
+             * 가공 관련 정보
+             * cast는 최대 10명까지만 저장하며, crew는 producer, director, writer 등의 job을 가진 인물들만 추출하여 저장한다.
+             *
+             * 작품 정보의 상단에 위치하는 대표인물의 경우, TMDB 데이터에서는 별도로 표기하지 않기 때문에 나름의 판단기준을 만들어보았다.
+             * 1. TV의 경우 Executive Producer, MOVIE는 Director가 대표인물인 경우가 많다.
+             * 2. importanceOrder 값이 높을수록 대표인물일 가능성이 높다. 따라서 정렬을 하게 될 경우 이 값을 기준으로 한다.
+             */
             List<DetailsPerson> castList = getCastListWithMaximumSize(tmdbDetails.getCredits().getCast());
             List<DetailsPerson> crewList = mergeAndCleanDuplicateCrew(tmdbDetails.getCredits().getCrew());
 
