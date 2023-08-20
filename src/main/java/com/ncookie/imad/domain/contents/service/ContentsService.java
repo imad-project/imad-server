@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.contents.service;
 
 import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.entity.MovieData;
 import com.ncookie.imad.domain.contents.entity.TvProgramData;
@@ -20,9 +21,10 @@ import org.springframework.stereotype.Service;
 public class ContentsService {
     private final TmdbApiClient apiClient;
 
+    private final ContentsRepository contentsRepository;
+
     private final MovieDataRepository movieDataRepository;
     private final TvProgramDataRepository tvProgramDataRepository;
-    private final ContentsRepository contentsRepository;
 
     // 작품 검색
     public SearchResponse searchKeywords(String query, String type, int page) {
@@ -49,6 +51,10 @@ public class ContentsService {
 
     public boolean checkDuplicationExists(long id, ContentsType type) {
         return contentsRepository.existsByTmdbIdAndTmdbType(id, type);
+    }
+
+    public Contents getContentsByTmdbIdAndTmdbType(long id, ContentsType type) {
+        return contentsRepository.findByTmdbIdAndTmdbType(id, type);
     }
 
     public TvProgramData getTvProgramDataByTmdbIdAndTmdbType(long id, ContentsType type) {

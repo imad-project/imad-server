@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.tmdb.service;
 
+import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.entity.MovieData;
 import com.ncookie.imad.domain.contents.entity.TvProgramData;
@@ -7,7 +8,9 @@ import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.networks.dto.DetailsNetworks;
 import com.ncookie.imad.domain.networks.entity.Networks;
 import com.ncookie.imad.domain.networks.service.NetworksService;
+import com.ncookie.imad.domain.person.dto.DetailsCredits;
 import com.ncookie.imad.domain.person.dto.DetailsPerson;
+import com.ncookie.imad.domain.person.entity.Credit;
 import com.ncookie.imad.domain.person.entity.CreditType;
 import com.ncookie.imad.domain.person.entity.Person;
 import com.ncookie.imad.domain.person.service.PersonService;
@@ -52,6 +55,46 @@ public class TmdbService {
     public TmdbDetails getTmdbDetails(long id, ContentsType type) {
         TmdbDetails tmdbDetails = TmdbDetails.builder().build();
 
+        // =========================================================================
+        // Credit, Person 데이터를 읽기 위한 Contetns entity 불러오기
+        log.info("해당 작품과 관련된 Credit 및 Person 데이터를 DB로부터 불러옵니다...");
+        Contents contentsEntity = contentsService.getContentsByTmdbIdAndTmdbType(id, type);
+        List<Credit> allCreditsByContentsId = personService.getAllCreditsByContentsId(contentsEntity);
+
+        List<DetailsPerson> castList = new ArrayList<>();
+        List<DetailsPerson> crewList = new ArrayList<>();
+
+        for (Credit credit : allCreditsByContentsId) {
+            // Person entity 조회
+            Person person = personService.getPersonEntity(credit.getPerson());
+
+            DetailsPerson detailsPerson = DetailsPerson.builder()
+                    .id(person.getPersonId())
+                    .creditId(credit.getCreditId())
+                    .name(person.getOriginalName()) // TODO: 번역된 이름으로 대체해야 함
+                    .gender(person.getGender())
+                    .profilePath(person.getProfilePath())
+
+                    .character(credit.getCharacterName())
+
+                    .knownForDepartment(credit.getKnownForDepartment())
+                    .department(credit.getDepartment())
+                    .job(credit.getJob())
+
+                    .creditType(credit.getCreditType())
+
+                    .build();
+
+            if (credit.getCreditType().equals(CreditType.CAST)) {
+                castList.add(detailsPerson);
+            } else if (credit.getCreditType().equals(CreditType.CREW)) {
+                crewList.add(detailsPerson);
+            }
+        }
+        log.info("Credit 및 Person 정보 로딩 완료");
+        // =========================================================================
+
+        // Contents(TvProgramData, MovieData), Season, Networks 등의 데이터 조회
         if (type.equals(ContentsType.TV)) {
             log.info("TV 데이터를 DB로부터 조회 시작");
             TvProgramData tvProgramData = contentsService.getTvProgramDataByTmdbIdAndTmdbType(id, type);
@@ -89,6 +132,12 @@ public class TmdbService {
                     .networks(networksEntities.stream()
                             .map(DetailsNetworks::toDTO)
                             .collect(Collectors.toList()))
+
+                    .credits(DetailsCredits.builder()
+                            .cast(castList)
+                            .crew(crewList)
+                            .build())
+
                     .build();
 
         } else if (type.equals(ContentsType.MOVIE)) {
@@ -117,6 +166,11 @@ public class TmdbService {
 
                     .releaseDate(movieData.getReleaseDate().toString())
                     .runtime(movieData.getRuntime())
+
+                    .credits(DetailsCredits.builder()
+                            .cast(castList)
+                            .crew(crewList)
+                            .build())
 
                     .build();
         }

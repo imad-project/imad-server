@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.person.service;
 
+import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.MovieData;
 import com.ncookie.imad.domain.contents.entity.TvProgramData;
 import com.ncookie.imad.domain.person.dto.DetailsPerson;
@@ -10,6 +11,8 @@ import com.ncookie.imad.domain.person.repository.PersonRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional
@@ -49,5 +52,12 @@ public class PersonService {
                         .creditType(credit.getCreditType())
                         .build());
     }
-}
 
+    public List<Credit> getAllCreditsByContentsId(Contents contents) {
+        return creditRepository.findAllByContents(contents);
+    }
+
+    public Person getPersonEntity(Person person) {
+        return personRepository.findByPersonId(person.getPersonId());
+    }
+}
