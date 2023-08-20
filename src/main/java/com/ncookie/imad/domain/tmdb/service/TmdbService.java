@@ -82,6 +82,7 @@ public class TmdbService {
                     .job(credit.getJob())
 
                     .creditType(credit.getCreditType())
+                    .importanceOrder(credit.getImportanceOrder())
 
                     .build();
 
