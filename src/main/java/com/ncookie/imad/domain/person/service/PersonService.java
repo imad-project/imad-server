@@ -36,6 +36,7 @@ public class PersonService {
                         .job(credit.getJob())
                         .characterName(credit.getCharacter())
                         .creditType(credit.getCreditType())
+                        .importanceOrder(credit.getImportanceOrder())
                         .build());
     }
 
@@ -50,6 +51,7 @@ public class PersonService {
                         .job(credit.getJob())
                         .characterName(credit.getCharacter())
                         .creditType(credit.getCreditType())
+                        .importanceOrder(credit.getImportanceOrder())
                         .build());
     }
 

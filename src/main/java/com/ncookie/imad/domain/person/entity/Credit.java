@@ -46,4 +46,7 @@ public class Credit {
     @Setter
     // credit의 타입이 cast(배우)인지, crew(스태프)인지 구분하기 위한 칼럼
     private CreditType creditType;
+
+    @Setter
+    private int importanceOrder;
 }

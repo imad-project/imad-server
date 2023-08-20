@@ -22,7 +22,10 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DetailsPerson {
+    // person id. 인물 자체에 대한 id
     private long id;
+
+    // credit id. 작품과 인물 간의 연결점인 credit의 id
     private String creditId;
 
     private String name;
@@ -40,6 +43,7 @@ public class DetailsPerson {
     // crew 데이터의 리스트에서 중복될수록 카운트를 +1 한다.
     private int importanceOrder;
 
+    // 해당 인물이 cast(배우)인지, crew(감독, 작가, PD 등)인지 구분하기 위한 변수
     private CreditType creditType;
 
     @JsonCreator
