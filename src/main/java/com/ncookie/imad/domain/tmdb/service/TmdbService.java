@@ -234,7 +234,7 @@ public class TmdbService {
                                 .status(tmdbDetails.getStatus())
 
                                 // TV 고유 데이터
-                                .firstAirDate(LocalDate.parse(tmdbDetails.getFirstAirDate()))
+                                .firstAirDate(LocalDate.parse(tmdbDetails.getFirstAirDate()))   // TODO: 데이터 null일 때 파싱 에러
                                 .lastAirDate(LocalDate.parse(tmdbDetails.getLastAirDate()))
                                 .numberOfEpisodes(tmdbDetails.getNumberOfEpisodes())
                                 .numberOfSeasons(tmdbDetails.getNumberOfSeasons())
