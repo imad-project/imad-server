@@ -122,8 +122,8 @@ public class TmdbService {
 
                     .name(tvProgramData.getTranslatedTitle())
                     .originalName(tvProgramData.getOriginalTitle())
-                    .firstAirDate(tvProgramData.getFirstAirDate().toString())
-                    .lastAirDate(tvProgramData.getLastAirDate().toString())
+                    .firstAirDate(getLocalDateString(tvProgramData.getFirstAirDate()))
+                    .lastAirDate(getLocalDateString(tvProgramData.getLastAirDate()))
 
                     .numberOfEpisodes(tvProgramData.getNumberOfEpisodes())
                     .numberOfSeasons(tvProgramData.getNumberOfSeasons())
@@ -166,7 +166,7 @@ public class TmdbService {
                     .title(movieData.getTranslatedTitle())
                     .originalTitle(movieData.getOriginalTitle())
 
-                    .releaseDate(movieData.getReleaseDate().toString())
+                    .releaseDate(getLocalDateString(movieData.getReleaseDate()))
                     .runtime(movieData.getRuntime())
 
                     .credits(DetailsCredits.builder()
@@ -179,7 +179,6 @@ public class TmdbService {
 
         return tmdbDetails;
     }
-
 
     @Transactional
     public TmdbDetails saveContentsDetails(TmdbDetails tmdbDetails, ContentsType type, String certification) {
@@ -321,14 +320,6 @@ public class TmdbService {
     }
 
 
-    private LocalDate parseLocalDate(String date) {
-        if (date == null || date.isEmpty()) {
-            return null;
-        } else {
-            return LocalDate.parse(date);
-        }
-    }
-
     private ContentsType checkAnimationGenre(Set<Integer> genres, ContentsType type) {
         if (genres.contains(16)) {
             return ContentsType.ANIMATION;
@@ -388,5 +379,17 @@ public class TmdbService {
         Set<String> uniqueItems = new LinkedHashSet<>(Arrays.asList(items));  // 중복 제거하면서 순서 유지
 
         return String.join(",", uniqueItems);
+    }
+
+    private LocalDate parseLocalDate(String date) {
+        if (date == null || date.isEmpty()) {
+            return null;
+        } else {
+            return LocalDate.parse(date);
+        }
+    }
+
+    private String getLocalDateString(LocalDate date) {
+        return (date != null) ? date.toString() : "";
     }
 }
