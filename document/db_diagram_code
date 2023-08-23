@@ -136,6 +136,7 @@ Table SeasonCollection {
   character varchar [note: "스태프가 연기도 겸한 경우"]
 
   credit_type varchar [note: "credit의 타입이 cast(배우)인지, crew(스태프)인지 구분하기 위한 칼럼"]
+  importance_order int [note: "crew 데이터의 리스트에서 중복될수록 +1"]
  }
 
 
