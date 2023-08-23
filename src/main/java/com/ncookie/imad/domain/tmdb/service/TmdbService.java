@@ -21,6 +21,7 @@ import com.ncookie.imad.domain.tmdb.dto.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -234,8 +235,8 @@ public class TmdbService {
                                 .status(tmdbDetails.getStatus())
 
                                 // TV 고유 데이터
-                                .firstAirDate(LocalDate.parse(tmdbDetails.getFirstAirDate()))   // TODO: 데이터 null일 때 파싱 에러
-                                .lastAirDate(LocalDate.parse(tmdbDetails.getLastAirDate()))
+                                .firstAirDate(parseLocalDate(tmdbDetails.getFirstAirDate()))
+                                .lastAirDate(parseLocalDate(tmdbDetails.getLastAirDate()))
                                 .numberOfEpisodes(tmdbDetails.getNumberOfEpisodes())
                                 .numberOfSeasons(tmdbDetails.getNumberOfSeasons())
 
@@ -288,7 +289,7 @@ public class TmdbService {
                                 .productionCountries(tmdbDetails.getProductionCountries())
 
                                 // MOVIE 고유 데이터
-                                .releaseDate(LocalDate.parse(tmdbDetails.getReleaseDate()))
+                                .releaseDate(parseLocalDate(tmdbDetails.getReleaseDate()))
                                 .runtime(tmdbDetails.getRuntime())
 
                                 .build()
@@ -319,6 +320,14 @@ public class TmdbService {
         }
     }
 
+
+    private LocalDate parseLocalDate(String date) {
+        if (date == null || date.isEmpty()) {
+            return null;
+        } else {
+            return LocalDate.parse(date);
+        }
+    }
 
     private ContentsType checkAnimationGenre(Set<Integer> genres, ContentsType type) {
         if (genres.contains(16)) {
