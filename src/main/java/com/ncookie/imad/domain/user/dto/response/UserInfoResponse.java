@@ -14,9 +14,17 @@ import lombok.Getter;
 public class UserInfoResponse {
     private String email;
     private String nickname;
+    
+    // 로그인 주체. 서비스 자체 회원 또는 소설 회원 등이 있음
     private AuthProvider authProvider;
+
     private Gender gender;
+    
+    // 연령대
     private int ageRange;
+
     private int profileImage;
+
+    // 유저의 추가정보 입력여부를 구분하기 위한 플래그 변수
     private Role role;
 }

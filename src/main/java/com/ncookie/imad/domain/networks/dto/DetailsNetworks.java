@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+// TV 작품을 방영한 방송사의 정보를 가지고 있는 DTO 클래스
 public class DetailsNetworks {
     private long id;
     private String logoPath;

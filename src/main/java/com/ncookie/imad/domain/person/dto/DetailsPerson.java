@@ -21,6 +21,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+// 배우, 감독, 작가, 스태프 등의 정보를 가지고 있는 DTO 클래스
 public class DetailsPerson {
     // person id. 인물 자체에 대한 id
     private long id;

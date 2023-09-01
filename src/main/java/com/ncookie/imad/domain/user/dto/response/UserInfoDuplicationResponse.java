@@ -9,5 +9,5 @@ import lombok.Getter;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserInfoDuplicationResponse {
-    private boolean validation;
+    private boolean validation;     // 중복 검사 결과 플래그. 중복이 아니라면 true, 중복 데이터라면 false 값을 가진다.
 }

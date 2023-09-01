@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class SignUpRequest {
     private String email;
     private String password;
-    private AuthProvider authProvider;
+    private AuthProvider authProvider;      // 소셜 회원은 별도의 함수를 사용하기 때문에 "IMAD"만 들어옴
 }

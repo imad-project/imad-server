@@ -19,6 +19,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+// TV 작품의 시즌 정보를 가지고 있는 DTO 클래스
 public class DetailsSeason {
     private long id;
 

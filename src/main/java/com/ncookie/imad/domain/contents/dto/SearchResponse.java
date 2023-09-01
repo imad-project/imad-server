@@ -12,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SearchResponse {
-    private int page;
-    private int totalPages;
-    private int totalResults;
+    private int page;           // 해당 검색결과의 페이지
+    private int totalPages;     // 검색 결과 총 페이지 수
+    private int totalResults;   // 검색 결과 데이터 총 개수
 
     @JsonProperty("results")
-    private List<SearchResult> results;
+    private List<SearchResult> results;     // 검색결과 상세 데이터
 }

@@ -19,20 +19,21 @@ import java.util.Set;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+// 작품 상세 정보를 클라이언트에게 전달해주기 위한 DTO 클래스
 public class TmdbDetails {
-    private long contentsId;
-    private long tmdbId;
+    private long contentsId;                        // IMAD 자체적으로 사용하는 id
+    private long tmdbId;                            // TMDB 내부적으로 사용하는 id
 
-    private String overview;
-    private String tagline;
-    private String posterPath;
-    private String originalLanguage;
-    private String certification;
+    private String overview;                        // 작품 개요
+    private String tagline;                         // 작품의 핵심이 되는 포인트나 제목에 대한 부연설명
+    private String posterPath;                      // 포스터
+    private String originalLanguage;                // 원어
+    private String certification;                   // 영상물 등급
 
-    private String status;
+    private String status;                          // 제작 중, 개봉함, 방영함 등의 값을 가짐
 
-    private Set<Integer> genres;
-    private Set<String> productionCountries;
+    private Set<Integer> genres;                    // 장르 리스트
+    private Set<String> productionCountries;        // 제작 국가
 
 
     // IMAD Data
@@ -43,27 +44,27 @@ public class TmdbDetails {
     private String title;
     private String originalTitle;
 
-    private String releaseDate;
-    private int runtime;
+    private String releaseDate;                      // 개봉일
+    private int runtime;                             // 상영시간
 
 
     // TV Data
     private String name;
     private String originalName;
 
-    private String firstAirDate;
-    private String lastAirDate;
+    private String firstAirDate;                      // 첫화 방영일
+    private String lastAirDate;                       // 마지막화 방영일
 
-    private int numberOfEpisodes;
-    private int numberOfSeasons;
+    private int numberOfEpisodes;                     // 에피소드 개수
+    private int numberOfSeasons;                      // 시즌 개수
 
-    private List<DetailsSeason> seasons;
-    private List<DetailsNetworks> networks;
+    private List<DetailsSeason> seasons;              // 시즌 정보
+    private List<DetailsNetworks> networks;           // 작품 방영한 방송사 정보
 
 
     // Credits
     @JsonProperty("credits")
-    private DetailsCredits credits;
+    private DetailsCredits credits;                    // 출연진(배우, 감독, 작가, 스태프 등 포함) 정보
 
 
     @JsonCreator
