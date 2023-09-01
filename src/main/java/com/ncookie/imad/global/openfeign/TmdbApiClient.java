@@ -3,7 +3,7 @@ package com.ncookie.imad.global.openfeign;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
@@ -30,7 +30,7 @@ public class TmdbApiClient {
 
 
     // 쿼리로 작품 검색. 전체 / TV / 영화 별로 검색할 수 있음
-    public SearchResponse searchByQuery(String query, String type, int page) {
+    public ContentsSearchResponse searchByQuery(String query, String type, int page) {
         return switch (type) {
             case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, false, language, page);
             case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, false, language, page);

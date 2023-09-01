@@ -1,6 +1,6 @@
 package com.ncookie.imad.domain.contents.controller;
 
-import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
@@ -22,9 +22,9 @@ public class ContentsController {
     private final TmdbService tmdbService;
 
     @GetMapping("/search")
-    public ApiResponse<SearchResponse> searchContentsByKeyword(@RequestParam(value = "query") String query,
-                                                               @RequestParam(value = "type") String type,
-                                                               @RequestParam(value = "page") int page) {
+    public ApiResponse<ContentsSearchResponse> searchContentsByKeyword(@RequestParam(value = "query") String query,
+                                                                       @RequestParam(value = "type") String type,
+                                                                       @RequestParam(value = "page") int page) {
         return ApiResponse.createSuccess(
                 ResponseCode.CONTENTS_SEARCH_SUCCESS,
                 contentsService.searchKeywords(query, type, page)

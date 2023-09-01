@@ -11,11 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchResponse {
+public class ContentsSearchResponse {
     private int page;           // 해당 검색결과의 페이지
     private int totalPages;     // 검색 결과 총 페이지 수
     private int totalResults;   // 검색 결과 데이터 총 개수
 
     @JsonProperty("results")
-    private List<SearchResult> results;     // 검색결과 상세 데이터
+    private List<ContentsSearchDetails> results;     // 검색결과 상세 데이터
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchResult {
+public class ContentsSearchDetails {
     private int id;     // TMDB에서 사용하는 id
 
     // For Movie

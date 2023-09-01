@@ -1,6 +1,6 @@
 package com.ncookie.imad.domain.contents.service;
 
-import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.entity.MovieData;
@@ -27,7 +27,7 @@ public class ContentsService {
     private final TvProgramDataRepository tvProgramDataRepository;
 
     // 작품 검색
-    public SearchResponse searchKeywords(String query, String type, int page) {
+    public ContentsSearchResponse searchKeywords(String query, String type, int page) {
         return apiClient.searchByQuery(query, type, page);
     }
 

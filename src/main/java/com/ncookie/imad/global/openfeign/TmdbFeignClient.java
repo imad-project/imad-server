@@ -1,6 +1,6 @@
 package com.ncookie.imad.global.openfeign;
 
-import com.ncookie.imad.domain.contents.dto.SearchResponse;
+import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -17,7 +17,7 @@ public interface TmdbFeignClient {
     // 키워드 통합 검색(영화, TV, 시리즈, 인물 등 포함)
     @GetMapping(value = "/search/multi")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
-    SearchResponse searchMultiByQuery(
+    ContentsSearchResponse searchMultiByQuery(
             @RequestHeader(value = "Authorization") String apiKey,
             @RequestParam(value = "query") String query,
             @RequestParam(value = "include_adult") boolean includeAdult,
@@ -27,7 +27,7 @@ public interface TmdbFeignClient {
 
     @GetMapping(value = "/search/tv")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
-    SearchResponse searchTvByQuery(
+    ContentsSearchResponse searchTvByQuery(
             @RequestHeader(value = "Authorization") String apiKey,
             @RequestParam(value = "query") String query,
             @RequestParam(value = "include_adult") boolean includeAdult,
@@ -37,7 +37,7 @@ public interface TmdbFeignClient {
 
     @GetMapping(value = "/search/movie")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
-    SearchResponse searchMovieByQuery(
+    ContentsSearchResponse searchMovieByQuery(
             @RequestHeader(value = "Authorization") String apiKey,
             @RequestParam(value = "query") String query,
             @RequestParam(value = "include_adult") boolean includeAdult,
