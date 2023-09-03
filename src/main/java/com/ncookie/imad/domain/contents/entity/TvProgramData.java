@@ -21,8 +21,8 @@ public class TvProgramData extends Contents {
     private LocalDate lastAirDate;
 
     @Setter
-    private int numberOfEpisodes;
+    private Integer numberOfEpisodes;
 
     @Setter
-    private int numberOfSeasons;
+    private Integer numberOfSeasons;
 }
