@@ -19,5 +19,5 @@ public class MovieData extends Contents {
     private LocalDate releaseDate;
 
     @Setter
-    private int runtime;
+    private Integer runtime;
 }
