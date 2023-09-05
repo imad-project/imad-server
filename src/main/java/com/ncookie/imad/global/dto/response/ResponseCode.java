@@ -22,8 +22,8 @@ public enum ResponseCode {
     LOGIN_SUCCESS(200, "정상적으로 로그인 되었습니다."),
     USER_INFO_GET_SUCCESS(200, "정상적으로 회원 정보를 조회했습니다."),
     USER_INFO_VALIDATION(200, "정상적으로 중복 검사를 수행했습니다."),
-    USER_INFO_UPDATE_SUCCESS(201, "정상적으로 회원 정보를 수정했습니다."),
-    USER_MODIFY_PASSWORD_SUCCESS(201, "정상적으로 비밀번호를 수정했습니다."),
+    USER_INFO_UPDATE_SUCCESS(200, "정상적으로 회원 정보를 수정했습니다."),
+    USER_MODIFY_PASSWORD_SUCCESS(200, "정상적으로 비밀번호를 수정했습니다."),
     USER_DELETE_SUCCESS(204, "회원 탈퇴가 정상적으로 처리되었습니다."),
 
     LOGIN_FAILURE(400, "로그인 정보를 다시 확인해주세요."),
@@ -40,6 +40,13 @@ public enum ResponseCode {
     CONTENTS_GET_DETAILS_SUCCESS(200, "작품 상세 정보 조회를 완료했습니다."),
     CONTENTS_GET_DETAILS_WRONG_TYPE(400, "잘못된 작품 타입입니다. (TV / MOVIE만 가능)"),
     CONTENTS_NOT_EXIST_TMDB_ID(404, "유효하지 않은 id이거나 TMDB API 서버에 문제가 발생했습니다."),
+    
+    // 리뷰 관련
+    REVIEW_GET_DETAILS_SUCCESS(200, "정상적으로 리뷰 정보를 조회했습니다."),
+    REVIEW_POST_DETAILS_SUCCESS(201, "정상적으로 리뷰 정보를 등록했습니다."),
+    REVIEW_PATCH_DETAILS_SUCCESS(200, "정상적으로 리뷰 정보를 수정했습니다."),
+    REVIEW_DELETE_DETAILS_SUCCESS(204, "정상적으로 리뷰 정보를 삭제했습니다."),
+    REVIEW_GET_LIST_SUCCESS(200, "정상적으로 리뷰 정보 리스트를 조회했습니다."),
 
 
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
