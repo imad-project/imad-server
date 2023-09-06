@@ -152,6 +152,16 @@ public class UserAccountService {
                 .build();
     }
 
+    public UserAccount getUserFromAccessToken(String accessToken) {
+        Optional<String> optionalEmail = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken));
+        if (optionalEmail.isPresent()) {
+            Optional<UserAccount> optionalUserAccount = userAccountRepository.findByEmail(optionalEmail.get());
+            return optionalUserAccount.orElse(null);
+        } else {
+            return null;
+        }
+    }
+
 
     /**
      * ==================================================================
