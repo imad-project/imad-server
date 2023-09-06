@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.review.controller;
 
-import com.ncookie.imad.domain.review.ReviewDetailsResponse;
+import com.ncookie.imad.domain.review.dto.ModifyReviewRequest;
+import com.ncookie.imad.domain.review.dto.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.dto.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.AddReviewResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
@@ -27,8 +28,13 @@ public class ReviewController {
     }
 
     @PatchMapping("/{id}")
-    public ApiResponse<?> reviewModify(@PathVariable("id") Long id) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_PATCH_DETAILS_SUCCESS);
+    public ApiResponse<Long> reviewModify(@RequestHeader("Authorization") String accessToken,
+                                          @PathVariable("id") Long id,
+                                          @RequestBody ModifyReviewRequest modifyReviewRequest) {
+        return ApiResponse.createSuccess(
+                ResponseCode.REVIEW_PATCH_DETAILS_SUCCESS,
+                reviewService.modifyReview(accessToken, id, modifyReviewRequest)
+        );
     }
 
     @DeleteMapping("/{id}")

@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.review;
+package com.ncookie.imad.domain.review.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
