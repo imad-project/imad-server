@@ -38,7 +38,9 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<?> reviewDelete(@PathVariable("id") Long id) {
+    public ApiResponse<?> reviewDelete(@RequestHeader("Authorization") String accessToken,
+                                       @PathVariable("id") Long id) {
+        reviewService.deleteReview(accessToken, id);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_DELETE_DETAILS_SUCCESS);
     }
 

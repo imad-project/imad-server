@@ -106,6 +106,24 @@ public class ReviewService {
         }
     }
 
+    public void deleteReview(String accessToken, Long reviewId) {
+        Optional<Review> optional = reviewRepository.findById(reviewId);
+        UserAccount user = getUserFromAccessToken(accessToken);
+
+        if (optional.isPresent()) {
+            Review review = optional.get();
+
+            // 해당 리뷰를 작성한 유저만 삭제할 수 있음
+            if (Objects.equals(review.getUserAccount().getId(), user.getId())) {
+                reviewRepository.delete(review);
+            } else {
+                throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
+            }
+        } else {
+            throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
+        }
+    }
+
     // 유저 null 체크를 위한 공용 메소드
     private UserAccount getUserFromAccessToken(String accessToken) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
