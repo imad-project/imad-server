@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.review.controller;
 
+import com.ncookie.imad.domain.review.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.dto.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.AddReviewResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
@@ -15,8 +16,8 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/{id}")
-    public ApiResponse<?> reviewDetails(@PathVariable("id") Long id) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_GET_DETAILS_SUCCESS);
+    public ApiResponse<ReviewDetailsResponse> reviewDetails(@PathVariable("id") Long id) {
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_DETAILS_SUCCESS, reviewService.getReview(id));
     }
 
     @PostMapping("")

@@ -49,6 +49,8 @@ public enum ResponseCode {
     REVIEW_DELETE_DETAILS_SUCCESS(204, "정상적으로 리뷰 정보를 삭제했습니다."),
     REVIEW_GET_LIST_SUCCESS(200, "정상적으로 리뷰 정보 리스트를 조회했습니다."),
 
+    REVIEW_NOT_FOUND(404, "해당 ID의 리뷰를 찾을 수 없습니다."),
+
     // 기타
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
     INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),

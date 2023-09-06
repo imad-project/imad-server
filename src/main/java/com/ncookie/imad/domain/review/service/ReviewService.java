@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.review.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.review.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.dto.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.AddReviewResponse;
 import com.ncookie.imad.domain.review.entity.Review;
@@ -14,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @RequiredArgsConstructor
 @Transactional
@@ -23,6 +26,34 @@ public class ReviewService {
 
     private final UserAccountService userAccountService;
     private final ContentsService contentsService;
+
+
+    public ReviewDetailsResponse getReview(Long reviewId) {
+        Optional<Review> optional = reviewRepository.findById(reviewId);
+
+        if (optional.isPresent()) {
+            Review review = optional.get();
+            return ReviewDetailsResponse.builder()
+                    .reviewId(review.getReviewId())
+                    .contentsId(review.getContents().getContentsId())
+
+                    .title(review.getTitle())
+                    .content(review.getContent())
+
+                    .score(review.getScore())
+                    .isSpoiler(review.isSpoiler())
+
+                    .likeCnt(review.getLikeCnt())
+                    .dislikeCnt(review.getDislikeCnt())
+
+                    .createdAt(review.getCreatedDate())
+                    .modifiedAt(review.getModifiedDate())
+
+                    .build();
+        } else {
+            throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
+        }
+    }
 
     public AddReviewResponse addReview(String accessToken, AddReviewRequest addReviewRequest) {
         UserAccount user = getUserFromAccessToken(accessToken);
