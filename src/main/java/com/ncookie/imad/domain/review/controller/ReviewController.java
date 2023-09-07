@@ -48,4 +48,12 @@ public class ReviewController {
     public ApiResponse<?> reviewList(@PathVariable("contentsId") Long contentsId) {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_GET_LIST_SUCCESS);
     }
+
+    @PatchMapping("/review/{id}")
+    public ApiResponse<?> reviewLikeStatusModify(@RequestHeader("Authorization") String accessToken,
+                                                 @PathVariable("id") Long id,
+                                                 @RequestBody int likeStatus) {
+        reviewService.modifyLikeStatus(accessToken, id, likeStatus);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_LIKE_STATUS_MODIFY_SUCCESS);
+    }
 }

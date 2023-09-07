@@ -8,6 +8,8 @@ import com.ncookie.imad.domain.review.dto.AddReviewResponse;
 import com.ncookie.imad.domain.review.dto.ModifyReviewRequest;
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.review.repository.ReviewRepository;
+import com.ncookie.imad.domain.review_like.entity.ReviewLike;
+import com.ncookie.imad.domain.review_like.service.ReviewLikeService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -28,6 +30,8 @@ public class ReviewService {
 
     private final UserAccountService userAccountService;
     private final ContentsService contentsService;
+
+    private final ReviewLikeService reviewLikeService;
 
 
     public ReviewDetailsResponse getReview(Long reviewId) {
@@ -123,6 +127,36 @@ public class ReviewService {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
         }
     }
+
+    public void modifyLikeStatus(String accessToken, Long reviewId, int likeStatus) {
+        Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
+        UserAccount user = getUserFromAccessToken(accessToken);
+
+        if (reviewOptional.isPresent()) {
+            Review review = reviewOptional.get();
+
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+
+            // like_status가 1이면 추천, -1이면 비추천, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
+            if (likeStatus == 0) {
+                reviewLikeService.deleteReviewLike(reviewLike);
+            } else if (likeStatus == -1 || likeStatus == 1) {
+                reviewLike.setLikeStatus(likeStatus);
+                ReviewLike savedReviewLikeStatus = reviewLikeService.saveReviewLikeStatus(reviewLike);
+
+                // reviewLike entity 저장/수정 실패
+                if (savedReviewLikeStatus == null) {
+                    throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+                }
+            } else {
+                throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+            }
+            // TODO: 리뷰 like, dislike count 수정 / 리뷰 조회 시 like_status 포함되도록
+        } else {
+            throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
+        }
+    }
+
 
     // 유저 null 체크를 위한 공용 메소드
     private UserAccount getUserFromAccessToken(String accessToken) {

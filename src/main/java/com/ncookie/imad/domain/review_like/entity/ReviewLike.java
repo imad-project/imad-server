@@ -1,5 +1,6 @@
-package com.ncookie.imad.domain.review.entity;
+package com.ncookie.imad.domain.review_like.entity;
 
+import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import jakarta.persistence.*;
 import lombok.*;

@@ -52,6 +52,10 @@ public enum ResponseCode {
     REVIEW_NOT_FOUND(404, "해당 ID의 리뷰를 찾을 수 없습니다."),
     REVIEW_MODIFY_NO_PERMISSION(403, "해당 리뷰를 수정할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
 
+    REVIEW_LIKE_STATUS_MODIFY_SUCCESS(200, "정상적으로 리뷰 좋아요/싫어요 상태를 수정했습니다."),
+    REVIEW_LIKE_STATUS_MODIFY_FAILED(400, "리뷰 좋아요/싫어요 상태를 수정하는데 실패했습니다."),
+    REVIEW_LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),
+
     // 기타
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
     INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),
