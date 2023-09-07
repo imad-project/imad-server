@@ -1,9 +1,6 @@
 package com.ncookie.imad.domain.review.controller;
 
-import com.ncookie.imad.domain.review.dto.ModifyReviewRequest;
-import com.ncookie.imad.domain.review.dto.ReviewDetailsResponse;
-import com.ncookie.imad.domain.review.dto.AddReviewRequest;
-import com.ncookie.imad.domain.review.dto.AddReviewResponse;
+import com.ncookie.imad.domain.review.dto.*;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -17,8 +14,9 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/{id}")
-    public ApiResponse<ReviewDetailsResponse> reviewDetails(@PathVariable("id") Long id) {
-        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_DETAILS_SUCCESS, reviewService.getReview(id));
+    public ApiResponse<ReviewDetailsResponse> reviewDetails(@RequestHeader("Authorization") String accessToken,
+                                                            @PathVariable("id") Long id) {
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_DETAILS_SUCCESS, reviewService.getReview(accessToken, id));
     }
 
     @PostMapping("")
@@ -49,11 +47,11 @@ public class ReviewController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_GET_LIST_SUCCESS);
     }
 
-    @PatchMapping("/review/{id}")
+    @PatchMapping("/{id}/like")
     public ApiResponse<?> reviewLikeStatusModify(@RequestHeader("Authorization") String accessToken,
                                                  @PathVariable("id") Long id,
-                                                 @RequestBody int likeStatus) {
-        reviewService.modifyLikeStatus(accessToken, id, likeStatus);
+                                                 @RequestBody ReviewLikeStatusRequest reviewLikeStatusRequest) {
+        reviewService.saveLikeStatus(accessToken, id, reviewLikeStatusRequest.getLikeStatus());
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_LIKE_STATUS_MODIFY_SUCCESS);
     }
 }

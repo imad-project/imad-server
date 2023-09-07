@@ -29,6 +29,8 @@ public class ReviewDetailsResponse {
     private int likeCnt;                    // 좋아요 수
     private int dislikeCnt;                 // 싫어요 수
 
-    private LocalDateTime createdAt;            // 리뷰 작성 날짜
-    private LocalDateTime modifiedAt;           // 리뷰 수정 날짜
+    private LocalDateTime createdAt;        // 리뷰 작성 날짜
+    private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
+
+    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
 }

@@ -34,11 +34,16 @@ public class ReviewService {
     private final ReviewLikeService reviewLikeService;
 
 
-    public ReviewDetailsResponse getReview(Long reviewId) {
+    public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
+        UserAccount user = getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
+
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
+
             return ReviewDetailsResponse.builder()
                     .reviewId(review.getReviewId())
                     .contentsId(review.getContents().getContentsId())
@@ -54,6 +59,8 @@ public class ReviewService {
 
                     .createdAt(review.getCreatedDate())
                     .modifiedAt(review.getModifiedDate())
+
+                    .likeStatus(likeStatus)
 
                     .build();
         } else {
@@ -128,7 +135,11 @@ public class ReviewService {
         }
     }
 
-    public void modifyLikeStatus(String accessToken, Long reviewId, int likeStatus) {
+    public void saveLikeStatus(String accessToken, Long reviewId, int likeStatus) {
+        if (likeStatus != -1 && likeStatus != 0 && likeStatus != 1) {
+            throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+        }
+
         Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
         UserAccount user = getUserFromAccessToken(accessToken);
 
@@ -137,21 +148,29 @@ public class ReviewService {
 
             ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
 
-            // like_status가 1이면 추천, -1이면 비추천, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
-            if (likeStatus == 0) {
-                reviewLikeService.deleteReviewLike(reviewLike);
-            } else if (likeStatus == -1 || likeStatus == 1) {
-                reviewLike.setLikeStatus(likeStatus);
-                ReviewLike savedReviewLikeStatus = reviewLikeService.saveReviewLikeStatus(reviewLike);
-
-                // reviewLike entity 저장/수정 실패
-                if (savedReviewLikeStatus == null) {
-                    throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
-                }
+            // reviewLike 신규등록
+            if (reviewLike == null) {
+                reviewLikeService.saveReviewLikeStatus(ReviewLike.builder()
+                        .userAccount(user)
+                        .review(review)
+                        .likeStatus(likeStatus)
+                        .build());
             } else {
-                throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+                // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
+                if (likeStatus == 0) {
+                    reviewLikeService.deleteReviewLike(reviewLike);
+                } else {
+                    reviewLike.setLikeStatus(likeStatus);
+                    ReviewLike savedReviewLikeStatus = reviewLikeService.saveReviewLikeStatus(reviewLike);
+
+                    // reviewLike entity 저장/수정 실패
+                    if (savedReviewLikeStatus == null) {
+                        throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+                    }
+                }
             }
-            // TODO: 리뷰 like, dislike count 수정 / 리뷰 조회 시 like_status 포함되도록
+
+            // TODO: 리뷰 like, dislike count 수정
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
         }
