@@ -27,4 +27,12 @@ public class ReviewLikeService {
     public void deleteReviewLike(ReviewLike reviewLike) {
         reviewLikeRepository.delete(reviewLike);
     }
+
+    public int getLikeCount(Review review) {
+        return reviewLikeRepository.countLikeByReview(review);
+    }
+
+    public int getDislikeCount(Review review) {
+        return reviewLikeRepository.countDislikeByReview(review);
+    }
 }

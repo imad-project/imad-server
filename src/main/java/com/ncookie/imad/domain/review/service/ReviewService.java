@@ -170,7 +170,10 @@ public class ReviewService {
                 }
             }
 
-            // TODO: 리뷰 like, dislike count 수정
+            // like, dislike count 갱신
+            review.setLikeCnt(reviewLikeService.getLikeCount(review));
+            review.setDislikeCnt(reviewLikeService.getDislikeCount(review));
+            reviewRepository.save(review);
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
         }
