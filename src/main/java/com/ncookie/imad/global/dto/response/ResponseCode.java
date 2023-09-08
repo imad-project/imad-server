@@ -22,8 +22,8 @@ public enum ResponseCode {
     LOGIN_SUCCESS(200, "정상적으로 로그인 되었습니다."),
     USER_INFO_GET_SUCCESS(200, "정상적으로 회원 정보를 조회했습니다."),
     USER_INFO_VALIDATION(200, "정상적으로 중복 검사를 수행했습니다."),
-    USER_INFO_UPDATE_SUCCESS(201, "정상적으로 회원 정보를 수정했습니다."),
-    USER_MODIFY_PASSWORD_SUCCESS(201, "정상적으로 비밀번호를 수정했습니다."),
+    USER_INFO_UPDATE_SUCCESS(200, "정상적으로 회원 정보를 수정했습니다."),
+    USER_MODIFY_PASSWORD_SUCCESS(200, "정상적으로 비밀번호를 수정했습니다."),
     USER_DELETE_SUCCESS(204, "회원 탈퇴가 정상적으로 처리되었습니다."),
 
     LOGIN_FAILURE(400, "로그인 정보를 다시 확인해주세요."),
@@ -40,8 +40,23 @@ public enum ResponseCode {
     CONTENTS_GET_DETAILS_SUCCESS(200, "작품 상세 정보 조회를 완료했습니다."),
     CONTENTS_GET_DETAILS_WRONG_TYPE(400, "잘못된 작품 타입입니다. (TV / MOVIE만 가능)"),
     CONTENTS_NOT_EXIST_TMDB_ID(404, "유효하지 않은 id이거나 TMDB API 서버에 문제가 발생했습니다."),
+    CONTENTS_ID_NOT_FOUND(404, "DB에 등록되지 않았거나 유효하지 않은 작품 ID 입니다."),
+    
+    // 리뷰 관련
+    REVIEW_GET_DETAILS_SUCCESS(200, "정상적으로 리뷰 정보를 조회했습니다."),
+    REVIEW_POST_DETAILS_SUCCESS(201, "정상적으로 리뷰 정보를 등록했습니다."),
+    REVIEW_PATCH_DETAILS_SUCCESS(200, "정상적으로 리뷰 정보를 수정했습니다."),
+    REVIEW_DELETE_DETAILS_SUCCESS(204, "정상적으로 리뷰 정보를 삭제했습니다."),
+    REVIEW_GET_LIST_SUCCESS(200, "정상적으로 리뷰 정보 리스트를 조회했습니다."),
 
+    REVIEW_NOT_FOUND(404, "해당 ID의 리뷰를 찾을 수 없습니다."),
+    REVIEW_MODIFY_NO_PERMISSION(403, "해당 리뷰를 수정할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
 
+    REVIEW_LIKE_STATUS_MODIFY_SUCCESS(200, "정상적으로 리뷰 좋아요/싫어요 상태를 수정했습니다."),
+    REVIEW_LIKE_STATUS_MODIFY_FAILED(400, "리뷰 좋아요/싫어요 상태를 수정하는데 실패했습니다."),
+    REVIEW_LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),
+
+    // 기타
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
     INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),
     NOTEQUAL_INPUT_PASSWORD(400,  "비밀번호가 일치하지 않습니다."),

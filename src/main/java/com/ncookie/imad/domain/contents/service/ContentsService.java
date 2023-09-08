@@ -39,6 +39,10 @@ public class ContentsService {
         return apiClient.getContentsCertification(id, type);
     }
 
+    public Contents getContentsEntityById(Long id) {
+        return contentsRepository.findById(id).orElse(null);
+    }
+
     public MovieData saveMovieData(MovieData movieData) {
         return movieDataRepository.save(movieData);
     }
