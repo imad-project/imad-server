@@ -1,8 +1,11 @@
-package com.ncookie.imad.domain.review.entity;
+package com.ncookie.imad.domain.review_like.entity;
 
+import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Builder
 @Getter
@@ -17,14 +20,16 @@ public class ReviewLike {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserAccount userAccount;
 
     @ManyToOne
     @JoinColumn(name = "review_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Review review;
 
 
     @Setter
-    // 추천이면 +1, 비추천이면 -1, 아무 상태도 아니면 해당 데이터 삭제
+    // 좋아요이면 +1, 싫어요이면 -1, 아무 상태도 아니면 해당 데이터 삭제
     private int likeStatus;
 }

@@ -21,7 +21,6 @@ import com.ncookie.imad.domain.tmdb.dto.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -176,6 +175,9 @@ public class TmdbService {
 
                     .build();
         }
+
+        tmdbDetails.setReviewCnt(contentsEntity.getReviewCnt());
+        tmdbDetails.setImadScore(contentsEntity.getImadScore());
 
         return tmdbDetails;
     }

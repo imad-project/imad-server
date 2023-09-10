@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class ImadServerApplication {
 
 	public static void main(String[] args) {
+		// TODO: 자식 테이블들에 @OnDelete 옵션 추가해야 함
 		SpringApplication.run(ImadServerApplication.class, args);
 	}
 }

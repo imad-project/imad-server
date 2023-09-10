@@ -1,0 +1,43 @@
+package com.ncookie.imad.domain.review.dto;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class ReviewDetailsResponse {
+    private Long reviewId;                  // 리뷰 ID
+    private Long contentsId;                // 작품 ID
+    
+    // 작품 정보
+    private String contentsTitle;
+    private String contentsPosterPath;
+    
+    // 유저 정보
+    private String userNickname;
+    private int userProfileImage;
+
+    // 리뷰 정보
+    private String title;                   // 제목
+    private String content;                 // 본문
+
+    private float score;                    // 리뷰 점수
+    private boolean isSpoiler;              // 스포일러 여부
+
+    private int likeCnt;                    // 좋아요 수
+    private int dislikeCnt;                 // 싫어요 수
+
+    private LocalDateTime createdAt;        // 리뷰 작성 날짜
+    private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
+
+    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+}

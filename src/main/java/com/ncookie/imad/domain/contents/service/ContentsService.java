@@ -39,6 +39,10 @@ public class ContentsService {
         return apiClient.getContentsCertification(id, type);
     }
 
+    public Contents getContentsEntityById(Long id) {
+        return contentsRepository.findById(id).orElse(null);
+    }
+
     public MovieData saveMovieData(MovieData movieData) {
         return movieDataRepository.save(movieData);
     }
@@ -63,5 +67,11 @@ public class ContentsService {
 
     public MovieData getMovieDataByTmdbIdAndTmdbType(long id, ContentsType type) {
         return movieDataRepository.findByTmdbIdAndTmdbType(id, type);
+    }
+
+
+    // 리뷰 관련
+    public void saveContentsScoreAndReviewCount(Contents contents) {
+        contentsRepository.save(contents);
     }
 }
