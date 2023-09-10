@@ -199,7 +199,9 @@ public class ReviewService {
     // 작품 평점 갱신
     private void calculateAndSaveAverageScore(Review review) {
         Contents contents = review.getContents();
-        contents.setImadScore(reviewRepository.calculateAverageScoreByReview(contents));
-        contentsService.saveContentsScore(contents);
+        contents.setReviewCnt(reviewRepository.countReviewForContents(contents));
+        contents.setImadScore(reviewRepository.calculateAverageScoreForContents(contents));
+
+        contentsService.saveContentsScoreAndReviewCount(contents);
     }
 }

@@ -71,7 +71,7 @@ public class ContentsService {
 
 
     // 리뷰 관련
-    public void saveContentsScore(Contents contents) {
+    public void saveContentsScoreAndReviewCount(Contents contents) {
         contentsRepository.save(contents);
     }
 }

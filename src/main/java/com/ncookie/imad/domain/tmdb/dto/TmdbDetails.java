@@ -38,6 +38,8 @@ public class TmdbDetails {
 
     // IMAD Data
     private ContentsType contentsType;
+    private int reviewCnt;                          // 리뷰 개수
+    private float imadScore;                        // IMAD 평점 평균
 
 
     // Movie Data

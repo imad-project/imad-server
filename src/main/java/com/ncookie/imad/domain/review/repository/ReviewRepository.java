@@ -7,5 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT AVG(score) FROM Review WHERE contents = :contents")
-    Float calculateAverageScoreByReview(Contents contents);
+    Float calculateAverageScoreForContents(Contents contents);
+
+    @Query("SELECT COUNT(*) FROM Review WHERE contents = :contents")
+    Integer countReviewForContents(Contents contents);
 }
