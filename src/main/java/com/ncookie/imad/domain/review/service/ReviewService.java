@@ -48,6 +48,12 @@ public class ReviewService {
                     .reviewId(review.getReviewId())
                     .contentsId(review.getContents().getContentsId())
 
+                    .contentsTitle(review.getContents().getTranslatedTitle())
+                    .contentsPosterPath(review.getContents().getPosterPath())
+
+                    .userNickname(review.getUserAccount().getNickname())
+                    .userProfileImage(review.getUserAccount().getProfileImage())
+
                     .title(review.getTitle())
                     .content(review.getContent())
 
@@ -72,6 +78,11 @@ public class ReviewService {
         UserAccount user = getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addReviewRequest.getContentsId());
 
+        // 유저는 작품에 대해 한 가지 리뷰만 작성할 수 있음
+        if (reviewRepository.existsReviewByUserAccountAndContents(user, contents)) {
+            throw new BadRequestException(ResponseCode.REVIEW_ALREADY_REGISTERED);
+        }
+
         if (contents == null) {
             throw new BadRequestException(ResponseCode.CONTENTS_ID_NOT_FOUND);
         }
@@ -88,6 +99,8 @@ public class ReviewService {
                 .isSpoiler(addReviewRequest.isSpoiler())
 
                 .build());
+
+        calculateAndSaveAverageScore(review);
 
         return AddReviewResponse.builder()
                 .reviewId(review.getReviewId())
@@ -108,6 +121,8 @@ public class ReviewService {
                 review.setScore(reviewRequest.getScore());
                 review.setSpoiler(reviewRequest.isSpoiler());
 
+                calculateAndSaveAverageScore(review);
+
                 return reviewRepository.save(review).getReviewId();
             } else {
                 throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
@@ -126,6 +141,7 @@ public class ReviewService {
 
             // 해당 리뷰를 작성한 유저만 삭제할 수 있음
             if (Objects.equals(review.getUserAccount().getId(), user.getId())) {
+                calculateAndSaveAverageScore(review);
                 reviewRepository.delete(review);
             } else {
                 throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
@@ -189,5 +205,14 @@ public class ReviewService {
         } else {
             return user;
         }
+    }
+
+    // 작품 평점 갱신
+    private void calculateAndSaveAverageScore(Review review) {
+        Contents contents = review.getContents();
+        contents.setReviewCnt(reviewRepository.countReviewForContents(contents));
+        contents.setImadScore(reviewRepository.calculateAverageScoreForContents(contents));
+
+        contentsService.saveContentsScoreAndReviewCount(contents);
     }
 }

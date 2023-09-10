@@ -68,4 +68,10 @@ public class ContentsService {
     public MovieData getMovieDataByTmdbIdAndTmdbType(long id, ContentsType type) {
         return movieDataRepository.findByTmdbIdAndTmdbType(id, type);
     }
+
+
+    // 리뷰 관련
+    public void saveContentsScoreAndReviewCount(Contents contents) {
+        contentsRepository.save(contents);
+    }
 }

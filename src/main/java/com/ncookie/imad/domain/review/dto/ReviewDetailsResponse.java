@@ -18,8 +18,15 @@ public class ReviewDetailsResponse {
     private Long reviewId;                  // 리뷰 ID
     private Long contentsId;                // 작품 ID
     
-    // TODO: 클라이언트와 논의하여 필요한 작품 추가 정보 등에 대해 정해야함 (제목, 포스터, 개봉연도 등)
+    // 작품 정보
+    private String contentsTitle;
+    private String contentsPosterPath;
+    
+    // 유저 정보
+    private String userNickname;
+    private int userProfileImage;
 
+    // 리뷰 정보
     private String title;                   // 제목
     private String content;                 // 본문
 
