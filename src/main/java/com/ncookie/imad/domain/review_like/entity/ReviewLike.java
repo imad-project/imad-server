@@ -4,6 +4,8 @@ import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Builder
 @Getter
@@ -18,10 +20,12 @@ public class ReviewLike {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserAccount userAccount;
 
     @ManyToOne
     @JoinColumn(name = "review_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Review review;
 
 
