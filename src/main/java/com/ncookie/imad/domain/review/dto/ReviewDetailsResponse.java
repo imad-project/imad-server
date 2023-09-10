@@ -19,12 +19,12 @@ public class ReviewDetailsResponse {
     private Long contentsId;                // 작품 ID
     
     // 작품 정보
-    private String contentsTitle;
-    private String contentsPosterPath;
+    private String contentsTitle;           // 작품 제목
+    private String contentsPosterPath;      // 작품 포스터 이미지 경로
     
     // 유저 정보
-    private String userNickname;
-    private int userProfileImage;
+    private String userNickname;            // 유저 닉네임
+    private int userProfileImage;           // 유저 프로필 이미지
 
     // 리뷰 정보
     private String title;                   // 제목
