@@ -48,6 +48,12 @@ public class ReviewService {
                     .reviewId(review.getReviewId())
                     .contentsId(review.getContents().getContentsId())
 
+                    .contentsTitle(review.getContents().getTranslatedTitle())
+                    .contentsPosterPath(review.getContents().getPosterPath())
+
+                    .userNickname(review.getUserAccount().getNickname())
+                    .userProfileImage(review.getUserAccount().getProfileImage())
+
                     .title(review.getTitle())
                     .content(review.getContent())
 
