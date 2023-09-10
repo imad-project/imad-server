@@ -141,8 +141,8 @@ public class ReviewService {
 
             // 해당 리뷰를 작성한 유저만 삭제할 수 있음
             if (Objects.equals(review.getUserAccount().getId(), user.getId())) {
-                calculateAndSaveAverageScore(review);
                 reviewRepository.delete(review);
+                calculateAndSaveAverageScore(review);
             } else {
                 throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
             }
