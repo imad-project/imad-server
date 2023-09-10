@@ -49,6 +49,7 @@ public enum ResponseCode {
     REVIEW_DELETE_DETAILS_SUCCESS(204, "정상적으로 리뷰 정보를 삭제했습니다."),
     REVIEW_GET_LIST_SUCCESS(200, "정상적으로 리뷰 정보 리스트를 조회했습니다."),
 
+    REVIEW_ALREADY_REGISTERED(409, "한 작품에 대해 한 가지 리뷰만 작성할 수 있습니다."),
     REVIEW_NOT_FOUND(404, "해당 ID의 리뷰를 찾을 수 없습니다."),
     REVIEW_MODIFY_NO_PERMISSION(403, "해당 리뷰를 수정할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
 

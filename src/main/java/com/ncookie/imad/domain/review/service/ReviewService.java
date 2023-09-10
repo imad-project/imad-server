@@ -78,6 +78,11 @@ public class ReviewService {
         UserAccount user = getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addReviewRequest.getContentsId());
 
+        // 유저는 작품에 대해 한 가지 리뷰만 작성할 수 있음
+        if (reviewRepository.existsReviewByUserAccountAndContents(user, contents)) {
+            throw new BadRequestException(ResponseCode.REVIEW_ALREADY_REGISTERED);
+        }
+
         if (contents == null) {
             throw new BadRequestException(ResponseCode.CONTENTS_ID_NOT_FOUND);
         }
