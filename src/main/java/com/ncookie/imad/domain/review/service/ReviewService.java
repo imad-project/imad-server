@@ -89,6 +89,8 @@ public class ReviewService {
 
                 .build());
 
+        calculateAndSaveAverageScore(review);
+
         return AddReviewResponse.builder()
                 .reviewId(review.getReviewId())
                 .build();
@@ -108,6 +110,8 @@ public class ReviewService {
                 review.setScore(reviewRequest.getScore());
                 review.setSpoiler(reviewRequest.isSpoiler());
 
+                calculateAndSaveAverageScore(review);
+
                 return reviewRepository.save(review).getReviewId();
             } else {
                 throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
@@ -126,6 +130,7 @@ public class ReviewService {
 
             // 해당 리뷰를 작성한 유저만 삭제할 수 있음
             if (Objects.equals(review.getUserAccount().getId(), user.getId())) {
+                calculateAndSaveAverageScore(review);
                 reviewRepository.delete(review);
             } else {
                 throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
@@ -189,5 +194,12 @@ public class ReviewService {
         } else {
             return user;
         }
+    }
+
+    // 작품 평점 갱신
+    private void calculateAndSaveAverageScore(Review review) {
+        Contents contents = review.getContents();
+        contents.setImadScore(reviewRepository.calculateAverageScoreByReview(contents));
+        contentsService.saveContentsScore(contents);
     }
 }
