@@ -1,10 +1,12 @@
 package com.ncookie.imad.domain.review.controller;
 
 import com.ncookie.imad.domain.review.dto.*;
+import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -43,8 +45,12 @@ public class ReviewController {
     }
 
     @GetMapping("/list/{contentsId}")
-    public ApiResponse<?> reviewList(@PathVariable("contentsId") Long contentsId) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_GET_LIST_SUCCESS);
+    public ApiResponse<Page<Review>> reviewList(@PathVariable("contentsId") Long contentsId,
+                                     @RequestParam(value = "page") int page,
+                                     @RequestParam(value = "sort") String sortString,
+                                     @RequestParam(value = "order") int order) {
+        Page<Review> reviewList = reviewService.getReviewList(contentsId, page, sortString, order);
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_LIST_SUCCESS, reviewList);
     }
 
     @PatchMapping("/{id}/like")
