@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ReviewListResponse {
+    // 여기서 보내는 ReviewDetailsResponse에는 userId와 likeStatus가 포함되어 있지 않고, 대신 null 또는 0 값이 들어간다.
     List<ReviewDetailsResponse> reviewDetailsResponseList;      // 리뷰 정보
 
     long totalElements;              // 총 리뷰 개수
