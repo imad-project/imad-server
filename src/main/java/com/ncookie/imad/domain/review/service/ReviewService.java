@@ -47,42 +47,21 @@ public class ReviewService {
             ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
-            return ReviewDetailsResponse.builder()
-                    .reviewId(review.getReviewId())
-                    .contentsId(review.getContents().getContentsId())
+            ReviewDetailsResponse dto = ReviewDetailsResponse.toDTO(review);
+            dto.setLikeStatus(likeStatus);
 
-                    .contentsTitle(review.getContents().getTranslatedTitle())
-                    .contentsPosterPath(review.getContents().getPosterPath())
-
-                    .userNickname(review.getUserAccount().getNickname())
-                    .userProfileImage(review.getUserAccount().getProfileImage())
-
-                    .title(review.getTitle())
-                    .content(review.getContent())
-
-                    .score(review.getScore())
-                    .isSpoiler(review.isSpoiler())
-
-                    .likeCnt(review.getLikeCnt())
-                    .dislikeCnt(review.getDislikeCnt())
-
-                    .createdAt(review.getCreatedDate())
-                    .modifiedAt(review.getModifiedDate())
-
-                    .likeStatus(likeStatus)
-
-                    .build();
+            return dto;
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
         }
     }
 
-    public Page<Review> getReviewList(Long contentsId, int pageNumber, String sortString, int order) {
+    public ReviewListResponse getReviewList(Long contentsId, int pageNumber, String sortString, int order) {
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         // sort가 null이거나, sort 설정 중 에러가 발생했을 때의 예외처리도 해주어야 함
-        Sort sort = null;
-        PageRequest pageable = null;
+        Sort sort;
+        PageRequest pageable;
         try {
             if (order == 0) {
                 // 오름차순 (ascending)
@@ -95,10 +74,9 @@ public class ReviewService {
             } else {
                 pageable = PageRequest.of(pageNumber, REVIEW_LIST_PAGE_SIZE);
             }
+
             Page<Review> reviewPage = reviewRepository.findAllByContents(contents, pageable);
-
-
-            return reviewPage;
+            return ReviewListResponse.toDTO(reviewPage);
         } catch (PropertyReferenceException e) {
             // sort string에 잘못된 값이 들어왔을 때 에러 발생
             throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);

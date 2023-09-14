@@ -45,11 +45,11 @@ public class ReviewController {
     }
 
     @GetMapping("/list/{contentsId}")
-    public ApiResponse<Page<Review>> reviewList(@PathVariable("contentsId") Long contentsId,
+    public ApiResponse<ReviewListResponse> reviewList(@PathVariable("contentsId") Long contentsId,
                                      @RequestParam(value = "page") int page,
                                      @RequestParam(value = "sort") String sortString,
                                      @RequestParam(value = "order") int order) {
-        Page<Review> reviewList = reviewService.getReviewList(contentsId, page, sortString, order);
+        ReviewListResponse reviewList = reviewService.getReviewList(contentsId, page, sortString, order);
         return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_LIST_SUCCESS, reviewList);
     }
 

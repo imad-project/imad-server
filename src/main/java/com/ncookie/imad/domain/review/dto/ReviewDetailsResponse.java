@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.review.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.ncookie.imad.domain.review.entity.Review;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,4 +41,30 @@ public class ReviewDetailsResponse {
     private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
 
     private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+
+    public static ReviewDetailsResponse toDTO(Review review) {
+        return ReviewDetailsResponse.builder()
+                .reviewId(review.getReviewId())
+                .contentsId(review.getContents().getContentsId())
+
+                .contentsTitle(review.getContents().getTranslatedTitle())
+                .contentsPosterPath(review.getContents().getPosterPath())
+
+                .userNickname(review.getUserAccount().getNickname())
+                .userProfileImage(review.getUserAccount().getProfileImage())
+
+                .title(review.getTitle())
+                .content(review.getContent())
+
+                .score(review.getScore())
+                .isSpoiler(review.isSpoiler())
+
+                .likeCnt(review.getLikeCnt())
+                .dislikeCnt(review.getDislikeCnt())
+
+                .createdAt(review.getCreatedDate())
+                .modifiedAt(review.getModifiedDate())
+
+                .build();
+    }
 }
