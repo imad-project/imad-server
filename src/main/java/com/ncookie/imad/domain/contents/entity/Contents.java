@@ -65,5 +65,5 @@ public class Contents {
 
     @Setter private int reviewCnt;
     @Setter private int postingCnt;
-    @Setter private float imadScore;
+    @Setter private Float imadScore;
 }

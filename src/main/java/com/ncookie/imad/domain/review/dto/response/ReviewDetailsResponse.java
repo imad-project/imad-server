@@ -20,8 +20,8 @@ public class ReviewDetailsResponse {
     private Long contentsId;                // 작품 ID
     
     // 작품 정보
-    private String contentsTitle;
-    private String contentsPosterPath;
+    private String contentsTitle;           // 작품 제목
+    private String contentsPosterPath;      // 작품 포스터 이미지 경로
     
     // 유저 정보
     private Long userId;                    // 유저 id
