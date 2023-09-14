@@ -2,7 +2,11 @@ package com.ncookie.imad.domain.review.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
-import com.ncookie.imad.domain.review.dto.*;
+import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
+import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
+import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
+import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
+import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.review.repository.ReviewRepository;
 import com.ncookie.imad.domain.review_like.entity.ReviewLike;
@@ -33,7 +37,7 @@ public class ReviewService {
     private final ContentsService contentsService;
 
     private final ReviewLikeService reviewLikeService;
-    
+
     private final int REVIEW_LIST_PAGE_SIZE = 10;
 
 

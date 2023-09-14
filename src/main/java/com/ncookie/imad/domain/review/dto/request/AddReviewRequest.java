@@ -1,6 +1,5 @@
-package com.ncookie.imad.domain.review.dto;
+package com.ncookie.imad.domain.review.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
