@@ -24,8 +24,9 @@ public class ReviewDetailsResponse {
     private String contentsPosterPath;
     
     // 유저 정보
-    private String userNickname;
-    private int userProfileImage;
+    private Long userId;                    // 유저 id
+    private String userNickname;            // 닉네임
+    private int userProfileImage;           // 프로필 이미지
 
     // 리뷰 정보
     private String title;                   // 제목

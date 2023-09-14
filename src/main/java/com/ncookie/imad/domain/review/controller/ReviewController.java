@@ -1,12 +1,10 @@
 package com.ncookie.imad.domain.review.controller;
 
 import com.ncookie.imad.domain.review.dto.*;
-import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor

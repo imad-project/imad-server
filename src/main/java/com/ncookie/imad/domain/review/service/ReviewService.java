@@ -47,10 +47,11 @@ public class ReviewService {
             ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
-            ReviewDetailsResponse dto = ReviewDetailsResponse.toDTO(review);
-            dto.setLikeStatus(likeStatus);
+            ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
+            reviewDetailsResponse.setUserId(user.getId());
+            reviewDetailsResponse.setLikeStatus(likeStatus);
 
-            return dto;
+            return reviewDetailsResponse;
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
         }
