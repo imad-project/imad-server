@@ -35,7 +35,7 @@ public class ReviewListResponse {
         List<Sort.Order> orders = sort.toList();
         for (Sort.Order order : orders) {
             sortProperty = order.getProperty();
-            sortDirection = order.getDirection().equals("ASC") ? 0 : 1;
+            sortDirection = order.getDirection().name().equals("ASC") ? 0 : 1;
         }
         
         // Review 데이터 가공
