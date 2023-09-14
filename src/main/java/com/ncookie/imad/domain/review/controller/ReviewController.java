@@ -43,8 +43,12 @@ public class ReviewController {
     }
 
     @GetMapping("/list/{contentsId}")
-    public ApiResponse<?> reviewList(@PathVariable("contentsId") Long contentsId) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_GET_LIST_SUCCESS);
+    public ApiResponse<ReviewListResponse> reviewList(@PathVariable("contentsId") Long contentsId,
+                                     @RequestParam(value = "page") int page,
+                                     @RequestParam(value = "sort") String sortString,
+                                     @RequestParam(value = "order") int order) {
+        ReviewListResponse reviewList = reviewService.getReviewList(contentsId, page, sortString, order);
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_LIST_SUCCESS, reviewList);
     }
 
     @PatchMapping("/{id}/like")

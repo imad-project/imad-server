@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.review.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.ncookie.imad.domain.review.entity.Review;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,8 +24,9 @@ public class ReviewDetailsResponse {
     private String contentsPosterPath;      // 작품 포스터 이미지 경로
     
     // 유저 정보
-    private String userNickname;            // 유저 닉네임
-    private int userProfileImage;           // 유저 프로필 이미지
+    private Long userId;                    // 유저 id
+    private String userNickname;            // 닉네임
+    private int userProfileImage;           // 프로필 이미지
 
     // 리뷰 정보
     private String title;                   // 제목
@@ -40,4 +42,30 @@ public class ReviewDetailsResponse {
     private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
 
     private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+
+    public static ReviewDetailsResponse toDTO(Review review) {
+        return ReviewDetailsResponse.builder()
+                .reviewId(review.getReviewId())
+                .contentsId(review.getContents().getContentsId())
+
+                .contentsTitle(review.getContents().getTranslatedTitle())
+                .contentsPosterPath(review.getContents().getPosterPath())
+
+                .userNickname(review.getUserAccount().getNickname())
+                .userProfileImage(review.getUserAccount().getProfileImage())
+
+                .title(review.getTitle())
+                .content(review.getContent())
+
+                .score(review.getScore())
+                .isSpoiler(review.isSpoiler())
+
+                .likeCnt(review.getLikeCnt())
+                .dislikeCnt(review.getDislikeCnt())
+
+                .createdAt(review.getCreatedDate())
+                .modifiedAt(review.getModifiedDate())
+
+                .build();
+    }
 }
