@@ -24,6 +24,16 @@ public class ReviewController {
         return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_DETAILS_SUCCESS, reviewService.getReview(accessToken, id));
     }
 
+    @GetMapping("/list/{contentsId}")
+    public ApiResponse<ReviewListResponse> reviewList(@RequestHeader("Authorization") String accessToken,
+                                                      @PathVariable("contentsId") Long contentsId,
+                                                      @RequestParam(value = "page") int page,
+                                                      @RequestParam(value = "sort") String sortString,
+                                                      @RequestParam(value = "order") int order) {
+        ReviewListResponse reviewList = reviewService.getReviewList(accessToken, contentsId, page, sortString, order);
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_LIST_SUCCESS, reviewList);
+    }
+
     @PostMapping("")
     public ApiResponse<AddReviewResponse> reviewAdd(@RequestHeader("Authorization") String accessToken,
                                                     @RequestBody AddReviewRequest addReviewRequest) {
@@ -45,15 +55,6 @@ public class ReviewController {
                                        @PathVariable("id") Long id) {
         reviewService.deleteReview(accessToken, id);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_DELETE_DETAILS_SUCCESS);
-    }
-
-    @GetMapping("/list/{contentsId}")
-    public ApiResponse<ReviewListResponse> reviewList(@PathVariable("contentsId") Long contentsId,
-                                                      @RequestParam(value = "page") int page,
-                                                      @RequestParam(value = "sort") String sortString,
-                                                      @RequestParam(value = "order") int order) {
-        ReviewListResponse reviewList = reviewService.getReviewList(contentsId, page, sortString, order);
-        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_LIST_SUCCESS, reviewList);
     }
 
     @PatchMapping("/{id}/like")

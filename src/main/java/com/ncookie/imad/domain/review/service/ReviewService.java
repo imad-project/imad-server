@@ -23,6 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -37,8 +39,6 @@ public class ReviewService {
     private final ContentsService contentsService;
 
     private final ReviewLikeService reviewLikeService;
-
-    private final int REVIEW_LIST_PAGE_SIZE = 10;
 
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
@@ -61,7 +61,10 @@ public class ReviewService {
         }
     }
 
-    public ReviewListResponse getReviewList(Long contentsId, int pageNumber, String sortString, int order) {
+    public ReviewListResponse getReviewList(String accessToken, Long contentsId, int pageNumber, String sortString, int order) {
+        int REVIEW_LIST_PAGE_SIZE = 10;
+
+        UserAccount user = getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         // sort가 null이거나, sort 설정 중 에러가 발생했을 때의 예외처리도 해주어야 함
@@ -81,12 +84,26 @@ public class ReviewService {
             }
 
             Page<Review> reviewPage = reviewRepository.findAllByContents(contents, pageable);
-            return ReviewListResponse.toDTO(reviewPage);
+
+            // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
+            List<ReviewDetailsResponse> reviewList = new ArrayList<>();
+            for (Review review : reviewPage.getContent().stream().toList()) {
+                ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+                int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
+
+                // DTO 클래스 변환 및 like status 설정
+                ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
+                reviewDetailsResponse.setLikeStatus(likeStatus);
+                reviewList.add(reviewDetailsResponse);
+            }
+
+            return ReviewListResponse.toDTO(reviewPage, reviewList);
         } catch (PropertyReferenceException e) {
             // sort string에 잘못된 값이 들어왔을 때 에러 발생
             throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);
         }
     }
+    
 
     public AddReviewResponse addReview(String accessToken, AddReviewRequest addReviewRequest) {
         UserAccount user = getUserFromAccessToken(accessToken);
