@@ -125,6 +125,7 @@ public class SecurityConfig {
                         "/api/user/validation/**",
                         "/api/callback/**",
                         "/api/test/**",
+                        "/oauth2/**",
                         "/auth/**",
                         "/h2-console/**")
                 .permitAll()
