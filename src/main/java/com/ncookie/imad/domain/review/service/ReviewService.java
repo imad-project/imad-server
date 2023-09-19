@@ -40,8 +40,6 @@ public class ReviewService {
 
     private final ReviewLikeService reviewLikeService;
 
-    private final int REVIEW_LIST_PAGE_SIZE = 10;
-
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
@@ -64,6 +62,8 @@ public class ReviewService {
     }
 
     public ReviewListResponse getReviewList(String accessToken, Long contentsId, int pageNumber, String sortString, int order) {
+        int REVIEW_LIST_PAGE_SIZE = 10;
+
         UserAccount user = getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
