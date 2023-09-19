@@ -51,6 +51,7 @@ public class ReviewDetailsResponse {
                 .contentsTitle(review.getContents().getTranslatedTitle())
                 .contentsPosterPath(review.getContents().getPosterPath())
 
+                .userId(review.getUserAccount().getId())
                 .userNickname(review.getUserAccount().getNickname())
                 .userProfileImage(review.getUserAccount().getProfileImage())
 
