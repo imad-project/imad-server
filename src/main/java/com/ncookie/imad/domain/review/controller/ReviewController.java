@@ -24,9 +24,9 @@ public class ReviewController {
         return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_DETAILS_SUCCESS, reviewService.getReview(accessToken, id));
     }
 
-    @GetMapping("/list/{contentsId}")
+    @GetMapping("/list")
     public ApiResponse<ReviewListResponse> reviewList(@RequestHeader("Authorization") String accessToken,
-                                                      @PathVariable("contentsId") Long contentsId,
+                                                      @RequestParam(value = "contents_id") Long contentsId,
                                                       @RequestParam(value = "page") int page,
                                                       @RequestParam(value = "sort") String sortString,
                                                       @RequestParam(value = "order") int order) {
@@ -57,7 +57,7 @@ public class ReviewController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_DELETE_DETAILS_SUCCESS);
     }
 
-    @PatchMapping("/{id}/like")
+    @PatchMapping("/like/{id}")
     public ApiResponse<?> reviewLikeStatusModify(@RequestHeader("Authorization") String accessToken,
                                                  @PathVariable("id") Long id,
                                                  @RequestBody ReviewLikeStatusRequest reviewLikeStatusRequest) {
