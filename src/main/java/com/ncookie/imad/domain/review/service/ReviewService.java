@@ -218,9 +218,8 @@ public class ReviewService {
             }
 
             // like, dislike count 갱신
-            review.setLikeCnt(reviewLikeService.getLikeCount(review));
-            review.setDislikeCnt(reviewLikeService.getDislikeCount(review));
-            reviewRepository.save(review);
+            reviewRepository.updateLikeCount(review.getReviewId(), reviewLikeService.getLikeCount(review));
+            reviewRepository.updateDislikeCount(review.getReviewId(), reviewLikeService.getDislikeCount(review));
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
         }
