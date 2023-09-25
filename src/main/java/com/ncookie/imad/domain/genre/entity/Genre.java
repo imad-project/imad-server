@@ -14,9 +14,8 @@ import lombok.*;
 @Entity
 public class Genre {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long genreId;
 
-    @Setter
     private String name;
+    private int genreType;      // 둘 다(0), TV(1), MOVIE(2)
 }
