@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Gender;
 import com.ncookie.imad.domain.user.entity.Role;
+import com.ncookie.imad.domain.user.entity.UserAccount;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,4 +28,16 @@ public class UserInfoResponse {
 
     // 유저의 추가정보 입력여부를 구분하기 위한 플래그 변수
     private Role role;
+
+    public static UserInfoResponse toDTO(UserAccount userAccount) {
+        return UserInfoResponse.builder()
+                .email(userAccount.getEmail())
+                .nickname(userAccount.getNickname())
+                .authProvider(userAccount.getAuthProvider())
+                .gender(userAccount.getGender())
+                .ageRange(userAccount.getAgeRange())
+                .profileImage(userAccount.getProfileImage())
+                .role(userAccount.getRole())
+                .build();
+    }
 }

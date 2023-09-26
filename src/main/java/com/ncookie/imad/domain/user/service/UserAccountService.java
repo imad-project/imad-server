@@ -53,27 +53,15 @@ public class UserAccountService {
     }
 
     public UserInfoResponse getUserInfo(String accessToken) {
-        UserInfoResponse userInfoResponse;
-
         // token에 데이터가 들어있는 것은 이미 filter에서 검증했기 떄문에 추가로 검사하지는 않음
         String email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken)).get();
 
         Optional<UserAccount> user = userAccountRepository.findByEmail(email);
         if (user.isPresent()) {
-            userInfoResponse = UserInfoResponse.builder()
-                    .email(user.get().getEmail())
-                    .nickname(user.get().getNickname())
-                    .authProvider(user.get().getAuthProvider())
-                    .gender(user.get().getGender())
-                    .ageRange(user.get().getAgeRange())
-                    .profileImage(user.get().getProfileImage())
-                    .role(user.get().getRole())
-                    .build();
+            return UserInfoResponse.toDTO(user.get());
         } else {
             throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
         }
-
-        return userInfoResponse;
     }
 
     public UserInfoResponse updateUserAccountInfo(String accessToken, UserUpdateRequest userUpdateRequest) {
@@ -98,15 +86,7 @@ public class UserAccountService {
         });
 
         UserAccount userAccount = userAccountRepository.findByEmail(email.get()).get();
-        return UserInfoResponse.builder()
-                .email(userAccount.getEmail())
-                .nickname(userAccount.getNickname())
-                .authProvider(userAccount.getAuthProvider())
-                .gender(userAccount.getGender())
-                .ageRange(userUpdateRequest.getAgeRange())
-                .profileImage(userAccount.getProfileImage())
-                .role(userAccount.getRole())
-                .build();
+        return UserInfoResponse.toDTO(userAccount);
     }
 
     public void deleteUserAccount(String accessToken) {
