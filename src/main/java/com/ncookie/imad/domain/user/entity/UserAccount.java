@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Table(indexes = {
         @Index(columnList = "user_id"),
         @Index(columnList = "email", unique = true),
@@ -37,6 +40,13 @@ public class UserAccount extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AuthProvider authProvider;
+
+    // 유저 선호 장르
+    @Setter
+    @ElementCollection
+    @CollectionTable(name = "preferred_genres", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
+    @Builder.Default
+    private Set<Long> preferredGenres = new HashSet<>();
 
     private String socialId;            // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
     @Setter private String oauth2AccessToken;   // oauth2 업체와의 연결 해제, 발급받은 토큰 revoke 등을 처리할 때 사용

@@ -18,9 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.ncookie.imad.global.Utils.extractToken;
 
@@ -31,6 +29,7 @@ import static com.ncookie.imad.global.Utils.extractToken;
 public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
+
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
@@ -81,7 +80,9 @@ public class UserAccountService {
             user.setAgeRange(userUpdateRequest.getAgeRange());
             user.setGender(userUpdateRequest.getGender());
             user.setProfileImage(userUpdateRequest.getProfileImage());
+            user.setPreferredGenres(userUpdateRequest.getPreferredGenres());
             user.authorizeUser();
+
             userAccountRepository.save(user);
         });
 
@@ -90,7 +91,6 @@ public class UserAccountService {
     }
 
     public void deleteUserAccount(String accessToken) {
-
         jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken))
                 .ifPresentOrElse(email ->
                                 userAccountRepository.findByEmail(email)
@@ -141,6 +141,32 @@ public class UserAccountService {
             return null;
         }
     }
+
+
+//    private void saveUserPreferredGenre(UserAccount userAccount, Set<Long> genres) {
+//        for (Long genre : genres) {
+//            userPreferredGenreRepository.save(
+//                    UserPreferredGenre.builder()
+//                    .userPreferredGenreId(
+//                            UserPreferredGenreId.builder()
+//                                    .userAccount(userAccount)
+//                                    .genreId(genre)
+//                                    .build())
+//                    .genreRate(0)
+//                    .build()
+//            );
+//        }
+//    }
+//
+//    private Set<Long> getUserPreferredGenreIdsFromEntities(Set<UserPreferredGenre> genresEntity) {
+//        Set<Long> genres = new HashSet<>();
+//
+//        for (UserPreferredGenre genre : genresEntity) {
+//            genres.add(genre.getUserPreferredGenreId().getGenreId());
+//        }
+//
+//        return genres;
+//    }
 
 
     /**

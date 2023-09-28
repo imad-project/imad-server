@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ncookie.imad.domain.user.entity.Gender;
 import lombok.Getter;
 
+import java.util.Set;
+
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Getter
 public class UserUpdateRequest {
@@ -12,5 +14,6 @@ public class UserUpdateRequest {
     int ageRange;
     int profileImage;
     String nickname;
-    // TODO: 장르 추가해야함
+
+    Set<Long> preferredGenres;
 }
