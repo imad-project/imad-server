@@ -18,9 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.ncookie.imad.global.Utils.extractToken;
 
@@ -31,6 +29,7 @@ import static com.ncookie.imad.global.Utils.extractToken;
 public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
+
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
@@ -53,27 +52,15 @@ public class UserAccountService {
     }
 
     public UserInfoResponse getUserInfo(String accessToken) {
-        UserInfoResponse userInfoResponse;
-
         // token에 데이터가 들어있는 것은 이미 filter에서 검증했기 떄문에 추가로 검사하지는 않음
         String email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken)).get();
 
         Optional<UserAccount> user = userAccountRepository.findByEmail(email);
         if (user.isPresent()) {
-            userInfoResponse = UserInfoResponse.builder()
-                    .email(user.get().getEmail())
-                    .nickname(user.get().getNickname())
-                    .authProvider(user.get().getAuthProvider())
-                    .gender(user.get().getGender())
-                    .ageRange(user.get().getAgeRange())
-                    .profileImage(user.get().getProfileImage())
-                    .role(user.get().getRole())
-                    .build();
+            return UserInfoResponse.toDTO(user.get());
         } else {
             throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
         }
-
-        return userInfoResponse;
     }
 
     public UserInfoResponse updateUserAccountInfo(String accessToken, UserUpdateRequest userUpdateRequest) {
@@ -93,24 +80,17 @@ public class UserAccountService {
             user.setAgeRange(userUpdateRequest.getAgeRange());
             user.setGender(userUpdateRequest.getGender());
             user.setProfileImage(userUpdateRequest.getProfileImage());
+            user.setPreferredGenres(userUpdateRequest.getPreferredGenres());
             user.authorizeUser();
+
             userAccountRepository.save(user);
         });
 
         UserAccount userAccount = userAccountRepository.findByEmail(email.get()).get();
-        return UserInfoResponse.builder()
-                .email(userAccount.getEmail())
-                .nickname(userAccount.getNickname())
-                .authProvider(userAccount.getAuthProvider())
-                .gender(userAccount.getGender())
-                .ageRange(userUpdateRequest.getAgeRange())
-                .profileImage(userAccount.getProfileImage())
-                .role(userAccount.getRole())
-                .build();
+        return UserInfoResponse.toDTO(userAccount);
     }
 
     public void deleteUserAccount(String accessToken) {
-
         jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken))
                 .ifPresentOrElse(email ->
                                 userAccountRepository.findByEmail(email)
@@ -161,6 +141,32 @@ public class UserAccountService {
             return null;
         }
     }
+
+
+//    private void saveUserPreferredGenre(UserAccount userAccount, Set<Long> genres) {
+//        for (Long genre : genres) {
+//            userPreferredGenreRepository.save(
+//                    UserPreferredGenre.builder()
+//                    .userPreferredGenreId(
+//                            UserPreferredGenreId.builder()
+//                                    .userAccount(userAccount)
+//                                    .genreId(genre)
+//                                    .build())
+//                    .genreRate(0)
+//                    .build()
+//            );
+//        }
+//    }
+//
+//    private Set<Long> getUserPreferredGenreIdsFromEntities(Set<UserPreferredGenre> genresEntity) {
+//        Set<Long> genres = new HashSet<>();
+//
+//        for (UserPreferredGenre genre : genresEntity) {
+//            genres.add(genre.getUserPreferredGenreId().getGenreId());
+//        }
+//
+//        return genres;
+//    }
 
 
     /**
