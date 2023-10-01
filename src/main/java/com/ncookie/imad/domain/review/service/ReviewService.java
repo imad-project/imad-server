@@ -43,7 +43,7 @@ public class ReviewService {
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -64,7 +64,7 @@ public class ReviewService {
     public ReviewListResponse getReviewList(String accessToken, Long contentsId, int pageNumber, String sortString, int order) {
         int REVIEW_LIST_PAGE_SIZE = 10;
 
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         // sort가 null이거나, sort 설정 중 에러가 발생했을 때의 예외처리도 해주어야 함
@@ -106,7 +106,7 @@ public class ReviewService {
     
 
     public AddReviewResponse addReview(String accessToken, AddReviewRequest addReviewRequest) {
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addReviewRequest.getContentsId());
 
         // 유저는 작품에 대해 한 가지 리뷰만 작성할 수 있음
@@ -140,7 +140,7 @@ public class ReviewService {
 
     public Long modifyReview(String accessToken, Long reviewId, ModifyReviewRequest reviewRequest) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -165,7 +165,7 @@ public class ReviewService {
 
     public void deleteReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -188,7 +188,7 @@ public class ReviewService {
         }
 
         Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (reviewOptional.isPresent()) {
             Review review = reviewOptional.get();
@@ -225,17 +225,6 @@ public class ReviewService {
         }
     }
 
-
-    // 유저 null 체크를 위한 공용 메소드
-    private UserAccount getUserFromAccessToken(String accessToken) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
-
-        if (user == null) {
-            throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
-        } else {
-            return user;
-        }
-    }
 
     // 작품 평점 갱신
     private void calculateAndSaveAverageScore(Review review) {

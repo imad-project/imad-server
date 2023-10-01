@@ -136,7 +136,11 @@ public class UserAccountService {
         Optional<String> optionalEmail = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken));
         if (optionalEmail.isPresent()) {
             Optional<UserAccount> optionalUserAccount = userAccountRepository.findByEmail(optionalEmail.get());
-            return optionalUserAccount.orElse(null);
+            if (optionalUserAccount.isEmpty()) {
+                throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
+            } else {
+                return optionalUserAccount.get();
+            }
         } else {
             return null;
         }
