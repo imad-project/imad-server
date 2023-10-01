@@ -2,6 +2,8 @@ package com.ncookie.imad.domain.profile.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.profile.dto.BookmarkDetails;
+import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.repository.ContentsBookmarkRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -14,6 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -23,12 +28,19 @@ public class ProfileService {
 
     private final ContentsBookmarkRepository contentsBookmarkRepository;
 
-    public Page<ContentsBookmark> getContentsBookmarkList(String accessToken, int pageNumber) {
+    public BookmarkListResponse getContentsBookmarkList(String accessToken, int pageNumber) {
         int REVIEW_LIST_PAGE_SIZE = 10;
-        return contentsBookmarkRepository.findAllByUserAccount(
+        Page<ContentsBookmark> contentsBookmarkPage = contentsBookmarkRepository.findAllByUserAccount(
                 userAccountService.getUserFromAccessToken(accessToken),
                 PageRequest.of(pageNumber - 1, REVIEW_LIST_PAGE_SIZE)
         );
+
+        List<BookmarkDetails> bookmarkDetailsList = new ArrayList<>();
+        for (ContentsBookmark bookmark : contentsBookmarkPage.getContent().stream().toList()) {
+            bookmarkDetailsList.add(BookmarkDetails.toDTO(bookmark));
+        }
+
+        return BookmarkListResponse.toDTO(contentsBookmarkPage, bookmarkDetailsList);
     }
     
     // 작품 북마크 추가

@@ -1,12 +1,11 @@
 package com.ncookie.imad.domain.profile.controller;
 
-import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
+import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -24,13 +23,12 @@ public class ProfileController {
 
     @Description("북마크한 작품 목록 조회")
     @GetMapping("/bookmark/list")
-    public ApiResponse<Page<ContentsBookmark>> getProfileBookmarks(
+    public ApiResponse<BookmarkListResponse> getProfileBookmarks(
             @RequestHeader("Authorization") String accessToken,
             @RequestParam("page") int pageNumber
     ) {
-        Page<ContentsBookmark> contentsBookmarkList = profileService.getContentsBookmarkList(accessToken, pageNumber);
+        BookmarkListResponse contentsBookmarkList = profileService.getContentsBookmarkList(accessToken, pageNumber);
         return ApiResponse.createSuccess(ResponseCode.PROFILE_GET_INFO_SUCCESS, contentsBookmarkList);
-
     }
 
     @Description("작품 북마크 추가")
