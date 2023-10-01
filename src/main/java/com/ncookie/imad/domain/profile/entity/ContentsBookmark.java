@@ -6,9 +6,6 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Builder
 @Getter

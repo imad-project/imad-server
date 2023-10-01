@@ -61,6 +61,11 @@ public enum ResponseCode {
     // 프로필 관련
     PROFILE_GET_INFO_SUCCESS(200, "정상적으로 프로필 정보를 조회했습니다."),
 
+    BOOKMARK_ADD_SUCCESS(201, "정상적으로 작품 북마크를 등록했습니다."),
+    BOOKMARK_ALREADY_EXIST(400, "이미 등록된 작품 북마크입니다."),
+    BOOKMARK_DELETE_SUCCESS(200, "정상적으로 작품 북마크를 삭제했습니다."),
+    BOOKMARK_WRONG_ID(400, "해당 ID의 작품 북마크를 찾을 수 없습니다."),
+
     // 기타
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
     INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),
