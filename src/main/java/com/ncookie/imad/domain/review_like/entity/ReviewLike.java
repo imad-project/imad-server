@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.review_like.entity;
 
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -13,7 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class ReviewLike {
+public class ReviewLike extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewLikeId;
