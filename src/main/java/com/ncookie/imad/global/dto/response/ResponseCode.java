@@ -66,6 +66,8 @@ public enum ResponseCode {
     BOOKMARK_DELETE_SUCCESS(200, "정상적으로 작품 북마크를 삭제했습니다."),
     BOOKMARK_WRONG_ID(400, "해당 ID의 작품 북마크를 찾을 수 없습니다."),
 
+    PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS(200, "정상적으로 작성한 리뷰 리스트를 조회하는데 성공했습니다."),
+
     // 기타
     HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
     INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),

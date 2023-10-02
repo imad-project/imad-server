@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.profile.controller;
 
 import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
+import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
@@ -65,9 +66,15 @@ public class ProfileController {
     }
 
     @Description("작성한 리뷰 목록 조회")
-    @GetMapping("/reviews")
-    public ApiResponse<?> getProfileReviews() {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
+    @GetMapping("/review/list")
+    public ApiResponse<ReviewListResponse> getProfileReviews(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestParam("page") int pageNumber
+    ) {
+        return ApiResponse.createSuccess(
+                ResponseCode.PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS,
+                profileService.getReviewList(accessToken, pageNumber)
+        );
     }
 
     @Description("좋아요한 게시글 목록 조회")

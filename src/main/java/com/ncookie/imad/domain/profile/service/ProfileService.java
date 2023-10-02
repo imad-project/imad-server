@@ -6,6 +6,8 @@ import com.ncookie.imad.domain.profile.dto.BookmarkDetails;
 import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.repository.ContentsBookmarkRepository;
+import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
+import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -25,6 +27,7 @@ import java.util.List;
 public class ProfileService {
     private final UserAccountService userAccountService;
     private final ContentsService contentsService;
+    private final ReviewService reviewService;
 
     private final ContentsBookmarkRepository contentsBookmarkRepository;
 
@@ -71,5 +74,11 @@ public class ProfileService {
             throw new BadRequestException(ResponseCode.BOOKMARK_WRONG_ID);
         }
         contentsBookmarkRepository.deleteByIdAndUserAccount(bookmarkId, user);
+    }
+
+    public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+
+        return reviewService.getReviewListByUser(user, pageNumber);
     }
 }
