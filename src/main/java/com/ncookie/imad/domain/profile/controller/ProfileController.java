@@ -54,13 +54,13 @@ public class ProfileController {
     }
 
     @Description("스크랩한 게시글 목록 조회")
-    @GetMapping("/scraps")
+    @GetMapping("/scrap/list")
     public ApiResponse<?> getProfileScraps() {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
     }
 
     @Description("작성한 게시글 목록 조회")
-    @GetMapping("/postings")
+    @GetMapping("/posting/list")
     public ApiResponse<?> getProfilePostings() {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
     }
@@ -78,13 +78,13 @@ public class ProfileController {
     }
 
     @Description("좋아요한 게시글 목록 조회")
-    @GetMapping("/like/postings")
+    @GetMapping("/like/posting/list")
     public ApiResponse<?> getProfileLikedPostings() {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
     }
 
     @Description("좋아요한 리뷰 목록 조회")
-    @GetMapping("/like/reviews")
+    @GetMapping("/like/review/list")
     public ApiResponse<?> getProfileLikedReviews() {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
     }
