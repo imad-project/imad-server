@@ -31,7 +31,8 @@ public class UserInfoResponse {
     // 유저의 추가정보 입력여부를 구분하기 위한 플래그 변수
     private Role role;
 
-    private Set<Long> preferredGenres;
+    private Set<Long> preferredTvGenres;
+    private Set<Long> preferredMovieGenres;
 
 
     public static UserInfoResponse toDTO(UserAccount userAccount) {
@@ -42,7 +43,10 @@ public class UserInfoResponse {
                 .gender(userAccount.getGender())
                 .ageRange(userAccount.getAgeRange())
                 .profileImage(userAccount.getProfileImage())
-                .preferredGenres(userAccount.getPreferredGenres())
+
+                .preferredTvGenres(userAccount.getPreferredTvGenres())
+                .preferredMovieGenres(userAccount.getPreferredMovieGenres())
+
                 .role(userAccount.getRole())
                 .build();
     }

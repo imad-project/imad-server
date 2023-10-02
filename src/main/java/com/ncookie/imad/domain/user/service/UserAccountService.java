@@ -80,7 +80,10 @@ public class UserAccountService {
             user.setAgeRange(userUpdateRequest.getAgeRange());
             user.setGender(userUpdateRequest.getGender());
             user.setProfileImage(userUpdateRequest.getProfileImage());
-            user.setPreferredGenres(userUpdateRequest.getPreferredGenres());
+
+            user.setPreferredTvGenres(userUpdateRequest.getPreferredTvGenres());
+            user.setPreferredMovieGenres(userUpdateRequest.getPreferredMovieGenres());
+
             user.authorizeUser();
 
             userAccountRepository.save(user);
