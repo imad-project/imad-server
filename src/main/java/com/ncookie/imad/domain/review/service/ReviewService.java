@@ -40,10 +40,11 @@ public class ReviewService {
 
     private final ReviewLikeService reviewLikeService;
 
+    private final int PAGE_SIZE = 10;
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -62,9 +63,7 @@ public class ReviewService {
     }
 
     public ReviewListResponse getReviewList(String accessToken, Long contentsId, int pageNumber, String sortString, int order) {
-        int REVIEW_LIST_PAGE_SIZE = 10;
-
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         // sort가 null이거나, sort 설정 중 에러가 발생했을 때의 예외처리도 해주어야 함
@@ -74,39 +73,73 @@ public class ReviewService {
             if (order == 0) {
                 // 오름차순 (ascending)
                 sort = Sort.by(sortString).ascending();
-                pageable = PageRequest.of(pageNumber, REVIEW_LIST_PAGE_SIZE, sort);
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
             } else if (order == 1) {
                 // 내림차순 (descending)
                 sort = Sort.by(sortString).descending();
-                pageable = PageRequest.of(pageNumber, REVIEW_LIST_PAGE_SIZE, sort);
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
             } else {
-                pageable = PageRequest.of(pageNumber, REVIEW_LIST_PAGE_SIZE);
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE);
             }
 
             Page<Review> reviewPage = reviewRepository.findAllByContents(contents, pageable);
-
-            // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
-            List<ReviewDetailsResponse> reviewList = new ArrayList<>();
-            for (Review review : reviewPage.getContent().stream().toList()) {
-                ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
-                int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
-
-                // DTO 클래스 변환 및 like status 설정
-                ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
-                reviewDetailsResponse.setLikeStatus(likeStatus);
-                reviewList.add(reviewDetailsResponse);
-            }
-
-            return ReviewListResponse.toDTO(reviewPage, reviewList);
+            return ReviewListResponse.toDTO(
+                    reviewPage,
+                    convertReviewListToReviewDetailsResponse(user, reviewPage.getContent().stream().toList())
+            );
         } catch (PropertyReferenceException e) {
             // sort string에 잘못된 값이 들어왔을 때 에러 발생
             throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);
         }
     }
+
+    public ReviewListResponse getReviewListByUser(UserAccount user, int pageNumber) {
+        Sort sort = Sort.by("createdDate").descending();
+        PageRequest pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
+        Page<Review> reviewPage = reviewRepository.findAllByUserAccount(user, pageable);
+
+        return ReviewListResponse.toDTO(
+                reviewPage,
+                convertReviewListToReviewDetailsResponse(user, reviewPage.getContent().stream().toList())
+        );
+    }
+
+    public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber) {
+        Sort sort = Sort.by("createdDate").descending();
+        PageRequest pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
+        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedReviewListByUser(user, pageable);
+
+        List<Review> reviewList = new ArrayList<>();
+
+        for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {
+            reviewList.add(reviewLike.getReview());
+        }
+
+        return ReviewListResponse.toDTO(
+                reviewLikePage,
+                convertReviewListToReviewDetailsResponse(user, reviewList)
+        );
+    }
+
+    private List<ReviewDetailsResponse> convertReviewListToReviewDetailsResponse(UserAccount user, List<Review> reviewList) {
+        // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
+        List<ReviewDetailsResponse> reviewDetailsResponseList = new ArrayList<>();
+        for (Review review : reviewList) {
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
+
+            // DTO 클래스 변환 및 like status 설정
+            ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
+            reviewDetailsResponse.setLikeStatus(likeStatus);
+            reviewDetailsResponseList.add(reviewDetailsResponse);
+        }
+
+        return reviewDetailsResponseList;
+    }
     
 
     public AddReviewResponse addReview(String accessToken, AddReviewRequest addReviewRequest) {
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addReviewRequest.getContentsId());
 
         // 유저는 작품에 대해 한 가지 리뷰만 작성할 수 있음
@@ -140,7 +173,7 @@ public class ReviewService {
 
     public Long modifyReview(String accessToken, Long reviewId, ModifyReviewRequest reviewRequest) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -165,7 +198,7 @@ public class ReviewService {
 
     public void deleteReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -188,7 +221,7 @@ public class ReviewService {
         }
 
         Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
-        UserAccount user = getUserFromAccessToken(accessToken);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (reviewOptional.isPresent()) {
             Review review = reviewOptional.get();
@@ -225,17 +258,6 @@ public class ReviewService {
         }
     }
 
-
-    // 유저 null 체크를 위한 공용 메소드
-    private UserAccount getUserFromAccessToken(String accessToken) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
-
-        if (user == null) {
-            throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
-        } else {
-            return user;
-        }
-    }
 
     // 작품 평점 갱신
     private void calculateAndSaveAverageScore(Review review) {

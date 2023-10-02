@@ -9,10 +9,14 @@ import com.ncookie.imad.domain.contents.repository.ContentsRepository;
 import com.ncookie.imad.domain.contents.repository.MovieDataRepository;
 import com.ncookie.imad.domain.contents.repository.TvProgramDataRepository;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
+import com.ncookie.imad.global.dto.response.ResponseCode;
+import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.global.openfeign.TmdbApiClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -39,8 +43,15 @@ public class ContentsService {
         return apiClient.getContentsCertification(id, type);
     }
 
+    // 프로필에서 작품 북마크 관련으로 사용하는 메소드
     public Contents getContentsEntityById(Long id) {
-        return contentsRepository.findById(id).orElse(null);
+        Optional<Contents> contents = contentsRepository.findById(id);
+
+        if (contents.isPresent()) {
+            return contents.get();
+        } else {
+            throw new BadRequestException(ResponseCode.CONTENTS_ID_NOT_FOUND);
+        }
     }
 
     public MovieData saveMovieData(MovieData movieData) {
@@ -74,4 +85,5 @@ public class ContentsService {
     public void saveContentsScoreAndReviewCount(Contents contents) {
         contentsRepository.save(contents);
     }
+
 }

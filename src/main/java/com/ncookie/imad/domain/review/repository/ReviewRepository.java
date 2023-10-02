@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findAllByContents(Contents contents, Pageable pageable);
+    Page<Review> findAllByUserAccount(UserAccount userAccount, Pageable pageable);
 
     boolean existsReviewByUserAccountAndContents(UserAccount user, Contents contents);
 
