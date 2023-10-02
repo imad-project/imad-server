@@ -51,7 +51,7 @@ public class ProfileService {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
-        if (!contentsBookmarkRepository.existsByContents(contents)) {
+        if (!contentsBookmarkRepository.existsByUserAccountAndContents(user, contents)) {
             contentsBookmarkRepository.save(
                     ContentsBookmark.builder()
                             .userAccount(user)
