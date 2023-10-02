@@ -67,20 +67,8 @@ public enum ResponseCode {
     BOOKMARK_WRONG_ID(400, "해당 ID의 작품 북마크를 찾을 수 없습니다."),
 
     PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS(200, "정상적으로 작성한 리뷰 리스트를 조회했습니다."),
-    PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS(200, "정상적으로 좋아요/싫어요를 등록한 리뷰 리스트를 조회했습니다."),
+    PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS(200, "정상적으로 좋아요/싫어요를 등록한 리뷰 리스트를 조회했습니다.");
 
-    // 기타
-    HANDLE_ACCESS_DENIED(403, "로그인이 필요합니다."),
-    INVALID_INPUT_USERNAME(400, "닉네임을 3자 이상 입력하세요."),
-    NOTEQUAL_INPUT_PASSWORD(400,  "비밀번호가 일치하지 않습니다."),
-    INVALID_PASSWORD(400,  "비밀번호를 4자 이상 입력하세요."),
-    INVALID_USERNAME(400,  "알파벳 대소문자와 숫자로만 입력하세요."),
-    NOT_AUTHORIZED(403, "작성자만 수정 및 삭제를 할 수 있습니다."),
-    USERNAME_DUPLICATION(400, "이미 등록된 아이디입니다."),
-
-    // 게시글
-    NOTFOUND_POST(404, "해당 게시글이 존재하지 않습니다."),
-    CONVERTING_FAILED(400, "파일 변환에 실패했습니다.");
 
     private final String message;
     private final int status;
