@@ -7,7 +7,10 @@ import com.ncookie.imad.domain.review_like.repository.ReviewLikeRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 
 
 @RequiredArgsConstructor
@@ -34,5 +37,17 @@ public class ReviewLikeService {
 
     public int getDislikeCount(Review review) {
         return reviewLikeRepository.countDislikeByReview(review);
+    }
+
+    public Page<ReviewLike> getLikedReviewListByUser(UserAccount user, Pageable pageable) {
+        return reviewLikeRepository.findAllByUserAccount(user, pageable);
+//        Page<ReviewLike> reviewLikePage = reviewLikeRepository.findAllByUserAccount(user, pageable);
+//        List<Review> reviewList = new ArrayList<>();
+//
+//        for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {
+//            reviewList.add(reviewLike.getReview());
+//        }
+//
+//        return reviewList;
     }
 }

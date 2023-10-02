@@ -2,7 +2,6 @@ package com.ncookie.imad.domain.review.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.ncookie.imad.domain.review.entity.Review;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Page;
@@ -28,10 +27,10 @@ public class ReviewListResponse {
     int sortDirection;              // 0 : 오름차순, 1 : 내림차순
     String sortProperty;            // 정렬 기준 (score, createdDate, likeCnt, dislikeCnt 등이 있음)
 
-    public static ReviewListResponse toDTO(Page<Review> reviewPage, List<ReviewDetailsResponse> reviewList) {
+    public static ReviewListResponse toDTO(Page<?> page, List<ReviewDetailsResponse> reviewList) {
         String sortProperty = null;
         int sortDirection = 0;
-        Sort sort = reviewPage.getSort();
+        Sort sort = page.getSort();
         List<Sort.Order> orders = sort.toList();
         for (Sort.Order order : orders) {
             sortProperty = order.getProperty();
@@ -41,12 +40,12 @@ public class ReviewListResponse {
         return ReviewListResponse.builder()
                 .reviewDetailsResponseList(reviewList)
 
-                .totalElements(reviewPage.getTotalElements())
-                .totalPages(reviewPage.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
 
-                .pageNumber(reviewPage.getNumber())
-                .numberOfElements(reviewPage.getNumberOfElements())
-                .sizeOfPage(reviewPage.getSize())
+                .pageNumber(page.getNumber())
+                .numberOfElements(page.getNumberOfElements())
+                .sizeOfPage(page.getSize())
 
                 .sortDirection(sortDirection)
                 .sortProperty(sortProperty)

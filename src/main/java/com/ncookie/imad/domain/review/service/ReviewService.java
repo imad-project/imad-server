@@ -83,7 +83,10 @@ public class ReviewService {
             }
 
             Page<Review> reviewPage = reviewRepository.findAllByContents(contents, pageable);
-            return ReviewListResponse.toDTO(reviewPage, convertReviewPageToList(user, reviewPage));
+            return ReviewListResponse.toDTO(
+                    reviewPage,
+                    convertReviewListToReviewDetailsResponse(user, reviewPage.getContent().stream().toList())
+            );
         } catch (PropertyReferenceException e) {
             // sort string에 잘못된 값이 들어왔을 때 에러 발생
             throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);
@@ -95,23 +98,43 @@ public class ReviewService {
         PageRequest pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
         Page<Review> reviewPage = reviewRepository.findAllByUserAccount(user, pageable);
 
-        return ReviewListResponse.toDTO(reviewPage, convertReviewPageToList(user, reviewPage));
+        return ReviewListResponse.toDTO(
+                reviewPage,
+                convertReviewListToReviewDetailsResponse(user, reviewPage.getContent().stream().toList())
+        );
     }
 
-    private List<ReviewDetailsResponse> convertReviewPageToList(UserAccount user, Page<Review> reviewPage) {
+    public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber) {
+        Sort sort = Sort.by("createdDate").descending();
+        PageRequest pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
+        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedReviewListByUser(user, pageable);
+
+        List<Review> reviewList = new ArrayList<>();
+
+        for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {
+            reviewList.add(reviewLike.getReview());
+        }
+
+        return ReviewListResponse.toDTO(
+                reviewLikePage,
+                convertReviewListToReviewDetailsResponse(user, reviewList)
+        );
+    }
+
+    private List<ReviewDetailsResponse> convertReviewListToReviewDetailsResponse(UserAccount user, List<Review> reviewList) {
         // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
-        List<ReviewDetailsResponse> reviewList = new ArrayList<>();
-        for (Review review : reviewPage.getContent().stream().toList()) {
+        List<ReviewDetailsResponse> reviewDetailsResponseList = new ArrayList<>();
+        for (Review review : reviewList) {
             ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             // DTO 클래스 변환 및 like status 설정
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
             reviewDetailsResponse.setLikeStatus(likeStatus);
-            reviewList.add(reviewDetailsResponse);
+            reviewDetailsResponseList.add(reviewDetailsResponse);
         }
 
-        return reviewList;
+        return reviewDetailsResponseList;
     }
     
 

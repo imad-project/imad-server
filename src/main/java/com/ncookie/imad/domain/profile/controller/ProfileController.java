@@ -83,9 +83,15 @@ public class ProfileController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
     }
 
-    @Description("좋아요한 리뷰 목록 조회")
+    @Description("좋아요/싫어요 등록한 리뷰 목록 조회")
     @GetMapping("/like/review/list")
-    public ApiResponse<?> getProfileLikedReviews() {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
+    public ApiResponse<ReviewListResponse> getProfileLikedReviews(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestParam("page") int pageNumber
+    ) {
+        return ApiResponse.createSuccess(
+                ResponseCode.PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS,
+                profileService.getLikedReviewList(accessToken, pageNumber)
+        );
     }
 }
