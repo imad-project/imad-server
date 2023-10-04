@@ -8,10 +8,7 @@ import com.ncookie.imad.domain.tmdb.service.TmdbService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RequiredArgsConstructor
@@ -32,14 +29,16 @@ public class ContentsController {
     }
 
     @GetMapping("/details")
-    public ApiResponse<TmdbDetails> getContentsDetails(@RequestParam(value = "id") int id,
-                                                       @RequestParam(value = "type") String type) {
+    public ApiResponse<TmdbDetails> getContentsDetails(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestParam(value = "id") int id,
+            @RequestParam(value = "type") String type) {
         ContentsType contentsType = ContentsType.valueOf(type.toUpperCase());
         // 이전에 저장했던 데이터라면 TMDB API 사용하지 않고 로컬 DB 조회하여 반환
         if (contentsService.checkDuplicationExists(id, contentsType)) {
             return ApiResponse.createSuccess(
                     ResponseCode.CONTENTS_GET_DETAILS_SUCCESS,
-                    tmdbService.getTmdbDetails(id, contentsType));
+                    tmdbService.getTmdbDetails(id, contentsType, accessToken));
         } else {
             // TMDB API 사용하여 details 및 certification 정보 받아옴
             TmdbDetails contentsDetails = contentsService.getContentsDetails(id, type);

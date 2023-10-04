@@ -14,10 +14,13 @@ import com.ncookie.imad.domain.person.entity.Credit;
 import com.ncookie.imad.domain.person.entity.CreditType;
 import com.ncookie.imad.domain.person.entity.Person;
 import com.ncookie.imad.domain.person.service.PersonService;
+import com.ncookie.imad.domain.profile.service.BookmarkService;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import com.ncookie.imad.domain.season.entity.Season;
 import com.ncookie.imad.domain.season.service.SeasonService;
 import com.ncookie.imad.domain.tmdb.dto.*;
+import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.domain.user.service.UserAccountService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,11 +51,14 @@ public class TmdbService {
 
     private final PersonService personService;
 
+    private final UserAccountService userAccountService;
+    private final BookmarkService bookmarkService;
+
     // 데이터 가공 시 캐스팅된 배우를 최대 몇 명까지 저장할지 지정
     private final int MAX_CAST_LIST_SIZE = 10;
 
     @Transactional
-    public TmdbDetails getTmdbDetails(long id, ContentsType type) {
+    public TmdbDetails getTmdbDetails(long id, ContentsType type, String accessToken) {
         TmdbDetails tmdbDetails = TmdbDetails.builder().build();
 
         // =========================================================================
@@ -94,6 +100,10 @@ public class TmdbService {
         }
         log.info("Credit 및 Person 정보 로딩 완료");
         // =========================================================================
+
+        // bookmark status 정보 조회
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        boolean bookmarkStatus = bookmarkService.existsByUserAccountAndContents(user, contentsEntity);
 
         // Contents(TvProgramData, MovieData), Season, Networks 등의 데이터 조회
         if (type.equals(ContentsType.TV)) {
@@ -139,6 +149,8 @@ public class TmdbService {
                             .crew(crewList)
                             .build())
 
+                    .bookmarkStatus(bookmarkStatus)
+
                     .build();
 
         } else if (type.equals(ContentsType.MOVIE)) {
@@ -172,6 +184,8 @@ public class TmdbService {
                             .cast(castList)
                             .crew(crewList)
                             .build())
+
+                    .bookmarkStatus(bookmarkStatus)
 
                     .build();
         }

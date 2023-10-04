@@ -67,6 +67,10 @@ public class TmdbDetails {
     // Credits
     @JsonProperty("credits")
     private DetailsCredits credits;                    // 출연진(배우, 감독, 작가, 스태프 등 포함) 정보
+    
+    
+    // 북마크 여부
+    private boolean bookmarkStatus;
 
 
     @JsonCreator
