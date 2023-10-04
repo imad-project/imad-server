@@ -15,5 +15,6 @@ public class UserUpdateRequest {
     int profileImage;
     String nickname;
 
-    Set<Long> preferredGenres;
+    Set<Long> preferredTvGenres;
+    Set<Long> preferredMovieGenres;
 }
