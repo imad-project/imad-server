@@ -5,7 +5,6 @@ import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.profile.dto.BookmarkDetails;
 import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
-import com.ncookie.imad.domain.profile.repository.ContentsBookmarkRepository;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -29,11 +28,11 @@ public class ProfileService {
     private final ContentsService contentsService;
     private final ReviewService reviewService;
 
-    private final ContentsBookmarkRepository contentsBookmarkRepository;
+    private final BookmarkService bookmarkService;
 
     public BookmarkListResponse getContentsBookmarkList(String accessToken, int pageNumber) {
         int REVIEW_LIST_PAGE_SIZE = 10;
-        Page<ContentsBookmark> contentsBookmarkPage = contentsBookmarkRepository.findAllByUserAccount(
+        Page<ContentsBookmark> contentsBookmarkPage = bookmarkService.findAllByUserAccount(
                 userAccountService.getUserFromAccessToken(accessToken),
                 PageRequest.of(pageNumber - 1, REVIEW_LIST_PAGE_SIZE)
         );
@@ -51,8 +50,8 @@ public class ProfileService {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
-        if (!contentsBookmarkRepository.existsByUserAccountAndContents(user, contents)) {
-            contentsBookmarkRepository.save(
+        if (!bookmarkService.existsByUserAccountAndContents(user, contents)) {
+            bookmarkService.save(
                     ContentsBookmark.builder()
                             .userAccount(user)
                             .contents(contents)
@@ -70,10 +69,10 @@ public class ProfileService {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         // 삭제할 데이터가 존재하지 않는 경우
-        if (!contentsBookmarkRepository.existsById(bookmarkId)) {
+        if (!bookmarkService.existsById(bookmarkId)) {
             throw new BadRequestException(ResponseCode.BOOKMARK_WRONG_ID);
         }
-        contentsBookmarkRepository.deleteByIdAndUserAccount(bookmarkId, user);
+        bookmarkService.deleteByIdAndUserAccount(bookmarkId, user);
     }
 
     public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
