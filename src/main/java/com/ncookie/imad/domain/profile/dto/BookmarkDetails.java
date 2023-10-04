@@ -15,7 +15,10 @@ public class BookmarkDetails {
     private Long bookmarkId;
 
     private Long userId;
+
     private Long contentsId;
+    private String contentsTitle;           // 작품 제목
+    private String contentsPosterPath;      // 작품 포스터 이미지 경로
 
     private LocalDateTime createdDate;
 
@@ -24,6 +27,8 @@ public class BookmarkDetails {
                 .bookmarkId(bookmark.getId())
                 .userId(bookmark.getUserAccount().getId())
                 .contentsId(bookmark.getContents().getContentsId())
+                .contentsTitle(bookmark.getContents().getTranslatedTitle())
+                .contentsPosterPath(bookmark.getContents().getPosterPath())
                 .createdDate(bookmark.getCreatedDate())
                 .build();
     }
