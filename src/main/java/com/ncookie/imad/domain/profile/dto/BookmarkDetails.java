@@ -18,6 +18,7 @@ public class BookmarkDetails {
     private Long userId;
 
     private Long contentsId;
+    private Long contentsTmdbId;            // 작품 TMDB ID
     private String contentsTitle;           // 작품 제목
     private String contentsPosterPath;      // 작품 포스터 이미지 경로
     private ContentsType contentsType;      // 작품 타입
@@ -30,6 +31,7 @@ public class BookmarkDetails {
                 .userId(bookmark.getUserAccount().getId())
 
                 .contentsId(bookmark.getContents().getContentsId())
+                .contentsTmdbId(bookmark.getContents().getTmdbId())
                 .contentsTitle(bookmark.getContents().getTranslatedTitle())
                 .contentsPosterPath(bookmark.getContents().getPosterPath())
                 .contentsType(bookmark.getContents().getContentsType())
