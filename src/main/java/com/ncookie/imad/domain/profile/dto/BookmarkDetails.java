@@ -34,7 +34,7 @@ public class BookmarkDetails {
                 .contentsTmdbId(bookmark.getContents().getTmdbId())
                 .contentsTitle(bookmark.getContents().getTranslatedTitle())
                 .contentsPosterPath(bookmark.getContents().getPosterPath())
-                .contentsType(bookmark.getContents().getContentsType())
+                .contentsType(bookmark.getContents().getTmdbType())
 
                 .createdDate(bookmark.getCreatedDate())
                 .build();
