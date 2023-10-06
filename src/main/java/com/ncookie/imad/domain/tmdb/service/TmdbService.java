@@ -14,6 +14,7 @@ import com.ncookie.imad.domain.person.entity.Credit;
 import com.ncookie.imad.domain.person.entity.CreditType;
 import com.ncookie.imad.domain.person.entity.Person;
 import com.ncookie.imad.domain.person.service.PersonService;
+import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.service.BookmarkService;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import com.ncookie.imad.domain.season.entity.Season;
@@ -38,7 +39,7 @@ import java.util.stream.Stream;
 /**
  * 이 프로젝트에서는 되도록 service와 entity 간의 관계를 1대1로 유지하고 싶다.
  * 그리고 하나의 클래스에서 다른 클래스를 호출하는 것 자체는 문제 없지만, 순환참조 이슈를 신경써야 한다.
- *
+ * ===
  * 이를 위해 도메인의 entity와 1대1로 매칭되는 서비스들을 호출하여 도메인이 겹치는 작업을 수행하는 서비스를 만들었다.
  * 이 서비스는 컨트롤러에서만 호출되어야 하며, 순환참조 방지를 위해 다른 서비스에서는 호출되면 안 된다.
  * 또한 직접 repository를 참조하지 않도록 한다.
@@ -101,9 +102,19 @@ public class TmdbService {
         log.info("Credit 및 Person 정보 로딩 완료");
         // =========================================================================
 
-        // bookmark status 정보 조회
+        // bookmark 정보 조회
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
-        boolean bookmarkStatus = bookmarkService.existsByUserAccountAndContents(user, contentsEntity);
+        ContentsBookmark contentsBookmark = bookmarkService.findByUserAccountAndContents(user, contentsEntity);
+
+        Long bookmarkId;
+        boolean bookmarkStatus;
+        if (contentsBookmark != null) {
+            bookmarkId = contentsBookmark.getId();
+            bookmarkStatus = true;
+        } else {
+            bookmarkId = null;
+            bookmarkStatus = false;
+        }
 
         // Contents(TvProgramData, MovieData), Season, Networks 등의 데이터 조회
         if (type.equals(ContentsType.TV)) {
@@ -149,6 +160,7 @@ public class TmdbService {
                             .crew(crewList)
                             .build())
 
+                    .bookmarkId(bookmarkId)
                     .bookmarkStatus(bookmarkStatus)
 
                     .build();
@@ -185,6 +197,7 @@ public class TmdbService {
                             .crew(crewList)
                             .build())
 
+                    .bookmarkId(bookmarkId)
                     .bookmarkStatus(bookmarkStatus)
 
                     .build();

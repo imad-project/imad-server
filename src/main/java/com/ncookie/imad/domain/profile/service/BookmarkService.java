@@ -21,6 +21,10 @@ public class BookmarkService {
         return contentsBookmarkRepository.findAllByUserAccount(userAccount, pageable);
     }
 
+    public ContentsBookmark findByUserAccountAndContents(UserAccount userAccount, Contents contents) {
+        return contentsBookmarkRepository.findByUserAccountAndContents(userAccount, contents);
+    }
+
     public boolean existsByUserAccountAndContents(UserAccount userAccount, Contents contents) {
         return contentsBookmarkRepository.existsByUserAccountAndContents(userAccount, contents);
     }

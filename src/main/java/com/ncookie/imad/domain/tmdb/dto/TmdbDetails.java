@@ -70,6 +70,7 @@ public class TmdbDetails {
     
     
     // 북마크 여부
+    private Long bookmarkId;
     private boolean bookmarkStatus;
 
 

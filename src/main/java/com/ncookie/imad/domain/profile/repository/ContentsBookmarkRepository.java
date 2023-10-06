@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ContentsBookmarkRepository extends JpaRepository<ContentsBookmark, Long> {
     Page<ContentsBookmark> findAllByUserAccount(UserAccount userAccount, Pageable pageable);
 
+    ContentsBookmark findByUserAccountAndContents(UserAccount userAccount, Contents contents);
+
     boolean existsByUserAccountAndContents(UserAccount userAccount, Contents contents);
 
     void deleteByIdAndUserAccount(Long id, UserAccount userAccount);
