@@ -1,8 +1,16 @@
 package com.ncookie.imad.global;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
+import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+
+import java.io.IOException;
 
 @Slf4j
 public class Utils {
@@ -39,6 +47,22 @@ public class Utils {
         log.info("> Result : IP Address : "+ip);
 
         return ip;
+    }
+
+    public static void sendLoginSuccessResponseWithUserInfo(HttpServletResponse response, UserInfoResponse userInfoResponse) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(mapper.writeValueAsString(
+                ApiResponse.createSuccess(ResponseCode.LOGIN_SUCCESS, userInfoResponse)));
+    }
+
+    public static void sendLoginSuccessResponse(HttpServletResponse response) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(mapper.writeValueAsString(
+                ApiResponse.createSuccessWithNoContent(ResponseCode.LOGIN_SUCCESS)));
     }
 
     public static void logWithOauthProvider(AuthProvider provider, String msg) {

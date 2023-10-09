@@ -6,6 +6,7 @@ import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -126,12 +127,14 @@ public class AppleService {
         }
     }
 
-    public void loginSuccess(UserAccount user, HttpServletResponse response) {
+    public void loginSuccess(UserAccount user, HttpServletResponse response) throws IOException {
         String accessToken = jwtService.createAccessToken(user.getEmail());
         String refreshToken = jwtService.createRefreshToken();
 
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
         jwtService.updateRefreshToken(user.getEmail(), refreshToken);
+
+        Utils.sendLoginSuccessResponse(response);
     }
 
     public String generateAuthToken(String code) throws IOException {
