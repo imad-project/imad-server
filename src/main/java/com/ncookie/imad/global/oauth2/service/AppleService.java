@@ -106,6 +106,7 @@ public class AppleService {
                                 .email(email)
                                 .role(Role.GUEST)
                                 .oauth2AccessToken(accessToken)
+                                .refreshToken(jwtService.createRefreshToken())
                                 .build()
                 );
             } else {

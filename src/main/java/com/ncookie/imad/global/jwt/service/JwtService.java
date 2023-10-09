@@ -3,7 +3,10 @@ package com.ncookie.imad.global.jwt.service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.dto.response.ResponseCode;
+import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
@@ -144,11 +147,16 @@ public class JwtService {
      * RefreshToken DB 저장(업데이트)
      */
     public void updateRefreshToken(String email, String refreshToken) {
-        userRepository.findByEmail(email)
-                .ifPresentOrElse(
-                        user -> user.updateRefreshToken(refreshToken),
-                        () -> new Exception("일치하는 회원이 없습니다.")
-                );
+        Optional<UserAccount> optionalUserAccount = userRepository.findByEmail(email);
+
+        if (optionalUserAccount.isPresent()) {
+            UserAccount user = optionalUserAccount.get();
+
+            user.updateRefreshToken(refreshToken);
+            userRepository.saveAndFlush(user);
+        } else {
+            throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);
+        }
     }
 
     public boolean isTokenValid(String token) {
