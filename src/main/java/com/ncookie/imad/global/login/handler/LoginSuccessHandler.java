@@ -6,12 +6,13 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
+import com.ncookie.imad.global.jwt.property.JwtProperties;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,17 +23,15 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
+@EnableConfigurationProperties({ JwtProperties.class })
 @RequiredArgsConstructor
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtService jwtService;
     private final UserAccountRepository userRepository;
 
-    @Value("${jwt.access.expiration}")
-    private String accessTokenExpiration;
+    private final JwtProperties jwtProperties;
 
-    @Value("${jwt.refresh.expiration}")
-    private String refreshTokenExpiration;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -72,8 +71,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
             log.info("로그인에 성공하였습니다. 이메일 : {}", email);
             log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
-            log.info("발급된 AccessToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(Long.parseLong(accessTokenExpiration) / 1000));
-            log.info("발급된 RefreshToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(Long.parseLong(refreshTokenExpiration) / 1000));
+            log.info("발급된 AccessToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(jwtProperties.getAccess().getExpiration() / 1000));
+            log.info("발급된 RefreshToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(jwtProperties.getRefresh().getExpiration() / 1000));
         }
     }
 
