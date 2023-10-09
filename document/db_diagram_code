@@ -15,6 +15,9 @@ Table User {
   age_range integer
   profile_image varchar
 
+  preferred_tv_genres integer [note: "유저 TV 선호 장르. 실제로는 별도의 테이블로 구현됨"]
+  preferred_movie_genres integer
+
   role varchar
   auth_provider varchar
 
@@ -29,7 +32,6 @@ Table User {
  */
 Table Contents {
   contents_id integer [primary key]
-
   contents_type varchar [note: "MOIVE, TV, ANIMATINO으로 임의로 구분함"]
 
   tmdb_id integer
@@ -40,12 +42,13 @@ Table Contents {
   origianl_language varchar
   tagline varchar
 
+  status varchar
   overview varchar
   poster_path varchar
-  production_countries varchar
-  certifications varchar [note: "시청 등급"]
+   certifications varchar [note: "시청 등급"]
 
-  status varchar
+  production_countries varchar
+  contents_genres varchar [note: "작품의 장르 리스트. 별도의 테이블로 구현됨"]
 
   review_cnt integer [note: "작품 리뷰 수"]
   article_cnt integer [note: "작품 게시글 수"]
@@ -148,22 +151,7 @@ Table Genre {
   genre_id integer [primary key]
 
   name varchar
-}
-
-Table UserPreferredGenre {
-  user_preferred_genre_id integer [primary key]
-
-  genre_id integer
-  user_id integer
-
-  rate integer [note: "장르 선호점수"]
-}
-
-Table ContentsGenre {
-  contents_genre_id integer [primary key]
-
-  genre_id integer
-  contents_id integer
+  genre_type integer
 }
 
 
@@ -179,7 +167,7 @@ Table Review {
 
   title varchar
   content varchar
-  rate float [note: "작품 평점"]
+  score float [note: "작품 평점"]
   is_spoiler boolean
 
   like_cnt integer
@@ -270,8 +258,6 @@ Table PostingLike {
 
   user_id integer
   contents_id integer
-
-  bookmark_status integer
  }
 
 
@@ -334,14 +320,6 @@ Ref: Season.season_id < SeasonCollection.season_id
 // Contents : Crew / Actor
 Ref: Contents.contents_id < Credit.contents_id
 Ref: Person.person_id < Credit.person_id
-
-
-// Genre : User / Contents
-Ref: Genre.genre_id < UserPreferredGenre.genre_id
-Ref: User.user_id < UserPreferredGenre.user_id
-
-Ref: Genre.genre_id < ContentsGenre.genre_id
-Ref: Contents.contents_id < ContentsGenre.contents_id
 
 
 // Review : User / Contents
