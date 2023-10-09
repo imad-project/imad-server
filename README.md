@@ -7,6 +7,7 @@ IMAD 프로젝트의 서버 코드 레포지토리이다. 해당 프로젝트 �
 - [IMAD iOS](https://github.com/QuaRang1225/IMad_Project)
 
 - [IMAD Wiki](https://github.com/NCookies/imad-server-wiki)
+  - [저장소 링크](https://github.com/NCookies/imad-server-wiki) 
 - [IMAD 모니터링 서버](https://github.com/NCookies/spring-boot-admin-server)
   - 테스트 및 배포 서버의 상태와 로그를 실시간으로 확인하기 위한 모니터링 서버 
 
