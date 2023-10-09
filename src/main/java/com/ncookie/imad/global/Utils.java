@@ -50,6 +50,15 @@ public class Utils {
         return ip;
     }
 
+    public static void sendSuccessReissueToken(HttpServletResponse response) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+        response.getWriter().write(mapper.writeValueAsString(
+                ApiResponse.createSuccessWithNoContent(ResponseCode.TOKEN_REISSUE_SUCCESS)));
+    }
+
     public static void sendLoginSuccessResponseWithUserInfo(HttpServletResponse response, UserInfoResponse userInfoResponse) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -68,14 +77,14 @@ public class Utils {
                 ApiResponse.createSuccessWithNoContent(ResponseCode.LOGIN_SUCCESS)));
     }
 
-    public static void sendLoginFailureResponse(HttpServletResponse response) throws IOException {
+    public static void sendErrorResponse(HttpServletResponse response, int status, ResponseCode responseCode) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.setStatus(status);
 
-        response.getWriter().write(mapper.writeValueAsString(ApiResponse.createError(ResponseCode.LOGIN_FAILURE)));
+        response.getWriter().write(mapper.writeValueAsString(ApiResponse.createError(responseCode)));
     }
 
     public static void logWithOauthProvider(AuthProvider provider, String msg) {

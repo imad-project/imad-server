@@ -12,10 +12,13 @@ public enum ResponseCode {
     INTERNAL_SERVER_ERROR(500, "Server Error"),
     INVALID_TYPE_VALUE(400, " Invalid Type Value"),
 
-    // spring security 예외
+    // Spring Security 관련
     UNAUTHORIZED_REQUEST(401, "잘못된 요청이거나 올바르지 않은 인증정보입니다."),
-    TOKEN_EXPIRED(401, "토큰의 기한이 만료되었습니다."),
     INVALID_REQUEST(403, "잘못된 접근입니다."),
+
+    TOKEN_EXPIRED(401, "토큰의 기한이 만료되었습니다."),
+    TOKEN_INVALID(401, "유효하지 않은 토큰입니다."),
+    TOKEN_REISSUE_SUCCESS(201, "정상적으로 토큰을 재발급했습니다"),
 
     // 유저
     SIGNUP_SUCCESS(201, "회원가입이 성공적으로 완료되었습니다."),

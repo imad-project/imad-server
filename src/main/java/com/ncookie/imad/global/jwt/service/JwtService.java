@@ -69,16 +69,6 @@ public class JwtService {
     }
 
     /**
-     * AccessToken 헤더에 실어서 보내기
-     */
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        response.setHeader(jwtProperties.getAccess().getHeader(), accessToken);
-        log.info("재발급된 Access Token : {}", accessToken);
-    }
-
-    /**
      * AccessToken + RefreshToken 헤더에 실어서 보내기
      */
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken){
@@ -88,7 +78,8 @@ public class JwtService {
         response.setHeader(jwtProperties.getRefresh().getHeader(), refreshToken);
 
         log.info("Headers : " + response.getHeaderNames().toString());
-        log.info("Access Token, Refresh Token 헤더 설정 완료");
+        log.info("AccessToken 설정 완료 : {}", accessToken);
+        log.info("RefreshToken 설정 완료 : {}", refreshToken);
     }
 
     /**
@@ -154,7 +145,7 @@ public class JwtService {
             JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey())).build().verify(token);
             return true;
         } catch (TokenExpiredException e) {
-            log.error("유효기간이 만료된 토큰입니다. {}", e.getMessage());
+            log.error("유효기간이 만료된 토큰입니다. {} {}", e.getMessage(), e.getExpiredOn());
             throw new TokenExpiredException(e.getMessage(), e.getExpiredOn());
         } catch (Exception e) {
             log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
