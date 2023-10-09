@@ -1,8 +1,7 @@
 package com.ncookie.imad.global.jwt.filter;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,17 +26,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         }
     }
 
-    private void setErrorResponse(HttpServletResponse response){
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-
-        try{
-            response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.createError(ResponseCode.TOKEN_EXPIRED)));
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+    // 토큰 재발급 요청 시 첨부된 refresh token이 만료되었을 때 예외처리
+    private void setErrorResponse(HttpServletResponse response) throws IOException {
+        Utils.sendErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), ResponseCode.TOKEN_EXPIRED);
     }
 }

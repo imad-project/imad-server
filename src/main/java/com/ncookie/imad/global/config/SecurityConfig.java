@@ -6,6 +6,7 @@ import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.filter.JwtAuthenticationFilter;
 import com.ncookie.imad.global.jwt.filter.JwtExceptionFilter;
+import com.ncookie.imad.global.jwt.property.JwtProperties;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import com.ncookie.imad.global.login.handler.LoginFailureHandler;
@@ -17,6 +18,7 @@ import com.ncookie.imad.global.oauth2.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -48,6 +50,7 @@ import static com.ncookie.imad.global.Utils.getClientIP;
  * JwtAuthenticationProcessingFilter는 AccessToken, RefreshToken 재발급
  */
 @Configuration
+@EnableConfigurationProperties({ JwtProperties.class })
 @RequiredArgsConstructor
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
@@ -58,6 +61,7 @@ public class SecurityConfig {
     // JWT 관련
     private final JwtService jwtService;
     private final JwtExceptionFilter jwtExceptionFilter;
+    private final JwtProperties jwtProperties;
 
     // 자체 로그인 관련
     private final LoginService loginService;
@@ -175,7 +179,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, userRepository);
+        return new LoginSuccessHandler(jwtService, userRepository, jwtProperties);
     }
 
     /**

@@ -38,7 +38,7 @@ public class RevokeService {
         UserAccount userAccount = extractUserFromAccessToken(accessToken);
         deleteUserAccount(userAccount);
 
-        String data = "client_id=" + appleService.getAPPLE_CLIENT_ID() +
+        String data = "client_id=" + appleService.getAppleClientId() +
                 "&client_secret=" + appleService.createClientSecretKey() +
                 "&token=" + userAccount.getOauth2AccessToken() +
                 "&token_type_hint=access_token";

@@ -7,12 +7,12 @@ import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.jwt.service.JwtService;
+import com.ncookie.imad.global.oauth2.property.AppleProperties;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -21,7 +21,7 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -37,6 +37,7 @@ import java.util.*;
 import static com.ncookie.imad.global.Utils.logWithOauthProvider;
 
 @Slf4j
+@EnableConfigurationProperties({ AppleProperties.class })
 @RequiredArgsConstructor
 @Service
 public class AppleService {
@@ -44,28 +45,15 @@ public class AppleService {
     private final UserAccountRepository userRepository;
     private final JwtService jwtService;
 
-    @Value("${apple.team-id}")
-    private String APPLE_TEAM_ID;
+    private final AppleProperties appleProperties;
 
-    @Value("${apple.login-key}")
-    private String APPLE_LOGIN_KEY;
-
-    @Getter
-    @Value("${apple.client-id}")
-    private String APPLE_CLIENT_ID;
-
-    @Value("${apple.redirect-url}")
-    private String APPLE_REDIRECT_URL;
-
-    @Value("${apple.key-path}")
-    private String APPLE_KEY_PATH;
 
     private final static String APPLE_AUTH_URL = "https://appleid.apple.com";
 
     public String getAppleLoginUrl() {
         return APPLE_AUTH_URL + "/auth/authorize"
-                + "?client_id=" + APPLE_CLIENT_ID
-                + "&redirect_uri=" + APPLE_REDIRECT_URL
+                + "?client_id=" + appleProperties.getClientId()
+                + "&redirect_uri=" + appleProperties.getRedirectUrl()
                 + "&response_type=code%20id_token&scope=name%20email&response_mode=form_post";
     }
 
@@ -106,6 +94,7 @@ public class AppleService {
                                 .email(email)
                                 .role(Role.GUEST)
                                 .oauth2AccessToken(accessToken)
+                                .refreshToken(jwtService.createRefreshToken())
                                 .build()
                 );
             } else {
@@ -125,7 +114,7 @@ public class AppleService {
         }
     }
 
-    public void loginSuccess(UserAccount user, HttpServletResponse response) {
+    public void loginSuccess(UserAccount user, HttpServletResponse response) throws IOException {
         String accessToken = jwtService.createAccessToken(user.getEmail());
         String refreshToken = jwtService.createRefreshToken();
 
@@ -138,10 +127,10 @@ public class AppleService {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", APPLE_CLIENT_ID);
+        params.add("client_id", appleProperties.getClientId());
         params.add("client_secret", createClientSecretKey());
         params.add("code", code);
-        params.add("redirect_uri", APPLE_REDIRECT_URL);
+        params.add("redirect_uri", appleProperties.getRedirectUrl());
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -167,24 +156,28 @@ public class AppleService {
     public String createClientSecretKey() throws IOException {
         // headerParams 적재
         Map<String, Object> headerParamsMap = new HashMap<>();
-        headerParamsMap.put("kid", APPLE_LOGIN_KEY);
+        headerParamsMap.put("kid", appleProperties.getLoginKey());
         headerParamsMap.put("alg", "ES256");
 
         // clientSecretKey 생성
         return Jwts
                 .builder()
                 .setHeaderParams(headerParamsMap)
-                .setIssuer(APPLE_TEAM_ID)
+                .setIssuer(appleProperties.getTeamId())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 30)) // 만료 시간 (30초)
                 .setAudience(APPLE_AUTH_URL)
-                .setSubject(APPLE_CLIENT_ID)
+                .setSubject(appleProperties.getClientId())
                 .signWith(SignatureAlgorithm.ES256, getPrivateKey())
                 .compact();
     }
 
+    public String getAppleClientId() {
+        return appleProperties.getClientId();
+    }
+
     private PrivateKey getPrivateKey() throws IOException {
-        ClassPathResource resource = new ClassPathResource(APPLE_KEY_PATH);
+        ClassPathResource resource = new ClassPathResource(appleProperties.getKeyPath());
         String privateKey = new String(resource.getInputStream().readAllBytes());
 
         Reader pemReader = new StringReader(privateKey);
