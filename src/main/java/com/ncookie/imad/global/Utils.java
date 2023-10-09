@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class Utils {
@@ -52,7 +53,8 @@ public class Utils {
     public static void sendLoginSuccessResponseWithUserInfo(HttpServletResponse response, UserInfoResponse userInfoResponse) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
         response.getWriter().write(mapper.writeValueAsString(
                 ApiResponse.createSuccess(ResponseCode.LOGIN_SUCCESS, userInfoResponse)));
     }
@@ -60,9 +62,20 @@ public class Utils {
     public static void sendLoginSuccessResponse(HttpServletResponse response) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
         response.getWriter().write(mapper.writeValueAsString(
                 ApiResponse.createSuccessWithNoContent(ResponseCode.LOGIN_SUCCESS)));
+    }
+
+    public static void sendLoginFailureResponse(HttpServletResponse response) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+        response.getWriter().write(mapper.writeValueAsString(ApiResponse.createError(ResponseCode.LOGIN_FAILURE)));
     }
 
     public static void logWithOauthProvider(AuthProvider provider, String msg) {
