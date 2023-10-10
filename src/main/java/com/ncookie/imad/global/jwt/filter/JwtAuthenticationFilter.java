@@ -2,6 +2,7 @@ package com.ncookie.imad.global.jwt.filter;
 
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.jwt.util.PasswordUtil;
 import jakarta.servlet.FilterChain;
@@ -56,23 +57,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 사용자 요청 헤더에서 RefreshToken 추출
         // -> RefreshToken이 없거나 유효하지 않다면(DB에 저장된 RefreshToken과 다르다면) null을 반환
+        //
         // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우밖에 없다.
         // 따라서, 위의 경우를 제외하면 추출한 refreshToken은 모두 null
         String refreshToken = jwtService.extractRefreshToken(request)
                 .filter(jwtService::isTokenValid)
                 .orElse(null);
 
-        // 리프레시 토큰이 요청 헤더에 존재했다면, 사용자가 AccessToken이 만료되어서
-        // RefreshToken까지 보낸 것이므로 리프레시 토큰이 DB의 리프레시 토큰과 일치하는지 판단 후,
-        // 일치한다면 AccessToken을 재발급해준다.
+        // RefreshToken이 요청 헤더에 존재한다면, 사용자가 AccessToken이 만료되어서
+        // RefreshToken까지 보낸 것이므로 리프레시 토큰이 DB의 리프레시 토큰과 일치하는지 판단한다.
+        // 만약 일치한다면 AccessToken과 RefreshToken을 재발급해준다.
         if (request.getRequestURI().equals(REISSUE_TOKEN_URL) && refreshToken != null) {
+            log.info("refresh 토큰 재발급 진행 중...");
             checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
-            return; // RefreshToken을 보낸 경우에는 AccessToken을 재발급 하고 인증 처리는 하지 않게 하기위해 바로 return으로 필터 진행 막기
+            return; // 토큰 재발급 후 인증 처리가 진행되지 않도록 return으로 필터 진행 막기
         }
 
-        // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
-        // AccessToken이 없거나 유효하지 않다면, 인증 객체가 담기지 않은 상태로 다음 필터로 넘어가기 때문에 403 에러 발생
-        // AccessToken이 유효하다면, 인증 객체가 담긴 상태로 다음 필터로 넘어가기 때문에 인증 성공
+        // RefreshToken이 없거나 유효하지 않을 때 실행. AccessToken을 검사하고 인증을 처리하는 로직 수행
+        //
+        // AccessToken 없거나 유효하지 않음 -> 인증 객체가 담기지 않은 상태로 다음 필터로 넘어가기 때문에 403 에러 발생
+        // AccessToken 유효 -> 인증 객체가 담긴 상태로 다음 필터로 넘어가기 때문에 인증 성공
         if (refreshToken == null) {
             checkAccessTokenAndAuthentication(request, response, filterChain);
         }
@@ -85,8 +89,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      *  reIssueRefreshToken()로 리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드 호출
      *  그 후 JwtService.sendAccessTokenAndRefreshToken()으로 응답 헤더에 보내기
      */
-    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        jwtService.isTokenValid(refreshToken);
+    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) throws IOException {
+        // 이미 위에서 refresh token을 추출할 때 유효성 검사를 시행했기 때문에 다시 할 필요는 없음
+        // 토큰의 기한이 만료되었다면 exception이 발생하여 처리되고,
+        // 유효하지 않은 토큰이라면 refreshToken이 null 값이 되므로 다음 필터에서 처리해준다.
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
                     jwtService.sendAccessAndRefreshToken(
@@ -94,6 +100,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             jwtService.createAccessToken(user.getEmail()),
                             reIssueRefreshToken(user));
                 });
+        Utils.sendSuccessReissueToken(response);
+        log.info("토큰 재발급이 완료되었습니다.");
     }
 
     /**
@@ -119,6 +127,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.info("checkAccessTokenAndAuthentication() 호출");
+        log.info("refresh token이 존재하지 않거나 유효하지 않으므로 access token 검사를 시행합니다.");
+
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .flatMap(accessToken -> jwtService.extractClaimFromJWT(CLAIM_EMAIL, accessToken))

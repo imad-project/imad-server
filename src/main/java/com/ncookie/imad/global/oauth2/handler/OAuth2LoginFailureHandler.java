@@ -1,9 +1,7 @@
 package com.ncookie.imad.global.oauth2.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +16,7 @@ import java.io.IOException;
 public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(mapper.writeValueAsString(ApiResponse.createError(ResponseCode.LOGIN_FAILURE)));
+        Utils.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, ResponseCode.LOGIN_FAILURE);
 
         log.info("소셜 로그인에 실패했습니다. 에러 메시지 : {}", exception.getMessage());
     }
