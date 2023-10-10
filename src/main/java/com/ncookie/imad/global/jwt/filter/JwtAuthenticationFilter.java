@@ -3,6 +3,7 @@ package com.ncookie.imad.global.jwt.filter;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.global.Utils;
+import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.jwt.util.PasswordUtil;
 import jakarta.servlet.FilterChain;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -26,10 +28,10 @@ import static com.ncookie.imad.global.jwt.service.JwtService.CLAIM_EMAIL;
 /**
  * Jwt 인증 필터
  * "/login" 이외의 URI 요청이 왔을 때 처리하는 필터
- *
+ * ---
  * 기본적으로 사용자는 요청 헤더에 AccessToken만 담아서 요청
  * AccessToken 만료 시에만 RefreshToken을 요청 헤더에 AccessToken과 함께 요청
- *
+ * ---
  * 1. RefreshToken이 없고, AccessToken이 유효한 경우 -> 인증 성공 처리, RefreshToken을 재발급하지는 않는다.
  * 2. RefreshToken이 없고, AccessToken이 없거나 유효하지 않은 경우 -> 인증 실패 처리, 403 ERROR
  * 3. RefreshToken이 있는 경우 -> DB의 RefreshToken과 비교하여 일치하면 AccessToken 재발급, RefreshToken 재발급(RTR 방식)
@@ -93,15 +95,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 이미 위에서 refresh token을 추출할 때 유효성 검사를 시행했기 때문에 다시 할 필요는 없음
         // 토큰의 기한이 만료되었다면 exception이 발생하여 처리되고,
         // 유효하지 않은 토큰이라면 refreshToken이 null 값이 되므로 다음 필터에서 처리해준다.
-        userRepository.findByRefreshToken(refreshToken)
-                .ifPresent(user -> {
-                    jwtService.sendAccessAndRefreshToken(
-                            response,
-                            jwtService.createAccessToken(user.getEmail()),
-                            reIssueRefreshToken(user));
-                });
-        Utils.sendSuccessReissueToken(response);
-        log.info("토큰 재발급이 완료되었습니다.");
+        if (jwtService.isTokenValid(refreshToken)) {
+            userRepository.findByRefreshToken(refreshToken)
+                    .ifPresent(user -> {
+                        jwtService.sendAccessAndRefreshToken(
+                                response,
+                                jwtService.createAccessToken(user.getEmail()),
+                                reIssueRefreshToken(user));
+                    });
+            Utils.sendSuccessReissueToken(response);
+            log.info("토큰 재발급이 완료되었습니다.");
+        } else {
+            Utils.sendErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), ResponseCode.TOKEN_INVALID);
+        }
     }
 
     /**
@@ -141,7 +147,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * [인증 허가 메소드]
      * 파라미터의 유저 : 우리가 만든 회원 객체 / 빌더의 유저 : UserDetails의 User 객체
-     *
+     * ---
      * new UsernamePasswordAuthenticationToken()로 인증 객체인 Authentication 객체 생성
      * UsernamePasswordAuthenticationToken의 파라미터
      * 1. 위에서 만든 UserDetailsUser 객체 (유저 정보)
@@ -149,7 +155,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 3. Collection < ? extends GrantedAuthority>로,
      * UserDetails의 User 객체 안에 Set<GrantedAuthority> authorities이 있어서 getter로 호출한 후에,
      * new NullAuthoritiesMapper()로 GrantedAuthoritiesMapper 객체를 생성하고 mapAuthorities()에 담기
-     *
+     * ---
      * SecurityContextHolder.getContext()로 SecurityContext를 꺼낸 후,
      * setAuthentication()을 이용하여 위에서 만든 Authentication 객체에 대한 인증 허가 처리
      */
