@@ -4,6 +4,7 @@ import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.posting.dto.AddPostingRequest;
 import com.ncookie.imad.domain.posting.dto.AddPostingResponse;
+import com.ncookie.imad.domain.posting.dto.ModifyPostingRequest;
 import com.ncookie.imad.domain.posting.dto.PostingDetailsResponse;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
@@ -60,5 +61,28 @@ public class PostingService {
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
+    }
+
+    public Long modifyPosting(String accessToken, Long postingId, ModifyPostingRequest modifyPostingRequest) {
+        Optional<Posting> optional = postingRepository.findById(postingId);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+
+        if (optional.isPresent()) {
+            Posting posting = optional.get();
+
+            if (posting.getUser().getId().equals(user.getId())) {
+                posting.setTitle(modifyPostingRequest.getTitle());
+                posting.setContent(modifyPostingRequest.getContent());
+                posting.setCategory(modifyPostingRequest.getCategory());
+                posting.setSpoiler(modifyPostingRequest.isSpoiler());
+
+                return postingRepository.save(posting).getPostingId();
+            } else {
+                throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
+            }
+        } else {
+            throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
+        }
+
     }
 }

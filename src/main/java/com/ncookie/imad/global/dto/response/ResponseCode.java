@@ -63,10 +63,14 @@ public enum ResponseCode {
 
     // 게시글 관련
     POSTING_GET_DETAILS_SUCCESS(200, "정상적으로 게시글을 조회했습니다."),
-    POSTING_POST_DETAILS_SUCCESS(201, "정상적으로 게시글을 추가했습니다."),
+    POSTING_ADD_DETAILS_SUCCESS(201, "정상적으로 게시글을 추가했습니다."),
+    POSTING_MODIFY_DETAILS_SUCCESS(200, "정상적으로 게시글을 수정했습니다."),
+    POSTING_DELETE_DETAILS_SUCCESS(204, "정상적으로 게시글을 삭제했습니다."),
 
     POSTING_NOT_FOUND(404, "해당 ID의 게시글을 찾을 수 없습니다."),
-    
+    POSTING_MODIFY_NO_PERMISSION(403, "해당 게시글을 수정할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
+
+
     // 프로필 관련
     PROFILE_GET_INFO_SUCCESS(200, "정상적으로 프로필 정보를 조회했습니다."),
 
