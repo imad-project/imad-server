@@ -39,7 +39,8 @@ public class PostingController {
     @DeleteMapping("/{id}")
     public ApiResponse<?> postingDetails(@RequestHeader("Authorization") String accessToken,
                                          @PathVariable Long id) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.POSTING_GET_DETAILS_SUCCESS);
+        postingService.deletePosting(accessToken, id);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.POSTING_DELETE_DETAILS_SUCCESS);
     }
 
     @GetMapping("/list")

@@ -80,6 +80,22 @@ public class PostingService {
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
+    }
 
+    public void deletePosting(String accessToken, Long postingId) {
+        Optional<Posting> optional = postingRepository.findById(postingId);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+
+        if (optional.isPresent()) {
+            Posting posting = optional.get();
+
+            if (posting.getUser().getId().equals(user.getId())) {
+                postingRepository.delete(posting);
+            } else {
+                throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
+            }
+        } else {
+            throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
+        }
     }
 }
