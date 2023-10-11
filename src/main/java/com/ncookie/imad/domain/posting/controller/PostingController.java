@@ -1,5 +1,7 @@
 package com.ncookie.imad.domain.posting.controller;
 
+import com.ncookie.imad.domain.posting.dto.AddPostingRequest;
+import com.ncookie.imad.domain.posting.dto.AddPostingResponse;
 import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -18,8 +20,11 @@ public class PostingController {
     }
 
     @PostMapping("")
-    public ApiResponse<?> postingAdd() {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.POSTING_GET_DETAILS_SUCCESS);
+    public ApiResponse<AddPostingResponse> postingAdd(@RequestHeader("Authorization") String accessToken,
+                                                      @RequestBody AddPostingRequest addPostingRequest) {
+
+        return ApiResponse.createSuccess(ResponseCode.POSTING_POST_DETAILS_SUCCESS,
+                postingService.addPosting(accessToken, addPostingRequest));
     }
 
     @PatchMapping("/{id}")

@@ -63,6 +63,7 @@ public enum ResponseCode {
 
     // 게시글 관련
     POSTING_GET_DETAILS_SUCCESS(200, "정상적으로 게시글을 조회했습니다."),
+    POSTING_POST_DETAILS_SUCCESS(201, "정상적으로 게시글을 추가했습니다."),
     
     // 프로필 관련
     PROFILE_GET_INFO_SUCCESS(200, "정상적으로 프로필 정보를 조회했습니다."),
