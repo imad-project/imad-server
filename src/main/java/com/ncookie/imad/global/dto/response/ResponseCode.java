@@ -47,8 +47,8 @@ public enum ResponseCode {
     
     // 리뷰 관련
     REVIEW_GET_DETAILS_SUCCESS(200, "정상적으로 리뷰 정보를 조회했습니다."),
-    REVIEW_POST_DETAILS_SUCCESS(201, "정상적으로 리뷰 정보를 등록했습니다."),
-    REVIEW_PATCH_DETAILS_SUCCESS(200, "정상적으로 리뷰 정보를 수정했습니다."),
+    REVIEW_ADD_DETAILS_SUCCESS(201, "정상적으로 리뷰 정보를 등록했습니다."),
+    REVIEW_MODIFY_DETAILS_SUCCESS(200, "정상적으로 리뷰 정보를 수정했습니다."),
     REVIEW_DELETE_DETAILS_SUCCESS(204, "정상적으로 리뷰 정보를 삭제했습니다."),
     REVIEW_GET_LIST_SUCCESS(200, "정상적으로 리뷰 정보 리스트를 조회했습니다."),
     REVIEW_GET_LIST_SORT_STRING_WRONG(200, "옳바르지 않은 정렬 기준입니다."),

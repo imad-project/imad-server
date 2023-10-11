@@ -37,7 +37,7 @@ public class ReviewController {
     @PostMapping("")
     public ApiResponse<AddReviewResponse> reviewAdd(@RequestHeader("Authorization") String accessToken,
                                                     @RequestBody AddReviewRequest addReviewRequest) {
-        return ApiResponse.createSuccess(ResponseCode.REVIEW_POST_DETAILS_SUCCESS, reviewService.addReview(accessToken, addReviewRequest));
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_ADD_DETAILS_SUCCESS, reviewService.addReview(accessToken, addReviewRequest));
     }
 
     @PatchMapping("/{id}")
@@ -45,7 +45,7 @@ public class ReviewController {
                                           @PathVariable("id") Long id,
                                           @RequestBody ModifyReviewRequest modifyReviewRequest) {
         return ApiResponse.createSuccess(
-                ResponseCode.REVIEW_PATCH_DETAILS_SUCCESS,
+                ResponseCode.REVIEW_MODIFY_DETAILS_SUCCESS,
                 reviewService.modifyReview(accessToken, id, modifyReviewRequest)
         );
     }
