@@ -17,9 +17,9 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ReviewDetailsResponse {
     private Long reviewId;                  // 리뷰 ID
-    private Long contentsId;                // 작품 ID
-    
+
     // 작품 정보
+    private Long contentsId;                // 작품 ID
     private String contentsTitle;           // 작품 제목
     private String contentsPosterPath;      // 작품 포스터 이미지 경로
     
@@ -46,8 +46,8 @@ public class ReviewDetailsResponse {
     public static ReviewDetailsResponse toDTO(Review review) {
         return ReviewDetailsResponse.builder()
                 .reviewId(review.getReviewId())
-                .contentsId(review.getContents().getContentsId())
 
+                .contentsId(review.getContents().getContentsId())
                 .contentsTitle(review.getContents().getTranslatedTitle())
                 .contentsPosterPath(review.getContents().getPosterPath())
 
