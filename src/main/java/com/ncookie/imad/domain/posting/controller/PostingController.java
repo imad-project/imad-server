@@ -16,7 +16,8 @@ public class PostingController {
 
     @GetMapping("/{id}")
     public ApiResponse<?> postingDetails(@PathVariable Long id) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.POSTING_GET_DETAILS_SUCCESS);
+        return ApiResponse.createSuccess(ResponseCode.POSTING_GET_DETAILS_SUCCESS,
+                postingService.getPosting(id));
     }
 
     @PostMapping("")
