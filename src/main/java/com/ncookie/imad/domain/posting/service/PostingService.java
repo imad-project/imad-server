@@ -3,7 +3,6 @@ package com.ncookie.imad.domain.posting.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.posting.dto.AddPostingRequest;
-import com.ncookie.imad.domain.posting.dto.AddPostingResponse;
 import com.ncookie.imad.domain.posting.dto.ModifyPostingRequest;
 import com.ncookie.imad.domain.posting.dto.PostingDetailsResponse;
 import com.ncookie.imad.domain.posting.entity.Posting;
@@ -28,7 +27,7 @@ public class PostingService {
     private final ContentsService contentsService;
 
 
-    public AddPostingResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
+    public Long addPosting(String accessToken, AddPostingRequest addPostingRequest) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addPostingRequest.getContentsId());
 
@@ -46,9 +45,7 @@ public class PostingService {
                         .build()
         );
 
-        return AddPostingResponse.builder()
-                .postingId(posting.getPostingId())
-                .build();
+        return posting.getPostingId();
     }
 
     public PostingDetailsResponse getPosting(Long postingId) {
