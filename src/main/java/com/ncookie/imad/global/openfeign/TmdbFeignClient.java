@@ -49,7 +49,7 @@ public interface TmdbFeignClient {
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     TmdbDetails getTvDetailsById(
             @RequestHeader(value = "Authorization") String apiKey,
-            @PathVariable(value = "id") int id,
+            @PathVariable(value = "id") Long id,
             @RequestParam(value = "language") String language,
             @RequestParam(value = "append_to_response") String appendToResponse
     );
@@ -58,7 +58,7 @@ public interface TmdbFeignClient {
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     TmdbDetails getMovieDetailsById(
             @RequestHeader(value = "Authorization") String apiKey,
-            @PathVariable(value = "id") int id,
+            @PathVariable(value = "id") Long id,
             @RequestParam(value = "language") String language,
             @RequestParam(value = "append_to_response") String appendToResponse
     );
@@ -67,13 +67,13 @@ public interface TmdbFeignClient {
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     String getTvCertification(
             @RequestHeader(value = "Authorization") String apiKey,
-            @PathVariable(value = "id") int id
+            @PathVariable(value = "id") Long id
     );
 
     @GetMapping("/movie/{id}/release_dates")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     String getMovieCertification(
             @RequestHeader(value = "Authorization") String apiKey,
-            @PathVariable(value = "id") int id
+            @PathVariable(value = "id") Long id
     );
 }

@@ -40,7 +40,7 @@ public class TmdbApiClient {
     }
 
     // 작품 상세 정보 조회
-    public TmdbDetails getContentsDetails(int id, String type) {
+    public TmdbDetails getContentsDetails(Long id, String type) {
         try {
 
             if (type.equals("tv")) {
@@ -63,7 +63,7 @@ public class TmdbApiClient {
         }
     }
 
-    public String getContentsCertification(int id, String type) {
+    public String getContentsCertification(Long id, String type) {
         ObjectMapper objectMapper = new ObjectMapper();
         String certification = "";
         

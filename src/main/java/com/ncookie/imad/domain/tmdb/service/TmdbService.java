@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-/**
+/*
  * 이 프로젝트에서는 되도록 service와 entity 간의 관계를 1대1로 유지하고 싶다.
  * 그리고 하나의 클래스에서 다른 클래스를 호출하는 것 자체는 문제 없지만, 순환참조 이슈를 신경써야 한다.
  * ===
@@ -58,7 +58,7 @@ public class TmdbService {
     private final BookmarkService bookmarkService;
 
     @Transactional
-    public TmdbDetails getTmdbDetails(long id, ContentsType type, String accessToken) {
+    public TmdbDetails getTmdbDetails(Long id, ContentsType type, String accessToken) {
         Contents contentsEntity = contentsService.getContentsByTmdbIdAndTmdbType(id, type);
         return loadAndGenerateTmdbDetailsFromEntity(contentsEntity, contentsEntity.getContentsId(), accessToken);
     }
