@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MovieDataRepository extends JpaRepository<MovieData, Long> {
     MovieData findByTmdbIdAndTmdbType(long id, ContentsType type);
+    MovieData findByContentsId(Long id);
 }

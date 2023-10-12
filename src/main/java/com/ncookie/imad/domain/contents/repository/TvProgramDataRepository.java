@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TvProgramDataRepository extends JpaRepository<TvProgramData, Long> {
     TvProgramData findByTmdbIdAndTmdbType(long id, ContentsType type);
+    TvProgramData findByContentsId(Long id);
 }

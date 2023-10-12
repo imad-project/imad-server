@@ -28,6 +28,14 @@ public class ContentsController {
         );
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<TmdbDetails> getContentsById(@RequestHeader("Authorization") String accessToken,
+                                                    @PathVariable("id") Long contentsId) {
+        return ApiResponse.createSuccess(
+                ResponseCode.CONTENTS_GET_DETAILS_SUCCESS,
+                tmdbService.getContentsDetailsById(accessToken, contentsId));
+    }
+
     @GetMapping("/details")
     public ApiResponse<TmdbDetails> getContentsDetails(
             @RequestHeader("Authorization") String accessToken,
