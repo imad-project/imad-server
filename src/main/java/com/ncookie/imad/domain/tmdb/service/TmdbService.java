@@ -22,6 +22,8 @@ import com.ncookie.imad.domain.season.service.SeasonService;
 import com.ncookie.imad.domain.tmdb.dto.*;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserAccountService;
+import com.ncookie.imad.global.dto.response.ResponseCode;
+import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-/**
+/*
  * 이 프로젝트에서는 되도록 service와 entity 간의 관계를 1대1로 유지하고 싶다.
  * 그리고 하나의 클래스에서 다른 클래스를 호출하는 것 자체는 문제 없지만, 순환참조 이슈를 신경써야 한다.
  * ===
@@ -55,17 +57,31 @@ public class TmdbService {
     private final UserAccountService userAccountService;
     private final BookmarkService bookmarkService;
 
-    // 데이터 가공 시 캐스팅된 배우를 최대 몇 명까지 저장할지 지정
-    private final int MAX_CAST_LIST_SIZE = 10;
+    @Transactional
+    public TmdbDetails getTmdbDetails(Long id, ContentsType type, String accessToken) {
+        Contents contentsEntity = contentsService.getContentsByTmdbIdAndTmdbType(id, type);
+        return loadAndGenerateTmdbDetailsFromEntity(contentsEntity, contentsEntity.getContentsId(), accessToken);
+    }
 
     @Transactional
-    public TmdbDetails getTmdbDetails(long id, ContentsType type, String accessToken) {
+    public TmdbDetails getContentsDetailsById(String accessToken, Long contentsId) {
+        Optional<Contents> optionalContents = contentsService.getContentsByContentsId(contentsId);
+
+        if (optionalContents.isPresent()) {
+            Contents contents = optionalContents.get();
+            return loadAndGenerateTmdbDetailsFromEntity(contents, contentsId, accessToken);
+        } else {
+            throw new BadRequestException(ResponseCode.CONTENTS_ID_NOT_FOUND);
+        }
+    }
+
+    @Transactional
+    public TmdbDetails loadAndGenerateTmdbDetailsFromEntity(Contents contentsEntity, Long contentsId, String accessToken) {
         TmdbDetails tmdbDetails = TmdbDetails.builder().build();
 
         // =========================================================================
         // Credit, Person 데이터를 읽기 위한 Contetns entity 불러오기
         log.info("해당 작품과 관련된 Credit 및 Person 데이터를 DB로부터 불러옵니다...");
-        Contents contentsEntity = contentsService.getContentsByTmdbIdAndTmdbType(id, type);
         List<Credit> allCreditsByContentsId = personService.getAllCreditsByContentsId(contentsEntity);
 
         List<DetailsPerson> castList = new ArrayList<>();
@@ -116,10 +132,11 @@ public class TmdbService {
             bookmarkStatus = false;
         }
 
+        ContentsType type = contentsEntity.getTmdbType();
         // Contents(TvProgramData, MovieData), Season, Networks 등의 데이터 조회
         if (type.equals(ContentsType.TV)) {
             log.info("TV 데이터를 DB로부터 조회 시작");
-            TvProgramData tvProgramData = contentsService.getTvProgramDataByTmdbIdAndTmdbType(id, type);
+            TvProgramData tvProgramData = contentsService.findTvProgramDataByContentsId(contentsId);
             List<Season> seasonsEntities = seasonService.getSeasonsEntities(tvProgramData);
             List<Networks> networksEntities = networksService.getNetworksEntities(tvProgramData);
             log.info("TV 데이터를 DB로부터 조회 완료 : [" + tvProgramData.getContentsId() + "] " + tvProgramData.getTranslatedTitle());
@@ -167,7 +184,7 @@ public class TmdbService {
 
         } else if (type.equals(ContentsType.MOVIE)) {
             log.info("영화 데이터를 DB로부터 조회 시작");
-            MovieData movieData = contentsService.getMovieDataByTmdbIdAndTmdbType(id, type);
+            MovieData movieData = contentsService.findMovieDataByContentsId(contentsId);
             log.info("영화 데이터를 DB로부터 조회 완료 : [" + movieData.getContentsId() + "] " + movieData.getTranslatedTitle());
 
             tmdbDetails = TmdbDetails.builder()
@@ -360,6 +377,8 @@ public class TmdbService {
     private List<DetailsPerson> getCastListWithMaximumSize(List<DetailsPerson> originalCastList) {
         // Cast(배우)의 경우, 최대 N명 분의 데이터만 저장한다.
         originalCastList.forEach(person -> person.setCreditType(CreditType.CAST));
+        // 데이터 가공 시 캐스팅된 배우를 최대 몇 명까지 저장할지 지정
+        int MAX_CAST_LIST_SIZE = 10;
         return originalCastList.subList(0, Math.min(originalCastList.size(), MAX_CAST_LIST_SIZE));
     }
 

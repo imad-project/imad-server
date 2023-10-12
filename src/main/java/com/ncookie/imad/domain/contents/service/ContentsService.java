@@ -35,11 +35,11 @@ public class ContentsService {
         return apiClient.searchByQuery(query, type, page);
     }
 
-    public TmdbDetails getContentsDetails(int id, String type) {
+    public TmdbDetails getContentsDetails(Long id, String type) {
         return apiClient.getContentsDetails(id, type);
     }
 
-    public String getContentsCertification(int id, String type) {
+    public String getContentsCertification(Long id, String type) {
         return apiClient.getContentsCertification(id, type);
     }
 
@@ -54,6 +54,21 @@ public class ContentsService {
         }
     }
 
+
+    /*
+     * =====================================
+     * Repository wrapper 메소드
+     * =====================================
+     */
+
+    public Contents getContentsByTmdbIdAndTmdbType(Long id, ContentsType type) {
+        return contentsRepository.findByTmdbIdAndTmdbType(id, type);
+    }
+
+    public Optional<Contents> getContentsByContentsId(Long id) {
+        return contentsRepository.findById(id);
+    }
+
     public MovieData saveMovieData(MovieData movieData) {
         return movieDataRepository.save(movieData);
     }
@@ -64,20 +79,16 @@ public class ContentsService {
         return tvProgramDataRepository.save(tvProgramData);
     }
 
-    public boolean checkDuplicationExists(long id, ContentsType type) {
+    public boolean checkDuplicationExists(Long id, ContentsType type) {
         return contentsRepository.existsByTmdbIdAndTmdbType(id, type);
     }
 
-    public Contents getContentsByTmdbIdAndTmdbType(long id, ContentsType type) {
-        return contentsRepository.findByTmdbIdAndTmdbType(id, type);
+    public TvProgramData findTvProgramDataByContentsId(Long id) {
+        return tvProgramDataRepository.findByContentsId(id);
     }
 
-    public TvProgramData getTvProgramDataByTmdbIdAndTmdbType(long id, ContentsType type) {
-        return tvProgramDataRepository.findByTmdbIdAndTmdbType(id, type);
-    }
-
-    public MovieData getMovieDataByTmdbIdAndTmdbType(long id, ContentsType type) {
-        return movieDataRepository.findByTmdbIdAndTmdbType(id, type);
+    public MovieData findMovieDataByContentsId(Long id) {
+        return movieDataRepository.findByContentsId(id);
     }
 
 
