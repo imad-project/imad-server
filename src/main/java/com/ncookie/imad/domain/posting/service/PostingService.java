@@ -2,10 +2,7 @@ package com.ncookie.imad.domain.posting.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
-import com.ncookie.imad.domain.posting.dto.AddPostingRequest;
-import com.ncookie.imad.domain.posting.dto.ModifyPostingRequest;
-import com.ncookie.imad.domain.posting.dto.PostingDetailsResponse;
-import com.ncookie.imad.domain.posting.dto.PostingListResponse;
+import com.ncookie.imad.domain.posting.dto.*;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -135,7 +132,7 @@ public class PostingService {
         return postingDetailsResponseList;
     }
 
-    public Long addPosting(String accessToken, AddPostingRequest addPostingRequest) {
+    public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addPostingRequest.getContentsId());
 
@@ -153,10 +150,12 @@ public class PostingService {
                         .build()
         );
 
-        return posting.getPostingId();
+        return PostingIdResponse.builder()
+                .postingId(posting.getPostingId())
+                .build();
     }
 
-    public Long modifyPosting(String accessToken, Long postingId, ModifyPostingRequest modifyPostingRequest) {
+    public PostingIdResponse modifyPosting(String accessToken, Long postingId, ModifyPostingRequest modifyPostingRequest) {
         Optional<Posting> optional = postingRepository.findById(postingId);
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
@@ -169,7 +168,9 @@ public class PostingService {
                 posting.setCategory(modifyPostingRequest.getCategory());
                 posting.setSpoiler(modifyPostingRequest.isSpoiler());
 
-                return postingRepository.save(posting).getPostingId();
+                return PostingIdResponse.builder()
+                        .postingId(postingRepository.save(posting).getPostingId())
+                        .build();
             } else {
                 throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
             }

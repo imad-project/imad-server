@@ -1,8 +1,6 @@
 package com.ncookie.imad.domain.posting.controller;
 
-import com.ncookie.imad.domain.posting.dto.AddPostingRequest;
-import com.ncookie.imad.domain.posting.dto.ModifyPostingRequest;
-import com.ncookie.imad.domain.posting.dto.PostingListResponse;
+import com.ncookie.imad.domain.posting.dto.*;
 import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -16,13 +14,13 @@ public class PostingController {
     private final PostingService postingService;
 
     @GetMapping("/{id}")
-    public ApiResponse<?> postingDetails(@PathVariable Long id) {
+    public ApiResponse<PostingDetailsResponse> postingDetails(@PathVariable Long id) {
         return ApiResponse.createSuccess(ResponseCode.POSTING_GET_DETAILS_SUCCESS,
                 postingService.getPosting(id));
     }
 
     @PostMapping("")
-    public ApiResponse<Long> postingAdd(@RequestHeader("Authorization") String accessToken,
+    public ApiResponse<PostingIdResponse> postingAdd(@RequestHeader("Authorization") String accessToken,
                                                       @RequestBody AddPostingRequest addPostingRequest) {
 
         return ApiResponse.createSuccess(ResponseCode.POSTING_ADD_DETAILS_SUCCESS,
@@ -30,15 +28,15 @@ public class PostingController {
     }
 
     @PatchMapping("/{id}")
-    public ApiResponse<?> postingModify(@RequestHeader("Authorization") String accessToken,
-                                        @PathVariable("id") Long id,
-                                        @RequestBody ModifyPostingRequest modifyPostingRequest) {
+    public ApiResponse<PostingIdResponse> postingModify(@RequestHeader("Authorization") String accessToken,
+                                                        @PathVariable("id") Long id,
+                                                        @RequestBody ModifyPostingRequest modifyPostingRequest) {
         return ApiResponse.createSuccess(ResponseCode.POSTING_MODIFY_DETAILS_SUCCESS,
                 postingService.modifyPosting(accessToken, id, modifyPostingRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<?> postingDetails(@RequestHeader("Authorization") String accessToken,
+    public ApiResponse<?> postingDelete(@RequestHeader("Authorization") String accessToken,
                                          @PathVariable Long id) {
         postingService.deletePosting(accessToken, id);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.POSTING_DELETE_DETAILS_SUCCESS);
@@ -49,7 +47,6 @@ public class PostingController {
                                                         @RequestParam(value = "page") int page) {
         return ApiResponse.createSuccess(ResponseCode.POSTING_GET_LIST_SUCCESS, postingService.getAllPostingList(accessToken, page));
     }
-
 
     @GetMapping("/list/search")
     public ApiResponse<PostingListResponse> postingListByQuery(@RequestHeader("Authorization") String accessToken,
