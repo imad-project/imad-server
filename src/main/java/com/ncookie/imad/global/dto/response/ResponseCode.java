@@ -59,7 +59,6 @@ public enum ResponseCode {
 
     REVIEW_LIKE_STATUS_MODIFY_SUCCESS(200, "정상적으로 리뷰 좋아요/싫어요 상태를 수정했습니다."),
     REVIEW_LIKE_STATUS_MODIFY_FAILED(400, "리뷰 좋아요/싫어요 상태를 수정하는데 실패했습니다."),
-    REVIEW_LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),
 
     // 게시글 관련
     POSTING_GET_DETAILS_SUCCESS(200, "정상적으로 게시글을 조회했습니다."),
@@ -67,11 +66,16 @@ public enum ResponseCode {
     POSTING_ADD_DETAILS_SUCCESS(201, "정상적으로 게시글을 추가했습니다."),
     POSTING_MODIFY_DETAILS_SUCCESS(200, "정상적으로 게시글을 수정했습니다."),
     POSTING_DELETE_DETAILS_SUCCESS(204, "정상적으로 게시글을 삭제했습니다."),
+    POSTING_LIKE_STATUS_MODIFY_SUCCESS(200, "정상적으로 게시글 좋아요/싫어요 상태를 수정했습니다."),
 
     POSTING_NOT_FOUND(404, "해당 ID의 게시글을 찾을 수 없습니다."),
     POSTING_MODIFY_NO_PERMISSION(403, "해당 게시글을 수정할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
     POSTING_WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다."),
     POSTING_WRONG_SEARCH_TYPE(400, "옳바르지 않은 검색 타입입니다."),
+
+    // 좋아요/싫어요 관련
+    LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),
+
 
     // 프로필 관련
     PROFILE_GET_INFO_SUCCESS(200, "정상적으로 프로필 정보를 조회했습니다."),

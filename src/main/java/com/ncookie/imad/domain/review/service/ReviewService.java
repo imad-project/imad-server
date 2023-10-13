@@ -217,7 +217,7 @@ public class ReviewService {
 
     public void saveLikeStatus(String accessToken, Long reviewId, int likeStatus) {
         if (likeStatus != -1 && likeStatus != 0 && likeStatus != 1) {
-            throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+            throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
         }
 
         Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
@@ -245,7 +245,7 @@ public class ReviewService {
 
                     // reviewLike entity 저장/수정 실패
                     if (savedReviewLikeStatus == null) {
-                        throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+                        throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
                     }
                 }
             }

@@ -2,6 +2,8 @@ package com.ncookie.imad.domain.posting.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.like.entity.PostingLike;
+import com.ncookie.imad.domain.like.service.PostingLikeService;
 import com.ncookie.imad.domain.posting.dto.*;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
@@ -29,6 +31,8 @@ public class PostingService {
 
     private final UserAccountService userAccountService;
     private final ContentsService contentsService;
+
+    private final PostingLikeService postingLikeService;
 
     private final int PAGE_SIZE = 10;
 
@@ -191,6 +195,50 @@ public class PostingService {
             } else {
                 throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
             }
+        } else {
+            throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
+        }
+    }
+
+    public void saveLikeStatus(String accessToken, Long postingId, int likeStatus) {
+        if (likeStatus != -1 && likeStatus != 0 && likeStatus != 1) {
+            throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
+        }
+
+        Optional<Posting> postingOptional = postingRepository.findById(postingId);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+
+
+        if (postingOptional.isPresent()) {
+            Posting posting = postingOptional.get();
+
+            PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
+
+            // postingLike 신규등록
+            if (postingLike == null) {
+                postingLikeService.saveLikeStatus(PostingLike.builder()
+                        .userAccount(user)
+                        .posting(posting)
+                        .likeStatus(likeStatus)
+                        .build());
+            } else {
+                // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
+                if (likeStatus == 0) {
+                    postingLikeService.deleteLikeStatus(postingLike);
+                } else {
+                    postingLike.setLikeStatus(likeStatus);
+                    PostingLike savedReviewLikeStatus = postingLikeService.saveLikeStatus(postingLike);
+
+                    // postingLike entity 저장/수정 실패
+                    if (savedReviewLikeStatus == null) {
+                        throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
+                    }
+                }
+            }
+
+            // like, dislike count 갱신
+            postingRepository.updateLikeCount(posting.getPostingId(), postingLikeService.getLikeCount(posting));
+            postingRepository.updateDislikeCount(posting.getPostingId(), postingLikeService.getDislikeCount(posting));
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }

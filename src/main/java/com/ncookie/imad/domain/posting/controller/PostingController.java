@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.posting.controller;
 
 import com.ncookie.imad.domain.posting.dto.*;
 import com.ncookie.imad.domain.posting.service.PostingService;
+import com.ncookie.imad.domain.like.dto.LikeStatusRequest;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
@@ -67,5 +68,14 @@ public class PostingController {
                 ResponseCode.POSTING_GET_LIST_SUCCESS,
                 postingService.getAllPostingListByQuery(accessToken, searchType, query, page, sortString, order)
         );
+    }
+    
+    @Description("게시글 좋아요/싫어요")
+    @PatchMapping("/like/{id}")
+    public ApiResponse<?> postingLikeStatusModify(@RequestHeader("Authorization") String accessToken,
+                                                  @PathVariable("id") Long id,
+                                                  @RequestBody LikeStatusRequest likeStatusRequest) {
+        postingService.saveLikeStatus(accessToken, id, likeStatusRequest.getLikeStatus());
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.POSTING_LIKE_STATUS_MODIFY_SUCCESS);
     }
 }

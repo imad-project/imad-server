@@ -2,7 +2,7 @@ package com.ncookie.imad.domain.review.controller;
 
 import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
-import com.ncookie.imad.domain.review.dto.request.ReviewLikeStatusRequest;
+import com.ncookie.imad.domain.like.dto.LikeStatusRequest;
 import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
 import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
@@ -60,8 +60,8 @@ public class ReviewController {
     @PatchMapping("/like/{id}")
     public ApiResponse<?> reviewLikeStatusModify(@RequestHeader("Authorization") String accessToken,
                                                  @PathVariable("id") Long id,
-                                                 @RequestBody ReviewLikeStatusRequest reviewLikeStatusRequest) {
-        reviewService.saveLikeStatus(accessToken, id, reviewLikeStatusRequest.getLikeStatus());
+                                                 @RequestBody LikeStatusRequest likeStatusRequest) {
+        reviewService.saveLikeStatus(accessToken, id, likeStatusRequest.getLikeStatus());
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_LIKE_STATUS_MODIFY_SUCCESS);
     }
 }
