@@ -1,7 +1,6 @@
 package com.ncookie.imad.domain.posting.repository;
 
 import com.ncookie.imad.domain.posting.entity.Posting;
-import com.ncookie.imad.domain.user.entity.UserAccount;
 import feign.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

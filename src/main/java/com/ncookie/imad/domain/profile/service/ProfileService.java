@@ -78,12 +78,12 @@ public class ProfileService {
     public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
-        return reviewService.getReviewListByUser(user, pageNumber);
+        return reviewService.getReviewListByUser(user, pageNumber - 1);
     }
 
     public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
-        return reviewService.getLikedReviewListByUser(user, pageNumber);
+        return reviewService.getLikedReviewListByUser(user, pageNumber - 1);
     }
 }
