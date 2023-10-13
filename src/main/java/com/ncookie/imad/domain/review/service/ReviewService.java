@@ -89,7 +89,7 @@ public class ReviewService {
             );
         } catch (PropertyReferenceException e) {
             // sort string에 잘못된 값이 들어왔을 때 에러 발생
-            throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);
+            throw new BadRequestException(ResponseCode.REVIEW_WRONG_SORT_STRING);
         }
     }
 
