@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 public class PostingDetailsResponse {
     private Long postingId;                 // 게시글 ID
 
-
     // 작품 정보
     private Long contentsId;                // 작품 ID
     private String contentsTitle;           // 작품 제목
@@ -38,6 +37,7 @@ public class PostingDetailsResponse {
 
     private boolean isSpoiler;              // 스포일러 여부
 
+    private int viewCnt;                    // 조회수
     private int likeCnt;                    // 좋아요 수
     private int dislikeCnt;                 // 싫어요 수
 
@@ -64,6 +64,7 @@ public class PostingDetailsResponse {
 
                 .isSpoiler(posting.isSpoiler())
 
+                .viewCnt(posting.getViewCnt())
                 .likeCnt(posting.getLikeCnt())
                 .dislikeCnt(posting.getDislikeCnt())
 

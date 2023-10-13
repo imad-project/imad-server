@@ -41,6 +41,11 @@ public class PostingService {
 
         if (optional.isPresent()) {
             Posting posting = optional.get();
+            
+            // 조회수 갱신
+            // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
+            posting.setViewCnt(posting.getViewCnt() + 1);
+            postingRepository.save(posting);
 
             return PostingDetailsResponse.toDTO(posting);
         } else {
