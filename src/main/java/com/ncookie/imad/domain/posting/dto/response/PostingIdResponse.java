@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.posting.dto;
+package com.ncookie.imad.domain.posting.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
