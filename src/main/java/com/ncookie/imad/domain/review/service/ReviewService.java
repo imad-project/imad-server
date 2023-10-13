@@ -9,8 +9,8 @@ import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.review.repository.ReviewRepository;
-import com.ncookie.imad.domain.review_like.entity.ReviewLike;
-import com.ncookie.imad.domain.review_like.service.ReviewLikeService;
+import com.ncookie.imad.domain.like.entity.ReviewLike;
+import com.ncookie.imad.domain.like.service.ReviewLikeService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -49,7 +49,7 @@ public class ReviewService {
         if (optional.isPresent()) {
             Review review = optional.get();
 
-            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
@@ -107,7 +107,7 @@ public class ReviewService {
     public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber) {
         Sort sort = Sort.by("createdDate").descending();
         PageRequest pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
-        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedReviewListByUser(user, pageable);
+        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(user, pageable);
 
         List<Review> reviewList = new ArrayList<>();
 
@@ -125,7 +125,7 @@ public class ReviewService {
         // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
         List<ReviewDetailsResponse> reviewDetailsResponseList = new ArrayList<>();
         for (Review review : reviewList) {
-            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             // DTO 클래스 변환 및 like status 설정
@@ -226,11 +226,11 @@ public class ReviewService {
         if (reviewOptional.isPresent()) {
             Review review = reviewOptional.get();
 
-            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
 
             // reviewLike 신규등록
             if (reviewLike == null) {
-                reviewLikeService.saveReviewLikeStatus(ReviewLike.builder()
+                reviewLikeService.saveLikeStatus(ReviewLike.builder()
                         .userAccount(user)
                         .review(review)
                         .likeStatus(likeStatus)
@@ -238,10 +238,10 @@ public class ReviewService {
             } else {
                 // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
                 if (likeStatus == 0) {
-                    reviewLikeService.deleteReviewLike(reviewLike);
+                    reviewLikeService.deleteLikeStatus(reviewLike);
                 } else {
                     reviewLike.setLikeStatus(likeStatus);
-                    ReviewLike savedReviewLikeStatus = reviewLikeService.saveReviewLikeStatus(reviewLike);
+                    ReviewLike savedReviewLikeStatus = reviewLikeService.saveLikeStatus(reviewLike);
 
                     // reviewLike entity 저장/수정 실패
                     if (savedReviewLikeStatus == null) {

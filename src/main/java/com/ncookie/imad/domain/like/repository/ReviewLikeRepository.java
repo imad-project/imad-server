@@ -1,7 +1,7 @@
-package com.ncookie.imad.domain.review_like.repository;
+package com.ncookie.imad.domain.like.repository;
 
 import com.ncookie.imad.domain.review.entity.Review;
-import com.ncookie.imad.domain.review_like.entity.ReviewLike;
+import com.ncookie.imad.domain.like.entity.ReviewLike;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import feign.Param;
 import org.springframework.data.domain.Page;
