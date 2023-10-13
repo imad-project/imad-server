@@ -136,7 +136,7 @@ public class JwtService {
             user.updateRefreshToken(refreshToken);
             userRepository.saveAndFlush(user);
         } else {
-            throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);
+            throw new BadRequestException(ResponseCode.REVIEW_WRONG_SORT_STRING);
         }
     }
 

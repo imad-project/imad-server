@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.review.dto.response;
+package com.ncookie.imad.domain.posting.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -13,8 +13,8 @@ import java.util.List;
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ReviewListResponse {
-    List<ReviewDetailsResponse> reviewDetailsResponseList;      // 리뷰 정보
+public class PostingListResponse {
+    List<PostingDetailsResponse> postingDetailsResponseList;
 
     long totalElements;              // 총 리뷰 개수
     long totalPages;                 // 총 페이지 수
@@ -24,9 +24,11 @@ public class ReviewListResponse {
     int sizeOfPage;                 // 한 페이지 당 최대 리뷰 개수
 
     int sortDirection;              // 0 : 오름차순, 1 : 내림차순
-    String sortProperty;            // 정렬 기준 (score, createdDate, likeCnt, dislikeCnt 등이 있음)
+    String sortProperty;            // 정렬 기준 (createdDate, likeCnt, dislikeCnt 등이 있음)
 
-    public static ReviewListResponse toDTO(Page<?> page, List<ReviewDetailsResponse> reviewList) {
+    int searchType;                 // 검색 기준 (제목+내용, 제목, 내용, 글쓴이 등)
+
+    public static PostingListResponse toDTO(Page<?> page, List<PostingDetailsResponse> postingList) {
         String sortProperty = null;
         int sortDirection = 0;
         Sort sort = page.getSort();
@@ -36,8 +38,8 @@ public class ReviewListResponse {
             sortDirection = order.getDirection().name().equals("ASC") ? 0 : 1;
         }
 
-        return ReviewListResponse.builder()
-                .reviewDetailsResponseList(reviewList)
+        return PostingListResponse.builder()
+                .postingDetailsResponseList(postingList)
 
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())

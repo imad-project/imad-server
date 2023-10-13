@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.review_like.entity;
+package com.ncookie.imad.domain.like.entity;
 
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;

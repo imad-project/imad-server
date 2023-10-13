@@ -2,7 +2,7 @@ package com.ncookie.imad.domain.review.controller;
 
 import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
-import com.ncookie.imad.domain.review.dto.request.ReviewLikeStatusRequest;
+import com.ncookie.imad.domain.like.dto.LikeStatusRequest;
 import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
 import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
@@ -37,7 +37,7 @@ public class ReviewController {
     @PostMapping("")
     public ApiResponse<AddReviewResponse> reviewAdd(@RequestHeader("Authorization") String accessToken,
                                                     @RequestBody AddReviewRequest addReviewRequest) {
-        return ApiResponse.createSuccess(ResponseCode.REVIEW_POST_DETAILS_SUCCESS, reviewService.addReview(accessToken, addReviewRequest));
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_ADD_DETAILS_SUCCESS, reviewService.addReview(accessToken, addReviewRequest));
     }
 
     @PatchMapping("/{id}")
@@ -45,7 +45,7 @@ public class ReviewController {
                                           @PathVariable("id") Long id,
                                           @RequestBody ModifyReviewRequest modifyReviewRequest) {
         return ApiResponse.createSuccess(
-                ResponseCode.REVIEW_PATCH_DETAILS_SUCCESS,
+                ResponseCode.REVIEW_MODIFY_DETAILS_SUCCESS,
                 reviewService.modifyReview(accessToken, id, modifyReviewRequest)
         );
     }
@@ -60,8 +60,8 @@ public class ReviewController {
     @PatchMapping("/like/{id}")
     public ApiResponse<?> reviewLikeStatusModify(@RequestHeader("Authorization") String accessToken,
                                                  @PathVariable("id") Long id,
-                                                 @RequestBody ReviewLikeStatusRequest reviewLikeStatusRequest) {
-        reviewService.saveLikeStatus(accessToken, id, reviewLikeStatusRequest.getLikeStatus());
+                                                 @RequestBody LikeStatusRequest likeStatusRequest) {
+        reviewService.saveLikeStatus(accessToken, id, likeStatusRequest.getLikeStatus());
         return ApiResponse.createSuccessWithNoContent(ResponseCode.REVIEW_LIKE_STATUS_MODIFY_SUCCESS);
     }
 }

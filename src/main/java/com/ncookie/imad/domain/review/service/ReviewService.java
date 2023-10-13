@@ -9,8 +9,8 @@ import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.review.repository.ReviewRepository;
-import com.ncookie.imad.domain.review_like.entity.ReviewLike;
-import com.ncookie.imad.domain.review_like.service.ReviewLikeService;
+import com.ncookie.imad.domain.like.entity.ReviewLike;
+import com.ncookie.imad.domain.like.service.ReviewLikeService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -49,7 +49,7 @@ public class ReviewService {
         if (optional.isPresent()) {
             Review review = optional.get();
 
-            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
@@ -73,13 +73,13 @@ public class ReviewService {
             if (order == 0) {
                 // 오름차순 (ascending)
                 sort = Sort.by(sortString).ascending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
+                pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
             } else if (order == 1) {
                 // 내림차순 (descending)
                 sort = Sort.by(sortString).descending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
+                pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
             } else {
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE);
+                pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE);
             }
 
             Page<Review> reviewPage = reviewRepository.findAllByContents(contents, pageable);
@@ -89,7 +89,7 @@ public class ReviewService {
             );
         } catch (PropertyReferenceException e) {
             // sort string에 잘못된 값이 들어왔을 때 에러 발생
-            throw new BadRequestException(ResponseCode.REVIEW_GET_LIST_SORT_STRING_WRONG);
+            throw new BadRequestException(ResponseCode.REVIEW_WRONG_SORT_STRING);
         }
     }
 
@@ -107,10 +107,9 @@ public class ReviewService {
     public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber) {
         Sort sort = Sort.by("createdDate").descending();
         PageRequest pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
-        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedReviewListByUser(user, pageable);
+        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(user, pageable);
 
         List<Review> reviewList = new ArrayList<>();
-
         for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {
             reviewList.add(reviewLike.getReview());
         }
@@ -125,7 +124,7 @@ public class ReviewService {
         // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
         List<ReviewDetailsResponse> reviewDetailsResponseList = new ArrayList<>();
         for (Review review : reviewList) {
-            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             // DTO 클래스 변환 및 like status 설정
@@ -217,7 +216,7 @@ public class ReviewService {
 
     public void saveLikeStatus(String accessToken, Long reviewId, int likeStatus) {
         if (likeStatus != -1 && likeStatus != 0 && likeStatus != 1) {
-            throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+            throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
         }
 
         Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
@@ -226,11 +225,11 @@ public class ReviewService {
         if (reviewOptional.isPresent()) {
             Review review = reviewOptional.get();
 
-            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
+            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
 
             // reviewLike 신규등록
             if (reviewLike == null) {
-                reviewLikeService.saveReviewLikeStatus(ReviewLike.builder()
+                reviewLikeService.saveLikeStatus(ReviewLike.builder()
                         .userAccount(user)
                         .review(review)
                         .likeStatus(likeStatus)
@@ -238,14 +237,14 @@ public class ReviewService {
             } else {
                 // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
                 if (likeStatus == 0) {
-                    reviewLikeService.deleteReviewLike(reviewLike);
+                    reviewLikeService.deleteLikeStatus(reviewLike);
                 } else {
                     reviewLike.setLikeStatus(likeStatus);
-                    ReviewLike savedReviewLikeStatus = reviewLikeService.saveReviewLikeStatus(reviewLike);
+                    ReviewLike savedReviewLikeStatus = reviewLikeService.saveLikeStatus(reviewLike);
 
                     // reviewLike entity 저장/수정 실패
                     if (savedReviewLikeStatus == null) {
-                        throw new BadRequestException(ResponseCode.REVIEW_LIKE_STATUS_INVALID);
+                        throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
                     }
                 }
             }
