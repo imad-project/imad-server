@@ -74,6 +74,7 @@ public enum ResponseCode {
     POSTING_WRONG_SEARCH_TYPE(400, "옳바르지 않은 검색 타입입니다."),
     
     // 댓글
+    COMMENT_ADD_SUCCESS(201, "정상적으로 댓글을 추가했습니다."),
 
     // 좋아요/싫어요
     LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),
