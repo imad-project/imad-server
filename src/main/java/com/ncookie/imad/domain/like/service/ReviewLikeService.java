@@ -24,13 +24,13 @@ public class ReviewLikeService implements LikeService<Review, ReviewLike> {
     }
 
     @Override
-    public ReviewLike saveLikeStatus(ReviewLike reviewLike) {
-        return reviewLikeRepository.save(reviewLike);
+    public ReviewLike saveLikeStatus(ReviewLike like) {
+        return reviewLikeRepository.save(like);
     }
 
     @Override
-    public void deleteLikeStatus(ReviewLike reviewLike) {
-        reviewLikeRepository.delete(reviewLike);
+    public void deleteLikeStatus(ReviewLike like) {
+        reviewLikeRepository.delete(like);
     }
 
     @Override
