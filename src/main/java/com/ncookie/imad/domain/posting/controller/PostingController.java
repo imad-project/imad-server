@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.posting.controller;
 
 import com.ncookie.imad.domain.posting.dto.AddPostingRequest;
 import com.ncookie.imad.domain.posting.dto.ModifyPostingRequest;
+import com.ncookie.imad.domain.posting.dto.PostingListResponse;
 import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -44,10 +45,23 @@ public class PostingController {
     }
 
     @GetMapping("/list")
-    public ApiResponse<?> postingListByContents(@RequestParam(value = "contents_id") Long contentsId,
+    public ApiResponse<PostingListResponse> postingList(@RequestHeader("Authorization") String accessToken,
+                                                        @RequestParam(value = "page") int page) {
+        return ApiResponse.createSuccess(ResponseCode.POSTING_GET_LIST_SUCCESS, postingService.getAllPostingList(accessToken, page));
+    }
+
+
+    @GetMapping("/list/search")
+    public ApiResponse<PostingListResponse> postingListByQuery(@RequestHeader("Authorization") String accessToken,
+                                                @RequestParam(value = "search_type") int searchType,
+                                                @RequestParam(value = "query") String query,
                                                 @RequestParam(value = "page") int page,
                                                 @RequestParam(value = "sort") String sortString,
                                                 @RequestParam(value = "order") int order) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.POSTING_GET_DETAILS_SUCCESS);
+
+        return ApiResponse.createSuccess(
+                ResponseCode.POSTING_GET_LIST_SUCCESS,
+                postingService.getAllPostingListByQuery(accessToken, searchType, query, page, sortString, order)
+        );
     }
 }

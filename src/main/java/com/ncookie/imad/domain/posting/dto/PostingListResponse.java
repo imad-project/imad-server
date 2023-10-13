@@ -26,7 +26,7 @@ public class PostingListResponse {
     int sortDirection;              // 0 : 오름차순, 1 : 내림차순
     String sortProperty;            // 정렬 기준 (createdDate, likeCnt, dislikeCnt 등이 있음)
 
-    int searchType;                 // 검색 기준 (제목+내용, 제목, 내용, 글쓴이, 댓글 등)
+    int searchType;                 // 검색 기준 (제목+내용, 제목, 내용, 글쓴이 등)
 
     public static PostingListResponse toDTO(Page<?> page, List<PostingDetailsResponse> postingList) {
         String sortProperty = null;
