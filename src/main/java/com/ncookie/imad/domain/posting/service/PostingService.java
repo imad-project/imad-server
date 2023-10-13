@@ -109,7 +109,6 @@ public class PostingService {
     }
 
     private PostingListResponse getPostingListResponseByPage(String accessToken, Page<Posting> postingPage) {
-
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         return PostingListResponse.toDTO(
@@ -119,18 +118,16 @@ public class PostingService {
     }
     
     private List<PostingDetailsResponse> convertPostingListToPostingDetailsResponseList(UserAccount user, List<Posting> postingList) {
-        // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
+        // Posting 클래스를 PostingDetailsResponse 데이터 형식에 맞게 매핑
         List<PostingDetailsResponse> postingDetailsResponseList = new ArrayList<>();
         for (Posting posting : postingList) {
-            // TODO: posting like 구현 후 추가해줘야 함
-//            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndReview(user, review);
-//            int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
-//
-//            // DTO 클래스 변환 및 like status 설정
-//            ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
-//            reviewDetailsResponse.setLikeStatus(likeStatus);
-//            reviewDetailsResponseList.add(reviewDetailsResponse);
-            postingDetailsResponseList.add(PostingDetailsResponse.toDTO(posting));
+            PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
+            int likeStatus = postingLike == null ? 0 : postingLike.getLikeStatus();
+
+            // DTO 클래스 변환 및 like status 설정
+            PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting);
+            postingDetailsResponse.setLikeStatus(likeStatus);
+            postingDetailsResponseList.add(postingDetailsResponse);
         }
 
         return postingDetailsResponseList;

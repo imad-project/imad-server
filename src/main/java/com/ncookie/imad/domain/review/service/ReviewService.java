@@ -110,7 +110,6 @@ public class ReviewService {
         Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(user, pageable);
 
         List<Review> reviewList = new ArrayList<>();
-
         for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {
             reviewList.add(reviewLike.getReview());
         }
