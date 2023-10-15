@@ -75,6 +75,10 @@ public enum ResponseCode {
     
     // 댓글
     COMMENT_ADD_SUCCESS(201, "정상적으로 댓글을 추가했습니다."),
+    COMMENT_MODIFY_SUCCESS(200, "정상적으로 댓글을 수정했습니다."),
+
+    COMMENT_MODIFY_NO_PERMISSION(403, "해당 댓글을 수정할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
+    COMMENT_NOT_FOUND(404, "해당 ID의 댓글을 찾을 수 없습니다."),
 
     // 좋아요/싫어요
     LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),

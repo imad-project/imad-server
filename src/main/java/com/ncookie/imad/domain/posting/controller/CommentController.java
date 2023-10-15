@@ -1,7 +1,7 @@
 package com.ncookie.imad.domain.posting.controller;
 
 import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
-import com.ncookie.imad.domain.posting.dto.request.AddPostingRequest;
+import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
 import com.ncookie.imad.domain.posting.dto.response.CommentIdResponse;
 import com.ncookie.imad.domain.posting.service.CommentService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -29,11 +29,13 @@ public class CommentController {
 
     @Description("댓글 수정")
     @PatchMapping("/{id}")
-    public ApiResponse<?> commentModify(
+    public ApiResponse<CommentIdResponse> commentModify(
             @RequestHeader("Authorization") String accessToken,
-            @PathVariable("id") Long id,
-            @RequestBody AddPostingRequest addPostingRequest) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.COMMENT_ADD_SUCCESS);
+            @PathVariable("id") Long commentId,
+            @RequestBody ModifyCommentRequest modifyCommentRequest) {
+        return ApiResponse.createSuccess(
+                ResponseCode.COMMENT_MODIFY_SUCCESS,
+                commentService.modifyComment(accessToken, commentId, modifyCommentRequest));
     }
 
     @Description("댓글 삭제")

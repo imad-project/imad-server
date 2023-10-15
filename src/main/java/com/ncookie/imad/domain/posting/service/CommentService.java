@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.posting.service;
 
 import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
+import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
 import com.ncookie.imad.domain.posting.dto.response.CommentIdResponse;
 import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
@@ -47,6 +48,28 @@ public class CommentService {
                     .build();
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
+        }
+    }
+
+    public CommentIdResponse modifyComment(String accessToken, Long commentId, ModifyCommentRequest modifyCommentRequest) {
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+
+            if (comment.getUserAccount().equals(user)) {
+                comment.setContent(modifyCommentRequest.getContent());
+
+                return CommentIdResponse.builder()
+                        .commentId(commentRepository.save(comment).getCommentId())
+                        .build();
+            } else {
+                throw new BadRequestException(ResponseCode.COMMENT_MODIFY_NO_PERMISSION);
+            }
+
+        } else {
+            throw new BadRequestException(ResponseCode.COMMENT_NOT_FOUND);
         }
     }
 }
