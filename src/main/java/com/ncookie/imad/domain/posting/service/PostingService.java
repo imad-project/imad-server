@@ -244,4 +244,8 @@ public class PostingService {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
     }
+
+    public Optional<Posting> getPostingEntityById(Long postingId) {
+        return postingRepository.findById(postingId);
+    }
 }
