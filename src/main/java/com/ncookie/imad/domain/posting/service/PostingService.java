@@ -177,7 +177,7 @@ public class PostingService {
                         .postingId(postingRepository.save(posting).getPostingId())
                         .build();
             } else {
-                throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
+                throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
             }
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
@@ -194,7 +194,7 @@ public class PostingService {
             if (posting.getUser().getId().equals(user.getId())) {
                 postingRepository.delete(posting);
             } else {
-                throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
+                throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
             }
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);

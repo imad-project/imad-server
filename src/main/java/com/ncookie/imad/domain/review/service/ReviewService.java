@@ -188,7 +188,7 @@ public class ReviewService {
 
                 return reviewRepository.save(review).getReviewId();
             } else {
-                throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
+                throw new BadRequestException(ResponseCode.REVIEW_NO_PERMISSION);
             }
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
@@ -207,7 +207,7 @@ public class ReviewService {
                 reviewRepository.delete(review);
                 calculateAndSaveAverageScore(review);
             } else {
-                throw new BadRequestException(ResponseCode.REVIEW_MODIFY_NO_PERMISSION);
+                throw new BadRequestException(ResponseCode.REVIEW_NO_PERMISSION);
             }
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
