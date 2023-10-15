@@ -33,4 +33,7 @@ public class Comment extends BaseTimeEntity {
 
     @Setter
     private String content;
+
+    @Setter
+    private boolean isRemoved;
 }

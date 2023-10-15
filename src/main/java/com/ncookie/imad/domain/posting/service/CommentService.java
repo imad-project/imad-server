@@ -65,9 +65,33 @@ public class CommentService {
                         .commentId(commentRepository.save(comment).getCommentId())
                         .build();
             } else {
-                throw new BadRequestException(ResponseCode.COMMENT_MODIFY_NO_PERMISSION);
+                throw new BadRequestException(ResponseCode.COMMENT_NO_PERMISSION);
             }
 
+        } else {
+            throw new BadRequestException(ResponseCode.COMMENT_NOT_FOUND);
+        }
+    }
+
+    public CommentIdResponse deleteComment(String accessToken, Long commentId) {
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+
+            // 댓글 내용은 삭제하지만 그 외의 데이터는 모두 남아있음
+            // isRemoved가 true인 댓글은 클라이언트에서 "삭제된 댓글입니다" 등으로 표시됨
+            if (comment.getUserAccount().equals(user)) {
+                comment.setContent(null);
+                comment.setRemoved(true);
+
+                return CommentIdResponse.builder()
+                        .commentId(commentRepository.save(comment).getCommentId())
+                        .build();
+            } else {
+                throw new BadRequestException(ResponseCode.COMMENT_NO_PERMISSION);
+            }
         } else {
             throw new BadRequestException(ResponseCode.COMMENT_NOT_FOUND);
         }

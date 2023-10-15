@@ -43,6 +43,8 @@ public class CommentController {
     public ApiResponse<?> commentDelete(
             @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") Long id) {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.COMMENT_ADD_SUCCESS);
+        return ApiResponse.createSuccess(
+                ResponseCode.COMMENT_DELETE_SUCCESS,
+                commentService.deleteComment(accessToken, id));
     }
 }
