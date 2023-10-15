@@ -8,6 +8,7 @@ import com.ncookie.imad.domain.posting.dto.request.AddPostingRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyPostingRequest;
 import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
 import com.ncookie.imad.domain.posting.dto.response.PostingIdResponse;
+import com.ncookie.imad.domain.posting.dto.response.PostingListElement;
 import com.ncookie.imad.domain.posting.dto.response.PostingListResponse;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
@@ -121,15 +122,15 @@ public class PostingService {
         );
     }
     
-    private List<PostingDetailsResponse> convertPostingListToPostingDetailsResponseList(UserAccount user, List<Posting> postingList) {
+    private List<PostingListElement> convertPostingListToPostingDetailsResponseList(UserAccount user, List<Posting> postingList) {
         // Posting 클래스를 PostingDetailsResponse 데이터 형식에 맞게 매핑
-        List<PostingDetailsResponse> postingDetailsResponseList = new ArrayList<>();
+        List<PostingListElement> postingDetailsResponseList = new ArrayList<>();
         for (Posting posting : postingList) {
             PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
             int likeStatus = postingLike == null ? 0 : postingLike.getLikeStatus();
 
             // DTO 클래스 변환 및 like status 설정
-            PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting);
+            PostingListElement postingDetailsResponse = PostingListElement.toDTO(posting);
             postingDetailsResponse.setLikeStatus(likeStatus);
             postingDetailsResponseList.add(postingDetailsResponse);
         }
