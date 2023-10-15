@@ -96,7 +96,7 @@ public class PostingService {
         // 검색 타입에 따라 repository에 데이터 요청
         Page<Posting> postingPage = switch (searchType) {
             // 제목 + 본문
-            case 0 -> postingRepository.findAllByTitleOrContentContaining(pageable, query, query);
+            case 0 -> postingRepository.findAllByTitleContainingOrContentContaining(pageable, query, query);
             
             // 제목
             case 1 -> postingRepository.findAllByTitleContaining(pageable, query);
