@@ -24,7 +24,7 @@ public class ContentsController {
                                                                        @RequestParam(value = "page") int page) {
         return ApiResponse.createSuccess(
                 ResponseCode.CONTENTS_SEARCH_SUCCESS,
-                contentsService.searchKeywords(query, type, page)
+                contentsService.searchKeywords(query, type, page - 1)
         );
     }
 

@@ -80,6 +80,7 @@ public enum ResponseCode {
 
     COMMENT_NO_PERMISSION(403, "해당 댓글을 수정 또는 삭제할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
     COMMENT_NOT_FOUND(404, "해당 ID의 댓글을 찾을 수 없습니다."),
+    COMMENT_ALREADY_REMOVED(410, "이미 삭제된 댓글입니다."),
 
     // 좋아요/싫어요
     LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),

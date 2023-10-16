@@ -28,7 +28,7 @@ public class ProfileController {
             @RequestHeader("Authorization") String accessToken,
             @RequestParam("page") int pageNumber
     ) {
-        BookmarkListResponse contentsBookmarkList = profileService.getContentsBookmarkList(accessToken, pageNumber);
+        BookmarkListResponse contentsBookmarkList = profileService.getContentsBookmarkList(accessToken, pageNumber - 1);
         return ApiResponse.createSuccess(ResponseCode.PROFILE_GET_INFO_SUCCESS, contentsBookmarkList);
     }
 
@@ -73,7 +73,7 @@ public class ProfileController {
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS,
-                profileService.getReviewList(accessToken, pageNumber)
+                profileService.getReviewList(accessToken, pageNumber - 1)
         );
     }
 
@@ -91,7 +91,7 @@ public class ProfileController {
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS,
-                profileService.getLikedReviewList(accessToken, pageNumber)
+                profileService.getLikedReviewList(accessToken, pageNumber - 1)
         );
     }
 }
