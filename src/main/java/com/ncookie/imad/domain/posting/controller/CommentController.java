@@ -40,7 +40,7 @@ public class CommentController {
 
     @Description("댓글 삭제")
     @DeleteMapping("/{id}")
-    public ApiResponse<?> commentDelete(
+    public ApiResponse<CommentIdResponse> commentDelete(
             @RequestHeader("Authorization") String accessToken,
             @PathVariable("id") Long id) {
         return ApiResponse.createSuccess(
