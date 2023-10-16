@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface PostingRepository extends JpaRepository<Posting, Long> {
-    Page<Posting> findAllByTitleOrContentContaining(Pageable pageable, String title, String content);
+    Page<Posting> findAllByTitleContainingOrContentContaining(Pageable pageable, String title, String content);
     Page<Posting> findAllByTitleContaining(Pageable pageable, String query);
     Page<Posting> findAllByContentContaining(Pageable pageable, String query);
 

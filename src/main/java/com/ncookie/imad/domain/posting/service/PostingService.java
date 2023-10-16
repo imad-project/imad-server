@@ -4,7 +4,9 @@ import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.like.entity.PostingLike;
 import com.ncookie.imad.domain.like.service.PostingLikeService;
-import com.ncookie.imad.domain.posting.dto.*;
+import com.ncookie.imad.domain.posting.dto.request.AddPostingRequest;
+import com.ncookie.imad.domain.posting.dto.request.ModifyPostingRequest;
+import com.ncookie.imad.domain.posting.dto.response.*;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -33,6 +35,7 @@ public class PostingService {
     private final ContentsService contentsService;
 
     private final PostingLikeService postingLikeService;
+    private final CommentService commentService;
 
     private final int PAGE_SIZE = 10;
 
@@ -42,13 +45,14 @@ public class PostingService {
 
         if (optional.isPresent()) {
             Posting posting = optional.get();
-            
+            List<CommentDetailsResponse> commentList = commentService.getCommentList(posting);
+
             // 조회수 갱신
             // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
             posting.setViewCnt(posting.getViewCnt() + 1);
             postingRepository.save(posting);
 
-            return PostingDetailsResponse.toDTO(posting);
+            return PostingDetailsResponse.toDTO(posting, commentList);
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
@@ -91,7 +95,7 @@ public class PostingService {
         // 검색 타입에 따라 repository에 데이터 요청
         Page<Posting> postingPage = switch (searchType) {
             // 제목 + 본문
-            case 0 -> postingRepository.findAllByTitleOrContentContaining(pageable, query, query);
+            case 0 -> postingRepository.findAllByTitleContainingOrContentContaining(pageable, query, query);
             
             // 제목
             case 1 -> postingRepository.findAllByTitleContaining(pageable, query);
@@ -117,15 +121,15 @@ public class PostingService {
         );
     }
     
-    private List<PostingDetailsResponse> convertPostingListToPostingDetailsResponseList(UserAccount user, List<Posting> postingList) {
+    private List<PostingListElement> convertPostingListToPostingDetailsResponseList(UserAccount user, List<Posting> postingList) {
         // Posting 클래스를 PostingDetailsResponse 데이터 형식에 맞게 매핑
-        List<PostingDetailsResponse> postingDetailsResponseList = new ArrayList<>();
+        List<PostingListElement> postingDetailsResponseList = new ArrayList<>();
         for (Posting posting : postingList) {
             PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
             int likeStatus = postingLike == null ? 0 : postingLike.getLikeStatus();
 
             // DTO 클래스 변환 및 like status 설정
-            PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting);
+            PostingListElement postingDetailsResponse = PostingListElement.toDTO(posting);
             postingDetailsResponse.setLikeStatus(likeStatus);
             postingDetailsResponseList.add(postingDetailsResponse);
         }
@@ -173,7 +177,7 @@ public class PostingService {
                         .postingId(postingRepository.save(posting).getPostingId())
                         .build();
             } else {
-                throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
+                throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
             }
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
@@ -190,7 +194,7 @@ public class PostingService {
             if (posting.getUser().getId().equals(user.getId())) {
                 postingRepository.delete(posting);
             } else {
-                throw new BadRequestException(ResponseCode.POSTING_MODIFY_NO_PERMISSION);
+                throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
             }
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);

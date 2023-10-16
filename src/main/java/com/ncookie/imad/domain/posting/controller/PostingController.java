@@ -1,6 +1,10 @@
 package com.ncookie.imad.domain.posting.controller;
 
-import com.ncookie.imad.domain.posting.dto.*;
+import com.ncookie.imad.domain.posting.dto.request.AddPostingRequest;
+import com.ncookie.imad.domain.posting.dto.request.ModifyPostingRequest;
+import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
+import com.ncookie.imad.domain.posting.dto.response.PostingIdResponse;
+import com.ncookie.imad.domain.posting.dto.response.PostingListResponse;
 import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.domain.like.dto.LikeStatusRequest;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -25,7 +29,7 @@ public class PostingController {
     @Description("게시글 등록")
     @PostMapping("")
     public ApiResponse<PostingIdResponse> postingAdd(@RequestHeader("Authorization") String accessToken,
-                                                      @RequestBody AddPostingRequest addPostingRequest) {
+                                                     @RequestBody AddPostingRequest addPostingRequest) {
 
         return ApiResponse.createSuccess(ResponseCode.POSTING_ADD_DETAILS_SUCCESS,
                 postingService.addPosting(accessToken, addPostingRequest));

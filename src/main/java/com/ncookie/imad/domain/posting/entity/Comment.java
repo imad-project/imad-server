@@ -27,10 +27,13 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
+    
+    // 부모 댓글. 답글을 달았을 때 최상위 댓글 아래에 순차적으로 등록됨
+    private Long parentId;
 
     @Setter
     private String content;
 
     @Setter
-    private int commentOrder;
+    private boolean isRemoved;
 }

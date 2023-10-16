@@ -1,5 +1,4 @@
-package com.ncookie.imad.domain.posting.dto;
-
+package com.ncookie.imad.domain.posting.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PostingDetailsResponse {
+public class PostingListElement {
     private Long postingId;                 // 게시글 ID
 
     // 작품 정보
@@ -32,7 +31,6 @@ public class PostingDetailsResponse {
 
     // 게시글 정보
     private String title;                   // 제목
-    private String content;                 // 본문
     private int category;                   // 카테고리
 
     private boolean isSpoiler;              // 스포일러 여부
@@ -41,13 +39,14 @@ public class PostingDetailsResponse {
     private int likeCnt;                    // 좋아요 수
     private int dislikeCnt;                 // 싫어요 수
 
+    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+
     private LocalDateTime createdAt;        // 리뷰 작성 날짜
     private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
 
-    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
 
-    public static PostingDetailsResponse toDTO(Posting posting) {
-        return PostingDetailsResponse.builder()
+    public static PostingListElement toDTO(Posting posting) {
+        return PostingListElement.builder()
                 .postingId(posting.getPostingId())
 
                 .contentsId(posting.getContents().getContentsId())
@@ -59,7 +58,6 @@ public class PostingDetailsResponse {
                 .userProfileImage(posting.getUser().getProfileImage())
 
                 .title(posting.getTitle())
-                .content(posting.getContent())
                 .category(posting.getCategory())
 
                 .isSpoiler(posting.isSpoiler())

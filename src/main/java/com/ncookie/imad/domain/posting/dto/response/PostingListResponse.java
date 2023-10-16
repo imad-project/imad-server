@@ -1,4 +1,4 @@
-package com.ncookie.imad.domain.posting.dto;
+package com.ncookie.imad.domain.posting.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PostingListResponse {
-    List<PostingDetailsResponse> postingDetailsResponseList;
+    List<PostingListElement> postingDetailsResponseList;
 
     long totalElements;              // 총 리뷰 개수
     long totalPages;                 // 총 페이지 수
@@ -28,7 +28,7 @@ public class PostingListResponse {
 
     int searchType;                 // 검색 기준 (제목+내용, 제목, 내용, 글쓴이 등)
 
-    public static PostingListResponse toDTO(Page<?> page, List<PostingDetailsResponse> postingList) {
+    public static PostingListResponse toDTO(Page<?> page, List<PostingListElement> postingList) {
         String sortProperty = null;
         int sortDirection = 0;
         Sort sort = page.getSort();
