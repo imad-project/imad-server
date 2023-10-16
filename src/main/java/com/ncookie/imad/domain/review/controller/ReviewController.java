@@ -30,7 +30,7 @@ public class ReviewController {
                                                       @RequestParam(value = "page") int page,
                                                       @RequestParam(value = "sort") String sortString,
                                                       @RequestParam(value = "order") int order) {
-        ReviewListResponse reviewList = reviewService.getReviewList(accessToken, contentsId, page, sortString, order);
+        ReviewListResponse reviewList = reviewService.getReviewList(accessToken, contentsId, page - 1, sortString, order);
         return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_LIST_SUCCESS, reviewList);
     }
 

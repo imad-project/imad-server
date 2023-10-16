@@ -60,7 +60,7 @@ public class PostingService {
 
     public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
         Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
+        PageRequest pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
 
         return getPostingListResponseByPage(accessToken, postingRepository.findAll(pageable));
     }
@@ -79,13 +79,13 @@ public class PostingService {
             if (order == 0) {
                 // 오름차순 (ascending)
                 sort = Sort.by(sortString).ascending();
-                pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
             } else if (order == 1) {
                 // 내림차순 (descending)
                 sort = Sort.by(sortString).descending();
-                pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, sort);
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
             } else {
-                pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE);
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE);
             }
         } catch (PropertyReferenceException e) {
             // sort string에 잘못된 값이 들어왔을 때 에러 발생

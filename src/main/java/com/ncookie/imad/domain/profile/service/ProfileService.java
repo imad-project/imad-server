@@ -34,7 +34,7 @@ public class ProfileService {
         int REVIEW_LIST_PAGE_SIZE = 10;
         Page<ContentsBookmark> contentsBookmarkPage = bookmarkService.findAllByUserAccount(
                 userAccountService.getUserFromAccessToken(accessToken),
-                PageRequest.of(pageNumber - 1, REVIEW_LIST_PAGE_SIZE)
+                PageRequest.of(pageNumber, REVIEW_LIST_PAGE_SIZE)
         );
 
         List<BookmarkDetails> bookmarkDetailsList = new ArrayList<>();
@@ -78,12 +78,12 @@ public class ProfileService {
     public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
-        return reviewService.getReviewListByUser(user, pageNumber - 1);
+        return reviewService.getReviewListByUser(user, pageNumber);
     }
 
     public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
-        return reviewService.getLikedReviewListByUser(user, pageNumber - 1);
+        return reviewService.getLikedReviewListByUser(user, pageNumber);
     }
 }
