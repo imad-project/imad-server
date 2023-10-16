@@ -209,7 +209,9 @@ Table Comment {
   posting_id integer
 
   content text
-  comment_order integer
+  parent_id integer       [note: "댓글 부모 ID. 이 댓글이 최상위라면 null 값이 들어감"]
+  is_removed boolean      [note: "댓글 삭제 여부"]
+
   created_at datetime
   modified_at datetime
 }
