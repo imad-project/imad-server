@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.posting.service;
 
 import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
+import com.ncookie.imad.domain.posting.dto.response.CommentDetailsResponse;
 import com.ncookie.imad.domain.posting.dto.response.CommentIdResponse;
 import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
@@ -14,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -24,31 +27,27 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     private final UserAccountService userAccountService;
-    private final PostingService postingService;
+    private final PostingRetrievalService postingRetrievalService;
 
 
     public CommentIdResponse addComment(String accessToken, AddCommentRequest addCommentRequest) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
-        Optional<Posting> postingOptional = postingService.getPostingEntityById(addCommentRequest.getPostingId());
+        Posting posting = postingRetrievalService.getPostingEntityById(addCommentRequest.getPostingId());
 
-        if (postingOptional.isPresent()) {
-            Comment comment = commentRepository.save(
-                    Comment.builder()
-                            .posting(postingOptional.get())
-                            .userAccount(user)
+        Comment comment = commentRepository.save(
+                Comment.builder()
+                        .posting(posting)
+                        .userAccount(user)
 
-                            .parentId(addCommentRequest.getParentId())
-                            .content(addCommentRequest.getContent())
+                        .parentId(addCommentRequest.getParentId())
+                        .content(addCommentRequest.getContent())
 
-                            .build()
-            );
+                        .build()
+        );
 
-            return CommentIdResponse.builder()
-                    .commentId(comment.getCommentId())
-                    .build();
-        } else {
-            throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
-        }
+        return CommentIdResponse.builder()
+                .commentId(comment.getCommentId())
+                .build();
     }
 
     public CommentIdResponse modifyComment(String accessToken, Long commentId, ModifyCommentRequest modifyCommentRequest) {
@@ -95,5 +94,17 @@ public class CommentService {
         } else {
             throw new BadRequestException(ResponseCode.COMMENT_NOT_FOUND);
         }
+    }
+
+
+    public List<CommentDetailsResponse> getCommentList(Posting posting) {
+        List<Comment> comments = commentRepository.findAllByPosting(posting);
+
+        List<CommentDetailsResponse> commentList = new ArrayList<>();
+        for (Comment c : comments) {
+            commentList.add(CommentDetailsResponse.toDTO(c));
+        }
+
+        return commentList;
     }
 }

@@ -6,10 +6,7 @@ import com.ncookie.imad.domain.like.entity.PostingLike;
 import com.ncookie.imad.domain.like.service.PostingLikeService;
 import com.ncookie.imad.domain.posting.dto.request.AddPostingRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyPostingRequest;
-import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
-import com.ncookie.imad.domain.posting.dto.response.PostingIdResponse;
-import com.ncookie.imad.domain.posting.dto.response.PostingListElement;
-import com.ncookie.imad.domain.posting.dto.response.PostingListResponse;
+import com.ncookie.imad.domain.posting.dto.response.*;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -38,6 +35,7 @@ public class PostingService {
     private final ContentsService contentsService;
 
     private final PostingLikeService postingLikeService;
+    private final CommentService commentService;
 
     private final int PAGE_SIZE = 10;
 
@@ -47,13 +45,14 @@ public class PostingService {
 
         if (optional.isPresent()) {
             Posting posting = optional.get();
-            
+            List<CommentDetailsResponse> commentList = commentService.getCommentList(posting);
+
             // 조회수 갱신
             // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
             posting.setViewCnt(posting.getViewCnt() + 1);
             postingRepository.save(posting);
 
-            return PostingDetailsResponse.toDTO(posting);
+            return PostingDetailsResponse.toDTO(posting, commentList);
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
@@ -244,9 +243,5 @@ public class PostingService {
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
-    }
-
-    public Optional<Posting> getPostingEntityById(Long postingId) {
-        return postingRepository.findById(postingId);
     }
 }

@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Builder
@@ -41,12 +42,17 @@ public class PostingDetailsResponse {
     private int likeCnt;                    // 좋아요 수
     private int dislikeCnt;                 // 싫어요 수
 
+    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+
     private LocalDateTime createdAt;        // 리뷰 작성 날짜
     private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
 
-    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+    // 댓글 정보
+    private int commentCnt;                                                     // 댓글 개수
+    private List<CommentDetailsResponse> commentDetailsResponseList;            // 댓글 리스트
 
-    public static PostingDetailsResponse toDTO(Posting posting) {
+
+    public static PostingDetailsResponse toDTO(Posting posting, List<CommentDetailsResponse> commentList) {
         return PostingDetailsResponse.builder()
                 .postingId(posting.getPostingId())
 
@@ -70,6 +76,9 @@ public class PostingDetailsResponse {
 
                 .createdAt(posting.getCreatedDate())
                 .modifiedAt(posting.getModifiedDate())
+
+                .commentCnt(commentList.size())
+                .commentDetailsResponseList(commentList)
 
                 .build();
     }
