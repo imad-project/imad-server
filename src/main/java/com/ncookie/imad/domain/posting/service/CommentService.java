@@ -42,6 +42,8 @@ public class CommentService {
                         .parentId(addCommentRequest.getParentId())
                         .content(addCommentRequest.getContent())
 
+                        .isRemoved(false)
+
                         .build()
         );
 
@@ -106,5 +108,9 @@ public class CommentService {
         }
 
         return commentList;
+    }
+
+    public int getCommentCount(Posting posting) {
+        return commentRepository.countCommentByPosting(posting);
     }
 }

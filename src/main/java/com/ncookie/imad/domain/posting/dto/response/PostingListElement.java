@@ -36,6 +36,8 @@ public class PostingListElement {
     private boolean isSpoiler;              // 스포일러 여부
 
     private int viewCnt;                    // 조회수
+    private int commentCnt;                 // 댓글수
+    
     private int likeCnt;                    // 좋아요 수
     private int dislikeCnt;                 // 싫어요 수
 
