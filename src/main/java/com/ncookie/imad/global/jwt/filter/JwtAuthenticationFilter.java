@@ -6,6 +6,7 @@ import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.jwt.util.PasswordUtil;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,7 +51,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    @Nonnull HttpServletResponse response,
+                                    @Nonnull FilterChain filterChain) throws ServletException, IOException {
         if (request.getRequestURI().equals(NO_CHECK_URL)) {
             filterChain.doFilter(request, response); // "/api/login" 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
