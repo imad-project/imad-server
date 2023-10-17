@@ -53,7 +53,6 @@ public class ReviewService {
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
-            reviewDetailsResponse.setUserId(user.getId());
             reviewDetailsResponse.setLikeStatus(likeStatus);
 
             return reviewDetailsResponse;
