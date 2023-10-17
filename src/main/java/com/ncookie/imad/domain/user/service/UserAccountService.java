@@ -30,7 +30,9 @@ public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
 
+    private final UserRetrievalService userRetrievalService;
     private final JwtService jwtService;
+
     private final PasswordEncoder passwordEncoder;
 
 
@@ -52,45 +54,33 @@ public class UserAccountService {
     }
 
     public UserInfoResponse getUserInfo(String accessToken) {
-        // token에 데이터가 들어있는 것은 이미 filter에서 검증했기 떄문에 추가로 검사하지는 않음
-        String email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken)).get();
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        Optional<UserAccount> user = userAccountRepository.findByEmail(email);
-        if (user.isPresent()) {
-            return UserInfoResponse.toDTO(user.get());
-        } else {
-            throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
-        }
+        return UserInfoResponse.toDTO(user);
     }
 
     public UserInfoResponse updateUserAccountInfo(String accessToken, UserUpdateRequest userUpdateRequest) {
-        Optional<String> email = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken));
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         // 닉네임 중복 불가
         userAccountRepository.findByNickname(userUpdateRequest.getNickname())
-                .ifPresent(user -> {
-                    if (!user.getEmail().equals(email.get())) {
+                .ifPresent(foundUser -> {
+                    if (!foundUser.equals(user)) {
                         throw new BadRequestException(ResponseCode.NICKNAME_DUPLICATED);
                     }
                 });
 
-        email.flatMap(userAccountRepository::findByEmail)
-                .ifPresent(user -> {
-            user.setNickname(userUpdateRequest.getNickname());
-            user.setAgeRange(userUpdateRequest.getAgeRange());
-            user.setGender(userUpdateRequest.getGender());
-            user.setProfileImage(userUpdateRequest.getProfileImage());
+        user.setNickname(userUpdateRequest.getNickname());
+        user.setAgeRange(userUpdateRequest.getAgeRange());
+        user.setGender(userUpdateRequest.getGender());
+        user.setProfileImage(userUpdateRequest.getProfileImage());
 
-            user.setPreferredTvGenres(userUpdateRequest.getPreferredTvGenres());
-            user.setPreferredMovieGenres(userUpdateRequest.getPreferredMovieGenres());
+        user.setPreferredTvGenres(userUpdateRequest.getPreferredTvGenres());
+        user.setPreferredMovieGenres(userUpdateRequest.getPreferredMovieGenres());
 
-            user.authorizeUser();
+        user.authorizeUser();
 
-            userAccountRepository.save(user);
-        });
-
-        UserAccount userAccount = userAccountRepository.findByEmail(email.get()).get();
-        return UserInfoResponse.toDTO(userAccount);
+        return UserInfoResponse.toDTO(userAccountRepository.save(user));
     }
 
     public void deleteUserAccount(String accessToken) {
@@ -109,18 +99,16 @@ public class UserAccountService {
 
     public void modifyUserPassword(String accessToken, ModifyUserPasswordRequest modifyUserPasswordRequest) {
         jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken))
-                .ifPresentOrElse(email -> {
-                    userAccountRepository.findByEmail(email)
-                            .ifPresentOrElse(user -> {
-                                if (passwordEncoder.matches(modifyUserPasswordRequest.getOldPassword(), user.getPassword())) {
-                                    user.setPassword(modifyUserPasswordRequest.getNewPassword());
-                                    user.passwordEncode(passwordEncoder);
-                                    userAccountRepository.save(user);
-                                } else {
-                                    throw new BadRequestException(ResponseCode.USER_MODIFY_PASSWORD_FAILURE);
-                                }
-                            }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
-                }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
+                .ifPresentOrElse(email -> userAccountRepository.findByEmail(email)
+                        .ifPresentOrElse(user -> {
+                            if (passwordEncoder.matches(modifyUserPasswordRequest.getOldPassword(), user.getPassword())) {
+                                user.setPassword(modifyUserPasswordRequest.getNewPassword());
+                                user.passwordEncode(passwordEncoder);
+                                userAccountRepository.save(user);
+                            } else {
+                                throw new BadRequestException(ResponseCode.USER_MODIFY_PASSWORD_FAILURE);
+                            }
+                        }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); }), () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
     }
 
     public UserInfoDuplicationResponse checkUserEmailDuplicated(UserInfoDuplicationRequest userInfoDuplicationRequest) {
