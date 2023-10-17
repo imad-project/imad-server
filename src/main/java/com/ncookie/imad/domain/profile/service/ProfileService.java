@@ -8,7 +8,7 @@ import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserAccountService;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -24,7 +24,7 @@ import java.util.List;
 @Transactional
 @Service
 public class ProfileService {
-    private final UserAccountService userAccountService;
+    private final UserRetrievalService userRetrievalService;
     private final ContentsService contentsService;
     private final ReviewService reviewService;
 
@@ -33,7 +33,7 @@ public class ProfileService {
     public BookmarkListResponse getContentsBookmarkList(String accessToken, int pageNumber) {
         int REVIEW_LIST_PAGE_SIZE = 10;
         Page<ContentsBookmark> contentsBookmarkPage = bookmarkService.findAllByUserAccount(
-                userAccountService.getUserFromAccessToken(accessToken),
+                userRetrievalService.getUserFromAccessToken(accessToken),
                 PageRequest.of(pageNumber, REVIEW_LIST_PAGE_SIZE)
         );
 
@@ -47,7 +47,7 @@ public class ProfileService {
     
     // 작품 북마크 추가
     public ResponseCode addContentsBookmark(String accessToken, Long contentsId) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         if (!bookmarkService.existsByUserAccountAndContents(user, contents)) {
@@ -66,7 +66,7 @@ public class ProfileService {
 
     // 작품 북마크 삭제
     public void deleteContentsBookmark(String accessToken, Long bookmarkId) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         // 삭제할 데이터가 존재하지 않는 경우
         if (!bookmarkService.existsById(bookmarkId)) {
@@ -76,13 +76,13 @@ public class ProfileService {
     }
 
     public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         return reviewService.getReviewListByUser(user, pageNumber);
     }
 
     public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         return reviewService.getLikedReviewListByUser(user, pageNumber);
     }
