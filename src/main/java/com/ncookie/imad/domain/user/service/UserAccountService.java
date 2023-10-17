@@ -135,20 +135,6 @@ public class UserAccountService {
                 .build();
     }
 
-    public UserAccount getUserFromAccessToken(String accessToken) {
-        Optional<String> optionalEmail = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken));
-        if (optionalEmail.isPresent()) {
-            Optional<UserAccount> optionalUserAccount = userAccountRepository.findByEmail(optionalEmail.get());
-            if (optionalUserAccount.isEmpty()) {
-                throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
-            } else {
-                return optionalUserAccount.get();
-            }
-        } else {
-            return null;
-        }
-    }
-
 
 //    private void saveUserPreferredGenre(UserAccount userAccount, Set<Long> genres) {
 //        for (Long genre : genres) {

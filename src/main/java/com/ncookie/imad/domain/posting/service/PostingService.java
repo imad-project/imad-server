@@ -10,7 +10,7 @@ import com.ncookie.imad.domain.posting.dto.response.*;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserAccountService;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -31,7 +31,7 @@ import java.util.Optional;
 public class PostingService {
     private final PostingRepository postingRepository;
 
-    private final UserAccountService userAccountService;
+    private final UserRetrievalService userRetrievalService;
     private final ContentsService contentsService;
 
     private final PostingLikeService postingLikeService;
@@ -42,7 +42,7 @@ public class PostingService {
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
         Optional<Posting> optional = postingRepository.findById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Posting posting = optional.get();
@@ -123,7 +123,7 @@ public class PostingService {
     }
 
     private PostingListResponse getPostingListResponseByPage(String accessToken, Page<Posting> postingPage) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         return PostingListResponse.toDTO(
                 postingPage,
@@ -153,7 +153,7 @@ public class PostingService {
     }
 
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addPostingRequest.getContentsId());
 
         Posting posting = postingRepository.save(
@@ -177,7 +177,7 @@ public class PostingService {
 
     public PostingIdResponse modifyPosting(String accessToken, Long postingId, ModifyPostingRequest modifyPostingRequest) {
         Optional<Posting> optional = postingRepository.findById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Posting posting = optional.get();
@@ -201,7 +201,7 @@ public class PostingService {
 
     public void deletePosting(String accessToken, Long postingId) {
         Optional<Posting> optional = postingRepository.findById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Posting posting = optional.get();
@@ -222,7 +222,7 @@ public class PostingService {
         }
 
         Optional<Posting> postingOptional = postingRepository.findById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
 
         if (postingOptional.isPresent()) {
