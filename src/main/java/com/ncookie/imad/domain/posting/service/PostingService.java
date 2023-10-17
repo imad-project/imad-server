@@ -56,8 +56,7 @@ public class PostingService {
 
             // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
             // 조회수 갱신
-            posting.setViewCnt(posting.getViewCnt() + 1);
-            postingRepository.save(posting);
+            postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
 
             // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
             PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
