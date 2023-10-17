@@ -11,7 +11,6 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
-import com.ncookie.imad.global.jwt.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static com.ncookie.imad.global.Utils.extractToken;
 
 @Slf4j
 @Transactional
@@ -31,7 +29,6 @@ public class UserAccountService {
     private final UserAccountRepository userAccountRepository;
 
     private final UserRetrievalService userRetrievalService;
-    private final JwtService jwtService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -84,31 +81,21 @@ public class UserAccountService {
     }
 
     public void deleteUserAccount(String accessToken) {
-        jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken))
-                .ifPresentOrElse(email ->
-                                userAccountRepository.findByEmail(email)
-                                .ifPresentOrElse(userAccountRepository::delete,
-                                        () -> {
-                                            throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
-                                        }),
-                        () -> {
-                            throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
-                        }
-                );
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        userAccountRepository.delete(user);
     }
 
     public void modifyUserPassword(String accessToken, ModifyUserPasswordRequest modifyUserPasswordRequest) {
-        jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken))
-                .ifPresentOrElse(email -> userAccountRepository.findByEmail(email)
-                        .ifPresentOrElse(user -> {
-                            if (passwordEncoder.matches(modifyUserPasswordRequest.getOldPassword(), user.getPassword())) {
-                                user.setPassword(modifyUserPasswordRequest.getNewPassword());
-                                user.passwordEncode(passwordEncoder);
-                                userAccountRepository.save(user);
-                            } else {
-                                throw new BadRequestException(ResponseCode.USER_MODIFY_PASSWORD_FAILURE);
-                            }
-                        }, () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); }), () -> { throw new BadRequestException(ResponseCode.USER_NOT_FOUND); });
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        if (passwordEncoder.matches(modifyUserPasswordRequest.getOldPassword(), user.getPassword())) {
+            user.setPassword(modifyUserPasswordRequest.getNewPassword());
+            user.passwordEncode(passwordEncoder);
+            userAccountRepository.save(user);
+        } else {
+            throw new BadRequestException(ResponseCode.USER_MODIFY_PASSWORD_FAILURE);
+        }
     }
 
     public UserInfoDuplicationResponse checkUserEmailDuplicated(UserInfoDuplicationRequest userInfoDuplicationRequest) {
@@ -122,33 +109,6 @@ public class UserAccountService {
                 .validation(!userAccountRepository.existsByNickname(userInfoDuplicationRequest.getInfo()))
                 .build();
     }
-
-
-//    private void saveUserPreferredGenre(UserAccount userAccount, Set<Long> genres) {
-//        for (Long genre : genres) {
-//            userPreferredGenreRepository.save(
-//                    UserPreferredGenre.builder()
-//                    .userPreferredGenreId(
-//                            UserPreferredGenreId.builder()
-//                                    .userAccount(userAccount)
-//                                    .genreId(genre)
-//                                    .build())
-//                    .genreRate(0)
-//                    .build()
-//            );
-//        }
-//    }
-//
-//    private Set<Long> getUserPreferredGenreIdsFromEntities(Set<UserPreferredGenre> genresEntity) {
-//        Set<Long> genres = new HashSet<>();
-//
-//        for (UserPreferredGenre genre : genresEntity) {
-//            genres.add(genre.getUserPreferredGenreId().getGenreId());
-//        }
-//
-//        return genres;
-//    }
-
 
     /**
      * ==================================================================
