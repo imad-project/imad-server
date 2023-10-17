@@ -9,6 +9,7 @@ import com.ncookie.imad.domain.user.dto.response.UserInfoDuplicationResponse;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
+import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,17 +21,20 @@ public class UserAccountController {
     private final UserAccountService userAccountService;
 
 
+    @Description("회원가입")
     @PostMapping("/api/signup")
     public ApiResponse<?> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
         userAccountService.signUp(signUpRequest);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.SIGNUP_SUCCESS);
     }
 
+    @Description("회원정보 조회")
     @GetMapping("/api/user")
     public ApiResponse<UserInfoResponse> getUserAccountInfo(@RequestHeader("Authorization") String accessToken) {
         return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserInfo(accessToken));
     }
 
+    @Description("회원정보 수정")
     @PatchMapping("/api/user")
     public ApiResponse<UserInfoResponse> updateUserAccountInfo(@RequestHeader("Authorization") String accessToken,
                                                                @RequestBody UserUpdateRequest userUpdateRequest) {
@@ -39,12 +43,14 @@ public class UserAccountController {
                 userAccountService.updateUserAccountInfo(accessToken, userUpdateRequest));
     }
 
+    @Description("회원탈퇴")
     @DeleteMapping("/api/user")
     public ApiResponse<?> deleteUserAccountInfo(@RequestHeader("Authorization") String accessToken) {
         userAccountService.deleteUserAccount(accessToken);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_DELETE_SUCCESS);
     }
 
+    @Description("비밀번호 수정")
     @PatchMapping("/api/user/password")
     public ApiResponse<?> modifyUserPassword(@RequestHeader("Authorization") String accessToken,
                                              @RequestBody ModifyUserPasswordRequest modifyUserPasswordRequest) {
@@ -52,11 +58,13 @@ public class UserAccountController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
     }
 
+    @Description("이메일 중복 검사")
     @PostMapping("/api/user/validation/email")
     public ApiResponse<UserInfoDuplicationResponse> validateUserAccountEmail(@RequestBody UserInfoDuplicationRequest email) {
         return ApiResponse.createSuccess(ResponseCode.USER_INFO_VALIDATION , userAccountService.checkUserEmailDuplicated(email));
     }
 
+    @Description("닉네임 중복 검사")
     @PostMapping("/api/user/validation/nickname")
     public ApiResponse<UserInfoDuplicationResponse> validateUserAccountNickname(@RequestBody UserInfoDuplicationRequest nickname) {
         return ApiResponse.createSuccess(ResponseCode.USER_INFO_VALIDATION , userAccountService.checkUserNicknameDuplicated(nickname));
