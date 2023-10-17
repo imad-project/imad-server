@@ -21,9 +21,10 @@ public class PostingController {
 
     @Description("게시글 조회")
     @GetMapping("/{id}")
-    public ApiResponse<PostingDetailsResponse> postingDetails(@PathVariable Long id) {
+    public ApiResponse<PostingDetailsResponse> postingDetails(@RequestHeader("Authorization") String accessToken,
+                                                              @PathVariable Long id) {
         return ApiResponse.createSuccess(ResponseCode.POSTING_GET_DETAILS_SUCCESS,
-                postingService.getPosting(id));
+                postingService.getPosting(accessToken, id));
     }
 
     @Description("게시글 등록")

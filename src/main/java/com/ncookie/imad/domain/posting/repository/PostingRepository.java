@@ -23,4 +23,8 @@ public interface PostingRepository extends JpaRepository<Posting, Long> {
     @Modifying
     @Query("UPDATE Posting SET dislikeCnt = :dislikeCnt WHERE postingId = :postingId")
     void updateDislikeCount(@Param("postingId") Long postingId, @Param("dislikeCnt") int dislikeCnt);
+
+    @Modifying
+    @Query("UPDATE Posting SET viewCnt = :viewCnt WHERE postingId = :postingId")
+    void updateViewCount(@Param("postingId") Long postingId, @Param("viewCnt") int viewCnt);
 }

@@ -40,19 +40,29 @@ public class PostingService {
     private final int PAGE_SIZE = 10;
 
 
-    public PostingDetailsResponse getPosting(Long postingId) {
+    public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
         Optional<Posting> optional = postingRepository.findById(postingId);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Posting posting = optional.get();
+
+            // 댓글 조회
             List<CommentDetailsResponse> commentList = commentService.getCommentList(posting);
 
-            // 조회수 갱신
-            // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
-            posting.setViewCnt(posting.getViewCnt() + 1);
-            postingRepository.save(posting);
+            // like status 조회
+            PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
+            int likeStatus = postingLike == null ? 0 : postingLike.getLikeStatus();
 
-            return PostingDetailsResponse.toDTO(posting, commentList);
+            // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
+            // 조회수 갱신
+            postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
+
+            // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
+            PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
+            postingDetailsResponse.setLikeStatus(likeStatus);
+
+            return postingDetailsResponse;
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
