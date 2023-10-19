@@ -13,6 +13,7 @@ import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -34,21 +36,28 @@ public class CommentService {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(addCommentRequest.getPostingId());
 
-        Comment comment = commentRepository.save(
-                Comment.builder()
-                        .posting(posting)
-                        .userAccount(user)
+        Comment comment = Comment.builder()
+                .posting(posting)
+                .userAccount(user)
 
-                        .parentId(addCommentRequest.getParentId())
-                        .content(addCommentRequest.getContent())
+                .content(addCommentRequest.getContent())
+                .isRemoved(false)
 
-                        .isRemoved(false)
+                .build();
 
-                        .build()
-        );
+        if (addCommentRequest.getParentId() != null) {
+            // 자식 댓글(답글) 등록
+            Comment parentComment = getCommentEntityById(addCommentRequest.getParentId());
+            comment.setParent(parentComment);
+
+            log.info("답글의 부모 댓글 설정 완료");
+        }
+
+        Comment save = commentRepository.save(comment);
+        log.info("댓글(답글) 등록 완료");
 
         return CommentIdResponse.builder()
-                .commentId(comment.getCommentId())
+                .commentId(save.getCommentId())
                 .build();
     }
 
@@ -112,6 +121,18 @@ public class CommentService {
         }
 
         return commentList;
+    }
+
+
+    private Comment getCommentEntityById(Long id) {
+        Optional<Comment> optionalComment = commentRepository.findById(id);
+        if (optionalComment.isPresent()) {
+            log.info("댓글 entity 조회 완료");
+            return optionalComment.get();
+        } else {
+            log.info("댓글 entity 조회 실패 : 해당 ID의 댓글을 찾을 수 없음");
+            throw new BadRequestException(ResponseCode.COMMENT_NOT_FOUND);
+        }
     }
 
     public int getCommentCount(Posting posting) {
