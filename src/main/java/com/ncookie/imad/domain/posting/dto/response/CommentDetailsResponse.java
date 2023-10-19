@@ -48,7 +48,7 @@ public class CommentDetailsResponse {
                 .userNickname(user.getNickname())
                 .userProfileImage(user.getProfileImage())
 
-                .parentId(comment.getParentId())
+                .parentId(comment.getParent().getCommentId())
                 .content(comment.getContent())
                 .isRemoved(comment.isRemoved())
 

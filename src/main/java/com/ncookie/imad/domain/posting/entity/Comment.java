@@ -4,11 +4,11 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@SuperBuilder
+
+@Builder
 @Getter
 @ToString
 @NoArgsConstructor
@@ -28,6 +28,12 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    @ToString.Exclude
+    private Comment parent;
 
     @Setter
     private String content;
