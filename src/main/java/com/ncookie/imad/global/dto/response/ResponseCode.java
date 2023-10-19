@@ -74,6 +74,7 @@ public enum ResponseCode {
     POSTING_WRONG_SEARCH_TYPE(400, "옳바르지 않은 검색 타입입니다."),
     
     // 댓글
+    COMMENT_GET_SUCCESS(200, "정상적으로 댓글을 조회했습니다."),
     COMMENT_ADD_SUCCESS(201, "정상적으로 댓글을 추가했습니다."),
     COMMENT_MODIFY_SUCCESS(200, "정상적으로 댓글을 수정했습니다."),
     COMMENT_DELETE_SUCCESS(200, "정상적으로 댓글을 삭제했습니다."),

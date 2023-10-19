@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.posting.controller;
 
 import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
+import com.ncookie.imad.domain.posting.dto.response.CommentDetailsResponse;
 import com.ncookie.imad.domain.posting.dto.response.CommentIdResponse;
 import com.ncookie.imad.domain.posting.service.CommentService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -17,6 +18,14 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService commentService;
 
+
+    @Description("댓글 조회")
+    @GetMapping("/{id}")
+    public ApiResponse<CommentDetailsResponse> commentGet(@PathVariable("id") Long commentId) {
+        return ApiResponse.createSuccess(
+                ResponseCode.COMMENT_GET_SUCCESS,
+                commentService.getComment(commentId));
+    }
 
     @Description("댓글 등록")
     @PostMapping("")

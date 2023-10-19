@@ -41,6 +41,8 @@ public class CommentDetailsResponse {
 
     public static CommentDetailsResponse toDTO(Comment comment) {
         UserAccount user = comment.getUserAccount();
+        Long parentId = comment.getParent() != null ? comment.getParent().getCommentId() : null;
+
         return CommentDetailsResponse.builder()
                 .commentId(comment.getCommentId())
 
@@ -48,7 +50,7 @@ public class CommentDetailsResponse {
                 .userNickname(user.getNickname())
                 .userProfileImage(user.getProfileImage())
 
-                .parentId(comment.getParent().getCommentId())
+                .parentId(parentId)
                 .content(comment.getContent())
                 .isRemoved(comment.isRemoved())
 

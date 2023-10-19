@@ -32,6 +32,11 @@ public class CommentService {
     private final PostingRetrievalService postingRetrievalService;
 
 
+    public CommentDetailsResponse getComment(Long commentId) {
+        Comment comment = getCommentEntityById(commentId);
+        return CommentDetailsResponse.toDTO(comment);
+    }
+
     public CommentIdResponse addComment(String accessToken, AddCommentRequest addCommentRequest) {
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(addCommentRequest.getPostingId());
