@@ -13,6 +13,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByPostingAndParentNull(Posting posting, Pageable pageable);
     Page<Comment> findAllByPostingAndParentNotNull(Posting posting, Pageable pageable);
+
+    @Query("SELECT COUNT(*) FROM Comment WHERE isRemoved = false")
     int countCommentByPosting(Posting posting);
 
     @Modifying
