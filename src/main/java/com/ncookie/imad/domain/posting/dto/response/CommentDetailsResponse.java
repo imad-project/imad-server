@@ -35,12 +35,19 @@ public class CommentDetailsResponse {
      */
     private boolean isRemoved;
 
+    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+
+    private int likeCnt;                    // 좋아요 수
+    private int dislikeCnt;                 // 싫어요 수
+
     private LocalDateTime createdAt;        // 댓글 작성 날짜
     private LocalDateTime modifiedAt;       // 댓글 수정 날짜
 
 
-    public static CommentDetailsResponse toDTO(Comment comment) {
+    public static CommentDetailsResponse toDTO(Comment comment, int likeStatus) {
         UserAccount user = comment.getUserAccount();
+        Long parentId = comment.getParent() != null ? comment.getParent().getCommentId() : null;
+
         return CommentDetailsResponse.builder()
                 .commentId(comment.getCommentId())
 
@@ -48,9 +55,13 @@ public class CommentDetailsResponse {
                 .userNickname(user.getNickname())
                 .userProfileImage(user.getProfileImage())
 
-                .parentId(comment.getParentId())
+                .parentId(parentId)
                 .content(comment.getContent())
                 .isRemoved(comment.isRemoved())
+
+                .likeStatus(likeStatus)
+                .likeCnt(comment.getLikeCnt())
+                .dislikeCnt(comment.getDislikeCnt())
 
                 .createdAt(comment.getCreatedDate())
                 .modifiedAt(comment.getModifiedDate())

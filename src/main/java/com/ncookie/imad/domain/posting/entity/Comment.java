@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+
 @Builder
 @Getter
 @ToString
@@ -27,13 +28,22 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
-    
-    // 부모 댓글. 답글을 달았을 때 최상위 댓글 아래에 순차적으로 등록됨
-    private Long parentId;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    @ToString.Exclude
+    private Comment parent;
 
     @Setter
     private String content;
 
     @Setter
     private boolean isRemoved;
+
+    @Setter
+    private int likeCnt;
+
+    @Setter
+    private int dislikeCnt;
 }

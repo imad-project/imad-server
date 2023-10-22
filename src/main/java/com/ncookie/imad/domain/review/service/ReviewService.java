@@ -12,6 +12,7 @@ import com.ncookie.imad.domain.review.repository.ReviewRepository;
 import com.ncookie.imad.domain.like.entity.ReviewLike;
 import com.ncookie.imad.domain.like.service.ReviewLikeService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
@@ -20,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -66,30 +66,13 @@ public class ReviewService {
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         // sort가 null이거나, sort 설정 중 에러가 발생했을 때의 예외처리도 해주어야 함
-        Sort sort;
-        PageRequest pageable;
-        try {
-            if (order == 0) {
-                // 오름차순 (ascending)
-                sort = Sort.by(sortString).ascending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-            } else if (order == 1) {
-                // 내림차순 (descending)
-                sort = Sort.by(sortString).descending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-            } else {
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE);
-            }
+        PageRequest pageable = Utils.getPageRequest(pageNumber, sortString, order);
 
-            Page<Review> reviewPage = reviewRepository.findAllByContents(contents, pageable);
-            return ReviewListResponse.toDTO(
-                    reviewPage,
-                    convertReviewListToReviewDetailsResponse(user, reviewPage.getContent().stream().toList())
-            );
-        } catch (PropertyReferenceException e) {
-            // sort string에 잘못된 값이 들어왔을 때 에러 발생
-            throw new BadRequestException(ResponseCode.REVIEW_WRONG_SORT_STRING);
-        }
+        Page<Review> reviewPage = reviewRepository.findAllByContents(contents, pageable);
+        return ReviewListResponse.toDTO(
+                reviewPage,
+                convertReviewListToReviewDetailsResponse(user, reviewPage.getContent().stream().toList())
+        );
     }
 
     public ReviewListResponse getReviewListByUser(UserAccount user, int pageNumber) {
