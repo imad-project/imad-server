@@ -6,6 +6,7 @@ import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
 import com.ncookie.imad.domain.posting.dto.response.CommentDetailsResponse;
 import com.ncookie.imad.domain.posting.dto.response.CommentIdResponse;
+import com.ncookie.imad.domain.posting.dto.response.CommentListResponse;
 import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.CommentRepository;
@@ -14,8 +15,13 @@ import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
+import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,10 +41,18 @@ public class CommentService {
     private final UserAccountService userAccountService;
     private final PostingRetrievalService postingRetrievalService;
 
+    private final int PAGE_SIZE = 10;
+
 
     public CommentDetailsResponse getComment(String accessToken, Long commentId) {
         Comment comment = getCommentEntityById(commentId);
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        
+        return getCommentDetailsResponse(user, comment);
+    }
+    
+    @Description("Comment entity 사용하여 CommentDetailsResponse로 변환하여 반환해주는 메소드")
+    private CommentDetailsResponse getCommentDetailsResponse(UserAccount user, Comment comment) {
 
         // like status 조회
         CommentLike commentLike = commentLikeService.findByUserAccountAndE(user, comment);
@@ -48,6 +62,37 @@ public class CommentService {
         commentDetailsResponse.setLikeStatus(likeStatus);
 
         return commentDetailsResponse;
+    }
+
+    public CommentListResponse getCommentListByPosting(String accessToken, Posting posting, int pageNumber, String sortString, int order) {
+        Sort sort;
+        PageRequest pageable;
+        try {
+            if (order == 0) {
+                // 오름차순 (ascending)
+                sort = Sort.by(sortString).ascending();
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
+            } else if (order == 1) {
+                // 내림차순 (descending)
+                sort = Sort.by(sortString).descending();
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
+            } else {
+                pageable = PageRequest.of(pageNumber, PAGE_SIZE);
+            }
+        } catch (PropertyReferenceException e) {
+            // sort string에 잘못된 값이 들어왔을 때 에러 발생
+            throw new BadRequestException(ResponseCode.POSTING_WRONG_SORT_STRING);
+        }
+
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        Page<Comment> commentPage = commentRepository.findAllByPosting(posting, pageable);
+
+        List<CommentDetailsResponse> commentDetailsResponseList = new ArrayList<>();
+        for (Comment c : commentPage.getContent().stream().toList()) {
+            commentDetailsResponseList.add(getCommentDetailsResponse(user, c));
+        }
+
+        return CommentListResponse.toDTO(commentPage, commentDetailsResponseList);
     }
 
     public CommentIdResponse addComment(String accessToken, AddCommentRequest addCommentRequest) {
@@ -127,18 +172,6 @@ public class CommentService {
         } else {
             throw new BadRequestException(ResponseCode.COMMENT_NOT_FOUND);
         }
-    }
-
-
-    public List<CommentDetailsResponse> getCommentList(Posting posting) {
-        List<Comment> comments = commentRepository.findAllByPosting(posting);
-
-        List<CommentDetailsResponse> commentList = new ArrayList<>();
-        for (Comment c : comments) {
-            commentList.add(CommentDetailsResponse.toDTO(c));
-        }
-
-        return commentList;
     }
 
 

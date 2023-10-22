@@ -48,7 +48,13 @@ public class PostingService {
             Posting posting = optional.get();
 
             // 댓글 조회
-            List<CommentDetailsResponse> commentList = commentService.getCommentList(posting);
+            // 게시글 조회 시 댓글 조회는 항상 날짜 기준/오름차순으로 첫 페이지의 데이터만 조회함
+            CommentListResponse commentList = commentService.getCommentListByPosting(
+                    accessToken,
+                    posting,
+                    0,
+                    "createdDate",
+                    0);
 
             // like status 조회
             PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);

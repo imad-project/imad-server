@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 @Builder
@@ -49,10 +48,10 @@ public class PostingDetailsResponse {
 
     // 댓글 정보
     private int commentCnt;                                                     // 댓글 개수
-    private List<CommentDetailsResponse> commentDetailsResponseList;            // 댓글 리스트
+    private CommentListResponse commentListResponse;            // 댓글 리스트
 
 
-    public static PostingDetailsResponse toDTO(Posting posting, List<CommentDetailsResponse> commentList) {
+    public static PostingDetailsResponse toDTO(Posting posting, CommentListResponse commentList) {
         return PostingDetailsResponse.builder()
                 .postingId(posting.getPostingId())
 
@@ -77,8 +76,8 @@ public class PostingDetailsResponse {
                 .createdAt(posting.getCreatedDate())
                 .modifiedAt(posting.getModifiedDate())
 
-                .commentCnt(commentList.size())
-                .commentDetailsResponseList(commentList)
+                .commentCnt((int) commentList.getTotalElements())
+                .commentListResponse(commentList)
 
                 .build();
     }
