@@ -15,6 +15,7 @@ import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -41,37 +44,31 @@ public class PostingService {
 
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
-        Optional<Posting> optional = postingRepository.findById(postingId);
+        Posting posting = getPostingEntityById(postingId);
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
-        if (optional.isPresent()) {
-            Posting posting = optional.get();
+        // 댓글 조회
+        // 게시글 조회 시 댓글 조회는 항상 날짜 기준/오름차순으로 첫 페이지의 데이터만 조회함
+        CommentListResponse commentList = commentService.getCommentListByPosting(
+                accessToken,
+                posting,
+                0,
+                "createdDate",
+                0);
 
-            // 댓글 조회
-            // 게시글 조회 시 댓글 조회는 항상 날짜 기준/오름차순으로 첫 페이지의 데이터만 조회함
-            CommentListResponse commentList = commentService.getCommentListByPosting(
-                    accessToken,
-                    posting,
-                    0,
-                    "createdDate",
-                    0);
+        // like status 조회
+        PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
+        int likeStatus = postingLike == null ? 0 : postingLike.getLikeStatus();
 
-            // like status 조회
-            PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
-            int likeStatus = postingLike == null ? 0 : postingLike.getLikeStatus();
+        // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
+        // 조회수 갱신
+        postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
 
-            // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
-            // 조회수 갱신
-            postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
+        // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
+        PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
+        postingDetailsResponse.setLikeStatus(likeStatus);
 
-            // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
-            PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
-            postingDetailsResponse.setLikeStatus(likeStatus);
-
-            return postingDetailsResponse;
-        } else {
-            throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
-        }
+        return postingDetailsResponse;
     }
 
     public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
@@ -182,43 +179,31 @@ public class PostingService {
     }
 
     public PostingIdResponse modifyPosting(String accessToken, Long postingId, ModifyPostingRequest modifyPostingRequest) {
-        Optional<Posting> optional = postingRepository.findById(postingId);
+        Posting posting = getPostingEntityById(postingId);
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
-        if (optional.isPresent()) {
-            Posting posting = optional.get();
+        if (posting.getUser().getId().equals(user.getId())) {
+            posting.setTitle(modifyPostingRequest.getTitle());
+            posting.setContent(modifyPostingRequest.getContent());
+            posting.setCategory(modifyPostingRequest.getCategory());
+            posting.setSpoiler(modifyPostingRequest.isSpoiler());
 
-            if (posting.getUser().getId().equals(user.getId())) {
-                posting.setTitle(modifyPostingRequest.getTitle());
-                posting.setContent(modifyPostingRequest.getContent());
-                posting.setCategory(modifyPostingRequest.getCategory());
-                posting.setSpoiler(modifyPostingRequest.isSpoiler());
-
-                return PostingIdResponse.builder()
-                        .postingId(postingRepository.save(posting).getPostingId())
-                        .build();
-            } else {
-                throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
-            }
+            return PostingIdResponse.builder()
+                    .postingId(postingRepository.save(posting).getPostingId())
+                    .build();
         } else {
-            throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
+            throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
         }
     }
 
     public void deletePosting(String accessToken, Long postingId) {
-        Optional<Posting> optional = postingRepository.findById(postingId);
+        Posting posting = getPostingEntityById(postingId);
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
-        if (optional.isPresent()) {
-            Posting posting = optional.get();
-
-            if (posting.getUser().getId().equals(user.getId())) {
-                postingRepository.delete(posting);
-            } else {
-                throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
-            }
+        if (posting.getUser().getId().equals(user.getId())) {
+            postingRepository.delete(posting);
         } else {
-            throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
+            throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
         }
     }
 
@@ -227,41 +212,46 @@ public class PostingService {
             throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
         }
 
-        Optional<Posting> postingOptional = postingRepository.findById(postingId);
+        Posting posting = getPostingEntityById(postingId);
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
 
+        PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
 
-        if (postingOptional.isPresent()) {
-            Posting posting = postingOptional.get();
-
-            PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
-
-            // postingLike 신규등록
-            if (postingLike == null) {
-                postingLikeService.saveLikeStatus(PostingLike.builder()
-                        .userAccount(user)
-                        .posting(posting)
-                        .likeStatus(likeStatus)
-                        .build());
+        // postingLike 신규등록
+        if (postingLike == null) {
+            postingLikeService.saveLikeStatus(PostingLike.builder()
+                    .userAccount(user)
+                    .posting(posting)
+                    .likeStatus(likeStatus)
+                    .build());
+        } else {
+            // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
+            if (likeStatus == 0) {
+                postingLikeService.deleteLikeStatus(postingLike);
             } else {
-                // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
-                if (likeStatus == 0) {
-                    postingLikeService.deleteLikeStatus(postingLike);
-                } else {
-                    postingLike.setLikeStatus(likeStatus);
-                    PostingLike savedPostingLikeStatus = postingLikeService.saveLikeStatus(postingLike);
+                postingLike.setLikeStatus(likeStatus);
+                PostingLike savedPostingLikeStatus = postingLikeService.saveLikeStatus(postingLike);
 
-                    // postingLike entity 저장/수정 실패
-                    if (savedPostingLikeStatus == null) {
-                        throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
-                    }
+                // postingLike entity 저장/수정 실패
+                if (savedPostingLikeStatus == null) {
+                    throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
                 }
             }
+        }
 
-            // like, dislike count 갱신
-            postingRepository.updateLikeCount(posting.getPostingId(), postingLikeService.getLikeCount(posting));
-            postingRepository.updateDislikeCount(posting.getPostingId(), postingLikeService.getDislikeCount(posting));
+        // like, dislike count 갱신
+        postingRepository.updateLikeCount(posting.getPostingId(), postingLikeService.getLikeCount(posting));
+        postingRepository.updateDislikeCount(posting.getPostingId(), postingLikeService.getDislikeCount(posting));
+    }
+    
+    private Posting getPostingEntityById(Long id) {
+        Optional<Posting> postingOptional = postingRepository.findById(id);
+
+        if (postingOptional.isPresent()) {
+            log.info("게시글 entity 조회 완료");
+            return postingOptional.get();
         } else {
+            log.info("게시글 entity 조회 실패 : 해당 ID의 댓글을 찾을 수 없음");
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
     }
