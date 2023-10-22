@@ -35,6 +35,8 @@ public class CommentDetailsResponse {
      */
     private boolean isRemoved;
 
+    private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+
     private LocalDateTime createdAt;        // 댓글 작성 날짜
     private LocalDateTime modifiedAt;       // 댓글 수정 날짜
 

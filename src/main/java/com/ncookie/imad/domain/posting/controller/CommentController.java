@@ -22,16 +22,19 @@ public class CommentController {
 
     @Description("댓글 조회")
     @GetMapping("/{id}")
-    public ApiResponse<CommentDetailsResponse> commentGet(@PathVariable("id") Long commentId) {
+    public ApiResponse<CommentDetailsResponse> commentGet(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable("id") Long commentId) {
         return ApiResponse.createSuccess(
                 ResponseCode.COMMENT_GET_SUCCESS,
-                commentService.getComment(commentId));
+                commentService.getComment(accessToken, commentId));
     }
 
     @Description("댓글 등록")
     @PostMapping("")
-    public ApiResponse<CommentIdResponse> commentAdd(@RequestHeader("Authorization") String accessToken,
-                                      @RequestBody AddCommentRequest addCommentRequest) {
+    public ApiResponse<CommentIdResponse> commentAdd(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestBody AddCommentRequest addCommentRequest) {
         return ApiResponse.createSuccess(
                 ResponseCode.COMMENT_ADD_SUCCESS,
                 commentService.addComment(accessToken, addCommentRequest));

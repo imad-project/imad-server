@@ -36,9 +36,18 @@ public class CommentService {
     private final PostingRetrievalService postingRetrievalService;
 
 
-    public CommentDetailsResponse getComment(Long commentId) {
+    public CommentDetailsResponse getComment(String accessToken, Long commentId) {
         Comment comment = getCommentEntityById(commentId);
-        return CommentDetailsResponse.toDTO(comment);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+
+        // like status 조회
+        CommentLike commentLike = commentLikeService.findByUserAccountAndE(user, comment);
+        int likeStatus = commentLike == null ? 0 : commentLike.getLikeStatus();
+
+        CommentDetailsResponse commentDetailsResponse = CommentDetailsResponse.toDTO(comment);
+        commentDetailsResponse.setLikeStatus(likeStatus);
+
+        return commentDetailsResponse;
     }
 
     public CommentIdResponse addComment(String accessToken, AddCommentRequest addCommentRequest) {
