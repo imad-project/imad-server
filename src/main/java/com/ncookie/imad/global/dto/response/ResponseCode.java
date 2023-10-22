@@ -78,6 +78,7 @@ public enum ResponseCode {
     COMMENT_ADD_SUCCESS(201, "정상적으로 댓글을 추가했습니다."),
     COMMENT_MODIFY_SUCCESS(200, "정상적으로 댓글을 수정했습니다."),
     COMMENT_DELETE_SUCCESS(200, "정상적으로 댓글을 삭제했습니다."),
+    COMMENT_LIKE_STATUS_MODIFY_SUCCESS(200, "정상적으로 댓글 좋아요/싫어요 상태를 수정했습니다."),
 
     COMMENT_NO_PERMISSION(403, "해당 댓글을 수정 또는 삭제할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
     COMMENT_NOT_FOUND(404, "해당 ID의 댓글을 찾을 수 없습니다."),

@@ -243,10 +243,10 @@ public class PostingService {
                     postingLikeService.deleteLikeStatus(postingLike);
                 } else {
                     postingLike.setLikeStatus(likeStatus);
-                    PostingLike savedReviewLikeStatus = postingLikeService.saveLikeStatus(postingLike);
+                    PostingLike savedPostingLikeStatus = postingLikeService.saveLikeStatus(postingLike);
 
                     // postingLike entity 저장/수정 실패
-                    if (savedReviewLikeStatus == null) {
+                    if (savedPostingLikeStatus == null) {
                         throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
                     }
                 }

@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.posting.controller;
 
+import com.ncookie.imad.domain.like.dto.LikeStatusRequest;
 import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
 import com.ncookie.imad.domain.posting.dto.response.CommentDetailsResponse;
@@ -55,5 +56,14 @@ public class CommentController {
         return ApiResponse.createSuccess(
                 ResponseCode.COMMENT_DELETE_SUCCESS,
                 commentService.deleteComment(accessToken, id));
+    }
+
+    @Description("댓글 좋아요/싫어요")
+    @PatchMapping("/like/{id}")
+    public ApiResponse<?> commentLikeStatusModify(@RequestHeader("Authorization") String accessToken,
+                                                  @PathVariable("id") Long id,
+                                                  @RequestBody LikeStatusRequest likeStatusRequest) {
+        commentService.saveLikeStatus(accessToken, id, likeStatusRequest.getLikeStatus());
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.COMMENT_LIKE_STATUS_MODIFY_SUCCESS);
     }
 }

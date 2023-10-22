@@ -1,5 +1,7 @@
 package com.ncookie.imad.domain.posting.service;
 
+import com.ncookie.imad.domain.like.entity.CommentLike;
+import com.ncookie.imad.domain.like.service.CommentLikeService;
 import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
 import com.ncookie.imad.domain.posting.dto.response.CommentDetailsResponse;
@@ -27,6 +29,8 @@ import java.util.Optional;
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
+
+    private final CommentLikeService commentLikeService;
 
     private final UserAccountService userAccountService;
     private final PostingRetrievalService postingRetrievalService;
@@ -142,5 +146,49 @@ public class CommentService {
 
     public int getCommentCount(Posting posting) {
         return commentRepository.countCommentByPosting(posting);
+    }
+
+    public void saveLikeStatus(String accessToken, Long commentId, int likeStatus) {
+        if (likeStatus != -1 && likeStatus != 0 && likeStatus != 1) {
+            throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
+        }
+
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+
+
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+
+            CommentLike commentLike = commentLikeService.findByUserAccountAndE(user, comment);
+
+            // commentLike 신규등록
+            if (commentLike == null) {
+                commentLikeService.saveLikeStatus(CommentLike.builder()
+                        .userAccount(user)
+                        .comment(comment)
+                        .likeStatus(likeStatus)
+                        .build());
+            } else {
+                // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
+                if (likeStatus == 0) {
+                    commentLikeService.deleteLikeStatus(commentLike);
+                } else {
+                    commentLike.setLikeStatus(likeStatus);
+                    CommentLike savedCommentLikeStatus = commentLikeService.saveLikeStatus(commentLike);
+
+                    // commentLike entity 저장/수정 실패
+                    if (savedCommentLikeStatus == null) {
+                        throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
+                    }
+                }
+            }
+
+            // like, dislike count 갱신
+            commentRepository.updateLikeCount(comment.getCommentId(), commentLikeService.getLikeCount(comment));
+            commentRepository.updateDislikeCount(comment.getCommentId(), commentLikeService.getDislikeCount(comment));
+        } else {
+            throw new BadRequestException(ResponseCode.COMMENT_NOT_FOUND);
+        }
     }
 }

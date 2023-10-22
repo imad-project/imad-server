@@ -40,4 +40,10 @@ public class Comment extends BaseTimeEntity {
 
     @Setter
     private boolean isRemoved;
+
+    @Setter
+    private int likeCnt;
+
+    @Setter
+    private int dislikeCnt;
 }
