@@ -5,6 +5,7 @@ import com.ncookie.imad.domain.posting.dto.request.AddCommentRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyCommentRequest;
 import com.ncookie.imad.domain.posting.dto.response.CommentDetailsResponse;
 import com.ncookie.imad.domain.posting.dto.response.CommentIdResponse;
+import com.ncookie.imad.domain.posting.dto.response.CommentListResponse;
 import com.ncookie.imad.domain.posting.service.CommentService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -28,6 +29,19 @@ public class CommentController {
         return ApiResponse.createSuccess(
                 ResponseCode.COMMENT_GET_SUCCESS,
                 commentService.getComment(accessToken, commentId));
+    }
+
+    @Description("댓글 리스트 조회")
+    @GetMapping("/list")
+    public ApiResponse<CommentListResponse> commentListGet(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestParam("posting_id") Long postingId,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "sort") String sortString,
+            @RequestParam(value = "order") int order
+    ) {
+        return ApiResponse.createSuccess(ResponseCode.COMMENT_GET_LIST_SUCCESS,
+                commentService.getCommentListByPosting(accessToken, postingId, page - 1, sortString, order));
     }
 
     @Description("댓글 등록")

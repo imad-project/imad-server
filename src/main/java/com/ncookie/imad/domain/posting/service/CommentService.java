@@ -50,7 +50,7 @@ public class CommentService {
         
         return getCommentDetailsResponse(user, comment);
     }
-    
+
     @Description("Comment entity 사용하여 CommentDetailsResponse로 변환하여 반환해주는 메소드")
     private CommentDetailsResponse getCommentDetailsResponse(UserAccount user, Comment comment) {
 
@@ -61,7 +61,7 @@ public class CommentService {
         return CommentDetailsResponse.toDTO(comment, likeStatus);
     }
 
-    public CommentListResponse getCommentListByPosting(String accessToken, Posting posting, int pageNumber, String sortString, int order) {
+    public CommentListResponse getCommentListByPosting(String accessToken, Long postingId, int pageNumber, String sortString, int order) {
         Sort sort;
         PageRequest pageable;
         try {
@@ -82,6 +82,7 @@ public class CommentService {
         }
 
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        Posting posting = postingRetrievalService.getPostingEntityById(postingId);
         Page<Comment> commentPage = commentRepository.findAllByPosting(posting, pageable);
 
         List<CommentDetailsResponse> commentDetailsResponseList = new ArrayList<>();
