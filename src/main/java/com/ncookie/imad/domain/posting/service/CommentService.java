@@ -61,7 +61,12 @@ public class CommentService {
         return CommentDetailsResponse.toDTO(comment, likeStatus);
     }
 
-    public CommentListResponse getCommentListByPosting(String accessToken, Long postingId, int pageNumber, String sortString, int order) {
+    public CommentListResponse getCommentListByPosting(String accessToken,
+                                                       Long postingId,
+                                                       int commentType,
+                                                       int pageNumber,
+                                                       String sortString,
+                                                       int order) {
         Sort sort;
         PageRequest pageable;
         try {
@@ -83,7 +88,17 @@ public class CommentService {
 
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(postingId);
-        Page<Comment> commentPage = commentRepository.findAllByPosting(posting, pageable);
+
+        Page<Comment> commentPage;
+        if (commentType == 0) {
+            // 댓글
+            commentPage = commentRepository.findAllByPostingAndParentNull(posting, pageable);
+        } else if (commentType == 1) {
+            // 답글
+            commentPage = commentRepository.findAllByPostingAndParentNotNull(posting, pageable);
+        } else {
+            throw new BadRequestException(ResponseCode.COMMENT_LIST_WRONG_TYPE);
+        }
 
         List<CommentDetailsResponse> commentDetailsResponseList = new ArrayList<>();
         for (Comment c : commentPage.getContent().stream().toList()) {

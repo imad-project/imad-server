@@ -11,7 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    Page<Comment> findAllByPosting(Posting posting, Pageable pageable);
+    Page<Comment> findAllByPostingAndParentNull(Posting posting, Pageable pageable);
+    Page<Comment> findAllByPostingAndParentNotNull(Posting posting, Pageable pageable);
     int countCommentByPosting(Posting posting);
 
     @Modifying
