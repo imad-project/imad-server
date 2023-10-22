@@ -43,7 +43,7 @@ public class CommentService {
 
     public CommentDetailsResponse getComment(String accessToken, Long commentId) {
         Comment comment = getCommentEntityById(commentId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         
         return getCommentDetailsResponse(user, comment);
     }
@@ -66,7 +66,7 @@ public class CommentService {
                                                        int order) {
         PageRequest pageable = Utils.getPageRequest(pageNumber, sortString, order);
 
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(postingId);
 
         Page<Comment> commentPage;
@@ -189,7 +189,7 @@ public class CommentService {
         }
 
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
 
         if (commentOptional.isPresent()) {
