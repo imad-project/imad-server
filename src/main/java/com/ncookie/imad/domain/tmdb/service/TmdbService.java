@@ -21,7 +21,7 @@ import com.ncookie.imad.domain.season.entity.Season;
 import com.ncookie.imad.domain.season.service.SeasonService;
 import com.ncookie.imad.domain.tmdb.dto.*;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserAccountService;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -54,7 +54,7 @@ public class TmdbService {
 
     private final PersonService personService;
 
-    private final UserAccountService userAccountService;
+    private final UserRetrievalService userRetrievalService;
     private final BookmarkService bookmarkService;
 
     @Transactional
@@ -119,7 +119,7 @@ public class TmdbService {
         // =========================================================================
 
         // bookmark 정보 조회
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         ContentsBookmark contentsBookmark = bookmarkService.findByUserAccountAndContents(user, contentsEntity);
 
         Long bookmarkId;

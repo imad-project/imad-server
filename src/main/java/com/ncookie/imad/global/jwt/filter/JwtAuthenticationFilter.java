@@ -6,6 +6,7 @@ import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.jwt.util.PasswordUtil;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,10 +49,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserAccountRepository userRepository;
 
-    private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    @Nonnull HttpServletResponse response,
+                                    @Nonnull FilterChain filterChain) throws ServletException, IOException {
         if (request.getRequestURI().equals(NO_CHECK_URL)) {
             filterChain.doFilter(request, response); // "/api/login" 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
@@ -97,12 +99,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 유효하지 않은 토큰이라면 refreshToken이 null 값이 되므로 다음 필터에서 처리해준다.
         if (jwtService.isTokenValid(refreshToken)) {
             userRepository.findByRefreshToken(refreshToken)
-                    .ifPresent(user -> {
-                        jwtService.sendAccessAndRefreshToken(
-                                response,
-                                jwtService.createAccessToken(user.getEmail()),
-                                reIssueRefreshToken(user));
-                    });
+                    .ifPresent(user ->
+                            jwtService.sendAccessAndRefreshToken(
+                            response,
+                            jwtService.createAccessToken(user.getEmail()),
+                            reIssueRefreshToken(user)));
             Utils.sendSuccessReissueToken(response);
             log.info("토큰 재발급이 완료되었습니다.");
         } else {
@@ -133,13 +134,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.info("checkAccessTokenAndAuthentication() 호출");
-        log.info("refresh token이 존재하지 않거나 유효하지 않으므로 access token 검사를 시행합니다.");
+        log.info("access token 검사 시행");
 
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .flatMap(accessToken -> jwtService.extractClaimFromJWT(CLAIM_EMAIL, accessToken))
                 .flatMap(userRepository::findByEmail)
-                .ifPresent(this::saveAuthentication);
+                .ifPresentOrElse(user -> {
+                    saveAuthentication(user);
+                    log.info("JWT 인증 성공");
+                }, () -> log.error("JWT 인증 실패 : 존재하지 않는 회원"));
 
         filterChain.doFilter(request, response);
     }
@@ -160,6 +164,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * setAuthentication()을 이용하여 위에서 만든 Authentication 객체에 대한 인증 허가 처리
      */
     public void saveAuthentication(UserAccount myUser) {
+        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+
         String password = myUser.getPassword();
         if (password == null) { // 소셜 로그인 유저의 비밀번호 임의로 설정 하여 소셜 로그인 유저도 인증 되도록 설정
             password = PasswordUtil.generateRandomPassword();

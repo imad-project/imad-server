@@ -10,8 +10,8 @@ import com.ncookie.imad.domain.posting.dto.response.*;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.Utils;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -34,7 +34,7 @@ import java.util.Optional;
 public class PostingService {
     private final PostingRepository postingRepository;
 
-    private final UserAccountService userAccountService;
+    private final UserRetrievalService userRetrievalService;
     private final ContentsService contentsService;
 
     private final PostingLikeService postingLikeService;
@@ -43,7 +43,7 @@ public class PostingService {
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
         Posting posting = getPostingEntityById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         // 댓글 조회
         // 게시글 조회 시 댓글 조회는 항상 날짜 기준/오름차순으로 첫 페이지의 데이터만 조회함
@@ -107,7 +107,7 @@ public class PostingService {
     }
 
     private PostingListResponse getPostingListResponseByPage(String accessToken, Page<Posting> postingPage) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         return PostingListResponse.toDTO(
                 postingPage,
@@ -137,7 +137,7 @@ public class PostingService {
     }
 
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addPostingRequest.getContentsId());
 
         Posting posting = postingRepository.save(
@@ -161,7 +161,7 @@ public class PostingService {
 
     public PostingIdResponse modifyPosting(String accessToken, Long postingId, ModifyPostingRequest modifyPostingRequest) {
         Posting posting = getPostingEntityById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (posting.getUser().getId().equals(user.getId())) {
             posting.setTitle(modifyPostingRequest.getTitle());
@@ -179,7 +179,7 @@ public class PostingService {
 
     public void deletePosting(String accessToken, Long postingId) {
         Posting posting = getPostingEntityById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (posting.getUser().getId().equals(user.getId())) {
             postingRepository.delete(posting);
@@ -194,7 +194,7 @@ public class PostingService {
         }
 
         Posting posting = getPostingEntityById(postingId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
 

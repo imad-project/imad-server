@@ -11,8 +11,8 @@ import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.CommentRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.Utils;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -37,7 +37,7 @@ public class CommentService {
 
     private final CommentLikeService commentLikeService;
 
-    private final UserAccountService userAccountService;
+    private final UserRetrievalService userRetrievalService;
     private final PostingRetrievalService postingRetrievalService;
 
 
@@ -89,7 +89,7 @@ public class CommentService {
     }
 
     public CommentIdResponse addComment(String accessToken, AddCommentRequest addCommentRequest) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(addCommentRequest.getPostingId());
 
         Comment comment = Comment.builder()
@@ -118,7 +118,7 @@ public class CommentService {
     }
 
     public CommentIdResponse modifyComment(String accessToken, Long commentId, ModifyCommentRequest modifyCommentRequest) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
 
         if (commentOptional.isPresent()) {
@@ -140,7 +140,7 @@ public class CommentService {
     }
 
     public CommentIdResponse deleteComment(String accessToken, Long commentId) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
 
         if (commentOptional.isPresent()) {

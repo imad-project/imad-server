@@ -12,8 +12,8 @@ import com.ncookie.imad.domain.review.repository.ReviewRepository;
 import com.ncookie.imad.domain.like.entity.ReviewLike;
 import com.ncookie.imad.domain.like.service.ReviewLikeService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.Utils;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -35,7 +35,7 @@ import java.util.Optional;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
 
-    private final UserAccountService userAccountService;
+    private final UserRetrievalService userRetrievalService;
     private final ContentsService contentsService;
 
     private final ReviewLikeService reviewLikeService;
@@ -44,7 +44,7 @@ public class ReviewService {
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -53,7 +53,6 @@ public class ReviewService {
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
-            reviewDetailsResponse.setUserId(user.getId());
             reviewDetailsResponse.setLikeStatus(likeStatus);
 
             return reviewDetailsResponse;
@@ -63,7 +62,7 @@ public class ReviewService {
     }
 
     public ReviewListResponse getReviewList(String accessToken, Long contentsId, int pageNumber, String sortString, int order) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         // sort가 null이거나, sort 설정 중 에러가 발생했을 때의 예외처리도 해주어야 함
@@ -121,7 +120,7 @@ public class ReviewService {
     
 
     public AddReviewResponse addReview(String accessToken, AddReviewRequest addReviewRequest) {
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addReviewRequest.getContentsId());
 
         // 유저는 작품에 대해 한 가지 리뷰만 작성할 수 있음
@@ -155,7 +154,7 @@ public class ReviewService {
 
     public Long modifyReview(String accessToken, Long reviewId, ModifyReviewRequest reviewRequest) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -180,7 +179,7 @@ public class ReviewService {
 
     public void deleteReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
             Review review = optional.get();
@@ -203,7 +202,7 @@ public class ReviewService {
         }
 
         Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
-        UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (reviewOptional.isPresent()) {
             Review review = reviewOptional.get();

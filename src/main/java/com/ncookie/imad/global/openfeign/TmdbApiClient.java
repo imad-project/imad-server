@@ -30,6 +30,7 @@ public class TmdbApiClient {
 
 
     // 쿼리로 작품 검색. 전체 / TV / 영화 별로 검색할 수 있음
+    // TMDB API에서 page는 1부터 시작함
     public ContentsSearchResponse searchByQuery(String query, String type, int page) {
         return switch (type) {
             case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, false, language, page);
