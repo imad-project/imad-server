@@ -11,6 +11,7 @@ import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserAccountService;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -19,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,8 +39,6 @@ public class PostingService {
 
     private final PostingLikeService postingLikeService;
     private final CommentService commentService;
-
-    private final int PAGE_SIZE = 10;
 
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
@@ -74,6 +72,7 @@ public class PostingService {
 
     public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
         Sort sort = Sort.by("createdDate").descending();
+        int PAGE_SIZE = 10;
         PageRequest pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
 
         return getPostingListResponseByPage(accessToken, postingRepository.findAll(pageable));
@@ -85,26 +84,7 @@ public class PostingService {
                                              int pageNumber,
                                              String sortString,
                                              int order) {
-
-        // sort가 null이거나, sort 설정 중 에러가 발생했을 때의 예외처리도 해주어야 함
-        Sort sort;
-        PageRequest pageable;
-        try {
-            if (order == 0) {
-                // 오름차순 (ascending)
-                sort = Sort.by(sortString).ascending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-            } else if (order == 1) {
-                // 내림차순 (descending)
-                sort = Sort.by(sortString).descending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-            } else {
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE);
-            }
-        } catch (PropertyReferenceException e) {
-            // sort string에 잘못된 값이 들어왔을 때 에러 발생
-            throw new BadRequestException(ResponseCode.POSTING_WRONG_SORT_STRING);
-        }
+        PageRequest pageable = Utils.getPageRequest(pageNumber, sortString, order);
 
         // 검색 타입에 따라 repository에 데이터 요청
         Page<Posting> postingPage = switch (searchType) {

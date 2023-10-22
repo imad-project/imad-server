@@ -12,6 +12,7 @@ import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.CommentRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserAccountService;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -20,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,8 +39,6 @@ public class CommentService {
 
     private final UserAccountService userAccountService;
     private final PostingRetrievalService postingRetrievalService;
-
-    private final int PAGE_SIZE = 10;
 
 
     public CommentDetailsResponse getComment(String accessToken, Long commentId) {
@@ -67,24 +64,7 @@ public class CommentService {
                                                        int pageNumber,
                                                        String sortString,
                                                        int order) {
-        Sort sort;
-        PageRequest pageable;
-        try {
-            if (order == 0) {
-                // 오름차순 (ascending)
-                sort = Sort.by(sortString).ascending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-            } else if (order == 1) {
-                // 내림차순 (descending)
-                sort = Sort.by(sortString).descending();
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-            } else {
-                pageable = PageRequest.of(pageNumber, PAGE_SIZE);
-            }
-        } catch (PropertyReferenceException e) {
-            // sort string에 잘못된 값이 들어왔을 때 에러 발생
-            throw new BadRequestException(ResponseCode.POSTING_WRONG_SORT_STRING);
-        }
+        PageRequest pageable = Utils.getPageRequest(pageNumber, sortString, order);
 
         UserAccount user = userAccountService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(postingId);

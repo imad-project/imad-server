@@ -55,7 +55,6 @@ public enum ResponseCode {
     REVIEW_ALREADY_REGISTERED(409, "한 작품에 대해 한 가지 리뷰만 작성할 수 있습니다."),
     REVIEW_NOT_FOUND(404, "해당 ID의 리뷰를 찾을 수 없습니다."),
     REVIEW_NO_PERMISSION(403, "해당 리뷰를 수정 또는 삭제할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
-    REVIEW_WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다."),
 
     REVIEW_LIKE_STATUS_MODIFY_SUCCESS(200, "정상적으로 리뷰 좋아요/싫어요 상태를 수정했습니다."),
     REVIEW_LIKE_STATUS_MODIFY_FAILED(400, "리뷰 좋아요/싫어요 상태를 수정하는데 실패했습니다."),
@@ -70,7 +69,6 @@ public enum ResponseCode {
 
     POSTING_NOT_FOUND(404, "해당 ID의 게시글을 찾을 수 없습니다."),
     POSTING_NO_PERMISSION(403, "해당 게시글을 수정 또는 삭제할 권한이 없습니다. 로그인 정보를 다시 확인해주세요."),
-    POSTING_WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다."),
     POSTING_WRONG_SEARCH_TYPE(400, "옳바르지 않은 검색 타입입니다."),
     
     // 댓글
@@ -89,7 +87,6 @@ public enum ResponseCode {
     // 좋아요/싫어요
     LIKE_STATUS_INVALID(404, "유효하지 않은 like status입니다. 다시 확인해주세요."),
 
-
     // 프로필
     PROFILE_GET_INFO_SUCCESS(200, "정상적으로 프로필 정보를 조회했습니다."),
 
@@ -99,8 +96,10 @@ public enum ResponseCode {
     BOOKMARK_WRONG_ID(400, "해당 ID의 작품 북마크를 찾을 수 없습니다."),
 
     PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS(200, "정상적으로 작성한 리뷰 리스트를 조회했습니다."),
-    PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS(200, "정상적으로 좋아요/싫어요를 등록한 리뷰 리스트를 조회했습니다.");
+    PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS(200, "정상적으로 좋아요/싫어요를 등록한 리뷰 리스트를 조회했습니다."),
 
+    // Utils
+    WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다.");
 
     private final String message;
     private final int status;
