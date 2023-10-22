@@ -58,10 +58,7 @@ public class CommentService {
         CommentLike commentLike = commentLikeService.findByUserAccountAndE(user, comment);
         int likeStatus = commentLike == null ? 0 : commentLike.getLikeStatus();
 
-        CommentDetailsResponse commentDetailsResponse = CommentDetailsResponse.toDTO(comment);
-        commentDetailsResponse.setLikeStatus(likeStatus);
-
-        return commentDetailsResponse;
+        return CommentDetailsResponse.toDTO(comment, likeStatus);
     }
 
     public CommentListResponse getCommentListByPosting(String accessToken, Posting posting, int pageNumber, String sortString, int order) {

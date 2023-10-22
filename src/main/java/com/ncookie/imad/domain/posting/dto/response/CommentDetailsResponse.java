@@ -44,7 +44,7 @@ public class CommentDetailsResponse {
     private LocalDateTime modifiedAt;       // 댓글 수정 날짜
 
 
-    public static CommentDetailsResponse toDTO(Comment comment) {
+    public static CommentDetailsResponse toDTO(Comment comment, int likeStatus) {
         UserAccount user = comment.getUserAccount();
         Long parentId = comment.getParent() != null ? comment.getParent().getCommentId() : null;
 
@@ -58,6 +58,10 @@ public class CommentDetailsResponse {
                 .parentId(parentId)
                 .content(comment.getContent())
                 .isRemoved(comment.isRemoved())
+
+                .likeStatus(likeStatus)
+                .likeCnt(comment.getLikeCnt())
+                .dislikeCnt(comment.getDislikeCnt())
 
                 .createdAt(comment.getCreatedDate())
                 .modifiedAt(comment.getModifiedDate())
