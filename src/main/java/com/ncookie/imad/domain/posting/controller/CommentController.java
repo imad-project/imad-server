@@ -37,12 +37,13 @@ public class CommentController {
             @RequestHeader("Authorization") String accessToken,
             @RequestParam("posting_id") Long postingId,
             @RequestParam("comment_type") int commentType,
+            @RequestParam("parent_id") long parentId,
             @RequestParam(value = "page") int page,
             @RequestParam(value = "sort") String sortString,
             @RequestParam(value = "order") int order
     ) {
         return ApiResponse.createSuccess(ResponseCode.COMMENT_GET_LIST_SUCCESS,
-                commentService.getCommentListByPosting(accessToken, postingId, commentType, page - 1, sortString, order));
+                commentService.getCommentListByPosting(accessToken, postingId, commentType, parentId, page - 1, sortString, order));
     }
 
     @Description("댓글 등록")

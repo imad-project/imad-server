@@ -51,6 +51,7 @@ public class PostingService {
                 accessToken,
                 postingId,
                 0,
+                null,
                 0,
                 "createdDate",
                 0);

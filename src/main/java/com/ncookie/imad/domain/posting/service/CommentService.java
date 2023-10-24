@@ -61,6 +61,7 @@ public class CommentService {
     public CommentListResponse getCommentListByPosting(String accessToken,
                                                        Long postingId,
                                                        int commentType,
+                                                       Long parentId,
                                                        int pageNumber,
                                                        String sortString,
                                                        int order) {
@@ -75,7 +76,8 @@ public class CommentService {
             commentPage = commentRepository.findAllByPostingAndParentNull(posting, pageable);
         } else if (commentType == 1) {
             // 답글
-            commentPage = commentRepository.findAllByPostingAndParentNotNull(posting, pageable);
+            Comment parentComment = getCommentEntityById(parentId);
+            commentPage = commentRepository.findAllByPostingAndParent(posting, parentComment, pageable);
         } else {
             throw new BadRequestException(ResponseCode.COMMENT_LIST_WRONG_TYPE);
         }
