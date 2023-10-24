@@ -54,6 +54,7 @@ public class PostingService {
                 0,
                 "createdDate",
                 0);
+        int commentCount = commentService.getCommentCount(posting);
 
         // like status 조회
         PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
@@ -66,6 +67,7 @@ public class PostingService {
         // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
         PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
         postingDetailsResponse.setLikeStatus(likeStatus);
+        postingDetailsResponse.setCommentCnt(commentCount);
 
         return postingDetailsResponse;
     }

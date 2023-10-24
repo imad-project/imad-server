@@ -76,7 +76,6 @@ public class PostingDetailsResponse {
                 .createdAt(posting.getCreatedDate())
                 .modifiedAt(posting.getModifiedDate())
 
-                .commentCnt((int) commentList.getTotalElements())
                 .commentListResponse(commentList)
 
                 .build();
