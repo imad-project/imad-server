@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.posting.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -14,5 +15,6 @@ public class AddPostingRequest {
     private String content;             // 게시글  본문
     private int category;               // 게시글 카테고리
 
+    @JsonProperty("is_spoiler")
     private boolean isSpoiler;          // 스포일러 여부
 }
