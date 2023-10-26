@@ -14,9 +14,9 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
 
     Page<ReviewLike> findAllByUserAccount(UserAccount user, Pageable pageable);
 
-    @Query("SELECT COUNT(*) FROM ReviewLike WHERE review = :review and likeStatus = 1")
+    @Query("SELECT COUNT(*) FROM ReviewLike WHERE review = :review AND likeStatus = 1")
     int countLikeByReview(@Param("review") Review review);
 
-    @Query("SELECT COUNT(*) FROM ReviewLike WHERE review = :review and likeStatus = -1")
+    @Query("SELECT COUNT(*) FROM ReviewLike WHERE review = :review AND likeStatus = -1")
     int countDislikeByReview(@Param("review") Review review);
 }

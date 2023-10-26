@@ -14,9 +14,9 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
 
     Page<CommentLike> findAllByUserAccount(UserAccount user, Pageable pageable);
 
-    @Query("SELECT COUNT(*) FROM CommentLike WHERE comment = :comment and likeStatus = 1")
+    @Query("SELECT COUNT(*) FROM CommentLike WHERE comment = :comment AND likeStatus = 1")
     int countLikeByComment(@Param("comment") Comment comment);
 
-    @Query("SELECT COUNT(*) FROM CommentLike WHERE comment = :comment and likeStatus = -1")
+    @Query("SELECT COUNT(*) FROM CommentLike WHERE comment = :comment AND likeStatus = -1")
     int countDislikeByComment(@Param("comment") Comment comment);
 }
