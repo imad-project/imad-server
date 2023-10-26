@@ -14,8 +14,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByPostingAndParentNull(Posting posting, Pageable pageable);
     Page<Comment> findAllByPostingAndParent(Posting posting, Comment parent, Pageable pageable);
 
-    @Query("SELECT COUNT(*) FROM Comment WHERE isRemoved = false")
-    int countCommentByPosting(Posting posting);
+    @Query("SELECT COUNT(*) FROM Comment WHERE posting = :posting AND isRemoved = false")
+    int countCommentByPosting(@Param("posting") Posting posting);
 
     int countCommentByParent(Comment comment);
 
