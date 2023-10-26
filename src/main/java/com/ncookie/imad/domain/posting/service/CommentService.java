@@ -50,12 +50,14 @@ public class CommentService {
 
     @Description("Comment entity 사용하여 CommentDetailsResponse로 변환하여 반환해주는 메소드")
     private CommentDetailsResponse getCommentDetailsResponse(UserAccount user, Comment comment) {
-
-        // like status 조회
+        // like status
         CommentLike commentLike = commentLikeService.findByUserAccountAndE(user, comment);
         int likeStatus = commentLike == null ? 0 : commentLike.getLikeStatus();
 
-        return CommentDetailsResponse.toDTO(comment, likeStatus);
+        // 답글 개수
+        int childCnt = commentRepository.countCommentByParent(comment);
+
+        return CommentDetailsResponse.toDTO(comment, likeStatus, childCnt);
     }
 
     public CommentListResponse getCommentListByPosting(String accessToken,

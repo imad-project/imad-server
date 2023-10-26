@@ -17,6 +17,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT COUNT(*) FROM Comment WHERE isRemoved = false")
     int countCommentByPosting(Posting posting);
 
+    int countCommentByParent(Comment comment);
+
     @Modifying
     @Query("UPDATE Comment SET likeCnt = :likeCnt WHERE commentId = :commentId")
     void updateLikeCount(@Param("commentId") Long commentId, @Param("likeCnt") int likeCnt);

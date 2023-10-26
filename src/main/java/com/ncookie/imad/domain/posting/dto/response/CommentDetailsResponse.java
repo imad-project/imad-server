@@ -27,6 +27,7 @@ public class CommentDetailsResponse {
 
     // 댓글 정보
     private Long parentId;                  // 댓글 부모 ID. 이 댓글이 최상위라면 null 값이 들어감
+    private int childCnt;                   // 답글 개수
     private String content;                 // 댓글 내용
     /**
      * 댓글 삭제 여부
@@ -44,7 +45,7 @@ public class CommentDetailsResponse {
     private LocalDateTime modifiedAt;       // 댓글 수정 날짜
 
 
-    public static CommentDetailsResponse toDTO(Comment comment, int likeStatus) {
+    public static CommentDetailsResponse toDTO(Comment comment, int likeStatus, int childCnt) {
         UserAccount user = comment.getUserAccount();
         Long parentId = comment.getParent() != null ? comment.getParent().getCommentId() : null;
 
@@ -56,6 +57,8 @@ public class CommentDetailsResponse {
                 .userProfileImage(user.getProfileImage())
 
                 .parentId(parentId)
+                .childCnt(childCnt)
+
                 .content(comment.getContent())
                 .isRemoved(comment.isRemoved())
 
