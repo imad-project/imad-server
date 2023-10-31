@@ -16,6 +16,7 @@ import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -68,9 +71,11 @@ public class ProfileService {
                             .contents(contents)
                             .build()
             );
+            log.info("북마크 등록 완료");
             return ResponseCode.BOOKMARK_ADD_SUCCESS;
         } else {
             // 해당 북마크가 이미 있을 때
+            log.error("북마크 등록 실패 : 이미 존재하는 북마크");
             return ResponseCode.BOOKMARK_ALREADY_EXIST;
         }
     }
@@ -81,8 +86,10 @@ public class ProfileService {
 
         // 삭제할 데이터가 존재하지 않는 경우
         if (!bookmarkService.existsById(bookmarkId)) {
+            log.error("북마크 삭제 실패 : 유효하지 않은 ID");
             throw new BadRequestException(ResponseCode.BOOKMARK_WRONG_ID);
         }
+        log.info("북마크 삭제 완료");
         bookmarkService.deleteByIdAndUserAccount(bookmarkId, user);
     }
 
@@ -103,9 +110,11 @@ public class ProfileService {
                             .posting(posting)
                             .build()
             );
+            log.info("스크랩 등록 완료");
             return ResponseCode.SCRAP_ADD_SUCCESS;
         } else {
             // 해당 스크랩이 이미 있을 때
+            log.error("스크랩 등록 실패 : 이미 존재하는 스크랩");
             return ResponseCode.SCRAP_ALREADY_EXIST;
         }
     }
