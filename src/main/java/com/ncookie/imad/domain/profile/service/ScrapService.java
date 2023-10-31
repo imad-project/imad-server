@@ -1,8 +1,6 @@
 package com.ncookie.imad.domain.profile.service;
 
-import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.posting.entity.Posting;
-import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.profile.repository.PostingScrapRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
