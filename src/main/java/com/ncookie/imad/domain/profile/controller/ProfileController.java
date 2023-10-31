@@ -17,11 +17,18 @@ import java.util.Map;
 public class ProfileController {
     private final ProfileService profileService;
 
+    @Description("프로필 관련 메인 데이터")
     @GetMapping("")
     public ApiResponse<?> getProfileInfo() {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
     }
 
+    
+    /*
+     * =================================================
+     * 북마크 관련
+     * =================================================
+     */
     @Description("북마크한 작품 목록 조회")
     @GetMapping("/bookmark/list")
     public ApiResponse<BookmarkListResponse> getProfileBookmarks(
@@ -52,13 +59,46 @@ public class ProfileController {
         profileService.deleteContentsBookmark(accessToken, bookmarkId);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.BOOKMARK_DELETE_SUCCESS);
     }
-
+    
+    
+    /*
+     * =================================================
+     * 스크랩 관련
+     * =================================================
+     */
     @Description("스크랩한 게시글 목록 조회")
     @GetMapping("/scrap/list")
     public ApiResponse<?> getProfileScraps() {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
     }
 
+    @Description("게시글 스크랩 추가")
+    @PostMapping("/scrap")
+    public ApiResponse<?> addPostingScrap(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestBody Map<String, Long> contentsId
+    ) {
+        return ApiResponse.createSuccessWithNoContent(
+                profileService.addPostingScrap(accessToken, contentsId.get("contents_id"))
+        );
+    }
+
+    @Description("게시글 스크랩 삭제")
+    @DeleteMapping("/scrap/{scrapId}")
+    public ApiResponse<?> deletePostingScrap(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable Long scrapId
+    ) {
+        profileService.deleteContentsBookmark(accessToken, scrapId);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.BOOKMARK_DELETE_SUCCESS);
+    }
+
+
+    /*
+     * =================================================
+     * 작성 및 좋아요/싫어요 표시한 리뷰/게시글
+     * =================================================
+     */
     @Description("작성한 게시글 목록 조회")
     @GetMapping("/posting/list")
     public ApiResponse<?> getProfilePostings() {
