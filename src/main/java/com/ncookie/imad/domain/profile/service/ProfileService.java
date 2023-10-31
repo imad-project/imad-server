@@ -119,6 +119,18 @@ public class ProfileService {
         }
     }
 
+    public void deletePostingScrap(String accessToken, Long scrapId) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        // 삭제할 데이터가 존재하지 않는 경우
+        if (!scrapService.existsById(scrapId)) {
+            log.error("스크랩 삭제 실패 : 유효하지 않은 ID");
+            throw new BadRequestException(ResponseCode.SCRAP_WRONG_ID);
+        }
+        log.info("스크랩 삭제 완료");
+        scrapService.deleteByIdAndUserAccount(scrapId, user);
+    }
+
 
     /*
      * =================================================

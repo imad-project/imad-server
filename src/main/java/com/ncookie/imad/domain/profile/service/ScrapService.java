@@ -15,11 +15,27 @@ import org.springframework.stereotype.Service;
 public class ScrapService {
     private final PostingScrapRepository scrapRepository;
 
+//    public Page<ContentsBookmark> findAllByUserAccount(UserAccount userAccount, Pageable pageable) {
+//        return contentsBookmarkRepository.findAllByUserAccount(userAccount, pageable);
+//    }
+//
+//    public ContentsBookmark findByUserAccountAndContents(UserAccount userAccount, Contents contents) {
+//        return contentsBookmarkRepository.findByUserAccountAndContents(userAccount, contents);
+//    }
+
     public boolean existsByUserAccountAndContents(UserAccount user, Posting posting) {
         return scrapRepository.existsByUserAccountAndPosting(user, posting);
     }
 
     public PostingScrap save(PostingScrap postingScrap) {
         return scrapRepository.save(postingScrap);
+    }
+
+    public boolean existsById(Long bookmarkId) {
+        return scrapRepository.existsById(bookmarkId);
+    }
+
+    public void deleteByIdAndUserAccount(Long id, UserAccount userAccount) {
+        scrapRepository.deleteByIdAndUserAccount(id, userAccount);
     }
 }

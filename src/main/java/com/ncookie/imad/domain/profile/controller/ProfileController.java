@@ -89,8 +89,8 @@ public class ProfileController {
             @RequestHeader("Authorization") String accessToken,
             @PathVariable Long scrapId
     ) {
-        profileService.deleteContentsBookmark(accessToken, scrapId);
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.BOOKMARK_DELETE_SUCCESS);
+        profileService.deletePostingScrap(accessToken, scrapId);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.SCRAP_DELETE_SUCCESS);
     }
 
 
