@@ -2,9 +2,12 @@ package com.ncookie.imad.domain.profile.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.posting.entity.Posting;
+import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
 import com.ncookie.imad.domain.profile.dto.BookmarkDetails;
 import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
+import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -27,8 +30,10 @@ public class ProfileService {
     private final UserRetrievalService userRetrievalService;
     private final ContentsService contentsService;
     private final ReviewService reviewService;
+    private final PostingRetrievalService postingRetrievalService;
 
     private final BookmarkService bookmarkService;
+    private final ScrapService scrapService;
 
     public BookmarkListResponse getContentsBookmarkList(String accessToken, int pageNumber) {
         int REVIEW_LIST_PAGE_SIZE = 10;
@@ -85,5 +90,23 @@ public class ProfileService {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         return reviewService.getLikedReviewListByUser(user, pageNumber);
+    }
+
+    public ResponseCode addPostingScrap(String accessToken, Long postingId) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+        Posting posting = postingRetrievalService.getPostingEntityById(postingId);
+
+        if (!scrapService.existsByUserAccountAndContents(user, posting)) {
+            scrapService.save(
+                    PostingScrap.builder()
+                            .userAccount(user)
+                            .posting(posting)
+                            .build()
+            );
+            return ResponseCode.SCRAP_ADD_SUCCESS;
+        } else {
+            // 해당 스크랩이 이미 있을 때
+            return ResponseCode.SCRAP_ALREADY_EXIST;
+        }
     }
 }

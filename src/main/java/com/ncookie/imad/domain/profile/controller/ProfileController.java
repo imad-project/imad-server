@@ -76,10 +76,10 @@ public class ProfileController {
     @PostMapping("/scrap")
     public ApiResponse<?> addPostingScrap(
             @RequestHeader("Authorization") String accessToken,
-            @RequestBody Map<String, Long> contentsId
+            @RequestBody Map<String, Long> postingId
     ) {
         return ApiResponse.createSuccessWithNoContent(
-                profileService.addPostingScrap(accessToken, contentsId.get("contents_id"))
+                profileService.addPostingScrap(accessToken, postingId.get("posting_id"))
         );
     }
 
