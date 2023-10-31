@@ -35,6 +35,12 @@ public class ProfileService {
     private final BookmarkService bookmarkService;
     private final ScrapService scrapService;
 
+
+    /*
+     * =================================================
+     * 북마크 관련
+     * =================================================
+     */
     public BookmarkListResponse getContentsBookmarkList(String accessToken, int pageNumber) {
         int REVIEW_LIST_PAGE_SIZE = 10;
         Page<ContentsBookmark> contentsBookmarkPage = bookmarkService.findAllByUserAccount(
@@ -80,18 +86,12 @@ public class ProfileService {
         bookmarkService.deleteByIdAndUserAccount(bookmarkId, user);
     }
 
-    public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
-        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        return reviewService.getReviewListByUser(user, pageNumber);
-    }
-
-    public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber) {
-        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
-
-        return reviewService.getLikedReviewListByUser(user, pageNumber);
-    }
-
+    /*
+     * =================================================
+     * 스크랩 관련
+     * =================================================
+     */
     public ResponseCode addPostingScrap(String accessToken, Long postingId) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(postingId);
@@ -108,5 +108,23 @@ public class ProfileService {
             // 해당 스크랩이 이미 있을 때
             return ResponseCode.SCRAP_ALREADY_EXIST;
         }
+    }
+
+
+    /*
+     * =================================================
+     * 작성/좋아요한 리뷰
+     * =================================================
+     */
+    public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        return reviewService.getReviewListByUser(user, pageNumber);
+    }
+
+    public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        return reviewService.getLikedReviewListByUser(user, pageNumber);
     }
 }
