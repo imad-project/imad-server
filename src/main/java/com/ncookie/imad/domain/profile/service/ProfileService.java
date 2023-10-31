@@ -12,6 +12,7 @@ import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -45,10 +46,9 @@ public class ProfileService {
      * =================================================
      */
     public BookmarkListResponse getContentsBookmarkList(String accessToken, int pageNumber) {
-        int REVIEW_LIST_PAGE_SIZE = 10;
         Page<ContentsBookmark> contentsBookmarkPage = bookmarkService.findAllByUserAccount(
                 userRetrievalService.getUserFromAccessToken(accessToken),
-                PageRequest.of(pageNumber, REVIEW_LIST_PAGE_SIZE)
+                PageRequest.of(pageNumber, Utils.PAGE_SIZE)
         );
 
         List<BookmarkDetails> bookmarkDetailsList = new ArrayList<>();
