@@ -9,9 +9,9 @@ name: Spring Boot & Gradle CI/CD
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "release" ]
   pull_request:
-    branches: [ master ]
+    branches: [ release ]
 
 # 해당 코드에서 사용될 변수 설정
 env:
@@ -41,7 +41,7 @@ jobs:
 
       # create application.yml
       - name: make application-aws.yml
-        if: contains(github.ref, 'master')
+        if: contains(github.ref, 'release')
         run: |
           # spring의 resources 경로로 이동
           cd ./src/main/resources
@@ -56,7 +56,7 @@ jobs:
         
       # create key.p8 file
       - name: make apple key.p8 file
-        if: contains(github.ref, 'master')
+        if: contains(github.ref, 'release')
         run: |
           # spring의 resources 경로로 이동
           mkdir ./src/main/resources/key
