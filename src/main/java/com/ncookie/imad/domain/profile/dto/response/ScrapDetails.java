@@ -1,8 +1,7 @@
-package com.ncookie.imad.domain.profile.dto;
+package com.ncookie.imad.domain.profile.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import lombok.Builder;
 import lombok.Data;

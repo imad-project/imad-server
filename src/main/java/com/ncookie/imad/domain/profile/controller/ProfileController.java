@@ -1,7 +1,7 @@
 package com.ncookie.imad.domain.profile.controller;
 
-import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
-import com.ncookie.imad.domain.profile.dto.ScrapListResponse;
+import com.ncookie.imad.domain.profile.dto.response.BookmarkListResponse;
+import com.ncookie.imad.domain.profile.dto.response.ScrapListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.global.dto.response.ApiResponse;
