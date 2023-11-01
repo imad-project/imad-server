@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.profile.controller;
 
+import com.ncookie.imad.domain.posting.dto.response.PostingListResponse;
 import com.ncookie.imad.domain.profile.dto.response.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.dto.response.ScrapListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
@@ -106,7 +107,7 @@ public class ProfileController {
      */
     @Description("작성한 게시글 목록 조회")
     @GetMapping("/posting/list")
-    public ApiResponse<?> getProfilePostings(
+    public ApiResponse<PostingListResponse> getProfilePostings(
             @RequestHeader("Authorization") String accessToken,
             @RequestParam("page") int pageNumber
     ) {
@@ -127,10 +128,15 @@ public class ProfileController {
         );
     }
 
-    @Description("좋아요/싫어요한 게시글 목록 조회")
+    @Description("좋아요/싫어요 등록한 게시글 목록 조회")
     @GetMapping("/like/posting/list")
-    public ApiResponse<?> getProfileLikedPostings() {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
+    public ApiResponse<PostingListResponse> getProfileLikedPostings(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestParam("page") int pageNumber
+    ) {
+        return ApiResponse.createSuccess(
+                ResponseCode.PROFILE_GET_LIKED_POSTING_LIST_SUCCESS,
+                profileService.getLikedPostingList(accessToken, pageNumber - 1));
     }
 
     @Description("좋아요/싫어요 등록한 리뷰 목록 조회")

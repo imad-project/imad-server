@@ -162,6 +162,11 @@ public class ProfileService {
         return postingService.getPostingListByUser(user, pageNumber);
     }
 
+    public PostingListResponse getLikedPostingList(String accessToken, int pageNumber) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        return postingService.getLikedPostingListByUser(user, pageNumber);
+    }
 
     /*
      * =================================================

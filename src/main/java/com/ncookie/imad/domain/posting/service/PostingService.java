@@ -3,7 +3,6 @@ package com.ncookie.imad.domain.posting.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.like.entity.PostingLike;
-import com.ncookie.imad.domain.like.entity.ReviewLike;
 import com.ncookie.imad.domain.like.service.PostingLikeService;
 import com.ncookie.imad.domain.posting.dto.request.AddPostingRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyPostingRequest;
@@ -272,5 +271,21 @@ public class PostingService {
                         user,
                         postingPage.getContent().stream().toList()));
 
+    }
+
+    public PostingListResponse getLikedPostingListByUser(UserAccount user, int pageNumber) {
+        Sort sort = Sort.by("createdDate").descending();
+        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
+        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(user, pageable);
+
+        List<Posting> postingList = new ArrayList<>();
+        for (PostingLike postingLike : postingLikePage.getContent().stream().toList()) {
+            postingList.add(postingLike.getPosting());
+        }
+
+        return PostingListResponse.toDTO(
+                postingLikePage,
+                convertPostingListToPostingDetailsResponseList(user, postingList)
+        );
     }
 }
