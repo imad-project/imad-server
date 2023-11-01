@@ -122,15 +122,9 @@ public class TmdbService {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         ContentsBookmark contentsBookmark = bookmarkService.findByUserAccountAndContents(user, contentsEntity);
 
-        Long bookmarkId;
-        boolean bookmarkStatus;
-        if (contentsBookmark != null) {
-            bookmarkId = contentsBookmark.getId();
-            bookmarkStatus = true;
-        } else {
-            bookmarkId = null;
-            bookmarkStatus = false;
-        }
+        Long bookmarkId = contentsBookmark != null ? contentsBookmark.getId() : null;
+        boolean bookmarkStatus = contentsBookmark != null;
+
 
         ContentsType type = contentsEntity.getTmdbType();
         // Contents(TvProgramData, MovieData), Season, Networks 등의 데이터 조회

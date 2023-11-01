@@ -40,8 +40,6 @@ public class ReviewService {
 
     private final ReviewLikeService reviewLikeService;
 
-    private final int PAGE_SIZE = 10;
-
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
@@ -77,18 +75,20 @@ public class ReviewService {
 
     public ReviewListResponse getReviewListByUser(UserAccount user, int pageNumber) {
         Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
+        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
         Page<Review> reviewPage = reviewRepository.findAllByUserAccount(user, pageable);
 
         return ReviewListResponse.toDTO(
                 reviewPage,
-                convertReviewListToReviewDetailsResponse(user, reviewPage.getContent().stream().toList())
+                convertReviewListToReviewDetailsResponse(
+                        user,
+                        reviewPage.getContent().stream().toList())
         );
     }
 
     public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber) {
         Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
+        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
         Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(user, pageable);
 
         List<Review> reviewList = new ArrayList<>();

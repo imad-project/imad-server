@@ -19,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class Utils {
+    public static int PAGE_SIZE = 10;
+
     private static final String BEARER = "Bearer ";
 
     public static String extractToken(String token) {
@@ -96,8 +98,6 @@ public class Utils {
     }
 
     public static PageRequest getPageRequest(int pageNumber, String sortString, int order) {
-        int PAGE_SIZE = 10;
-
         Sort sort;
         PageRequest pageable;
         try {
