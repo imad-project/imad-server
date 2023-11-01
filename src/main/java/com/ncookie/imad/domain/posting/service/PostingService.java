@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -82,11 +81,10 @@ public class PostingService {
     }
 
     public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        int PAGE_SIZE = 10;
-        PageRequest pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-
-        return getPostingListResponseByPage(accessToken, postingRepository.findAll(pageable));
+        return getPostingListResponseByPage(
+                accessToken,
+                postingRepository.findAll(Utils.getDefaultPageable(pageNumber))
+        );
     }
 
     public PostingListResponse getAllPostingListByQuery(String accessToken,
@@ -261,9 +259,7 @@ public class PostingService {
     }
 
     public PostingListResponse getPostingListByUser(UserAccount user, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
-        Page<Posting> postingPage = postingRepository.findAllByUser(user, pageable);
+        Page<Posting> postingPage = postingRepository.findAllByUser(user, Utils.getDefaultPageable(pageNumber));
 
         return PostingListResponse.toDTO(
                 postingPage,
@@ -274,9 +270,7 @@ public class PostingService {
     }
 
     public PostingListResponse getLikedPostingListByUser(UserAccount user, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
-        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(user, pageable);
+        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(user, Utils.getDefaultPageable(pageNumber));
 
         List<Posting> postingList = new ArrayList<>();
         for (PostingLike postingLike : postingLikePage.getContent().stream().toList()) {
