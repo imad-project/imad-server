@@ -2,8 +2,10 @@ package com.ncookie.imad.domain.profile.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.posting.dto.response.PostingListResponse;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
+import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.domain.profile.dto.response.BookmarkDetails;
 import com.ncookie.imad.domain.profile.dto.response.BookmarkListResponse;
 import com.ncookie.imad.domain.profile.dto.response.ScrapDetails;
@@ -35,8 +37,10 @@ import java.util.List;
 public class ProfileService {
     private final UserRetrievalService userRetrievalService;
     private final ContentsService contentsService;
-    private final ReviewService reviewService;
     private final PostingRetrievalService postingRetrievalService;
+
+    private final ReviewService reviewService;
+    private final PostingService postingService;
 
     private final BookmarkService bookmarkService;
     private final ScrapService scrapService;
@@ -145,6 +149,17 @@ public class ProfileService {
         }
         log.info("스크랩 삭제 완료");
         scrapService.deleteByIdAndUserAccount(scrapId, user);
+    }
+
+    /*
+     * =================================================
+     * 작성/좋아요한 게시글
+     * =================================================
+     */
+    public PostingListResponse getPostingList(String accessToken, int pageNumber) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        return postingService.getPostingListByUser(user, pageNumber);
     }
 
 

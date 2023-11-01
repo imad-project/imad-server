@@ -100,6 +100,8 @@ public enum ResponseCode {
     SCRAP_DELETE_SUCCESS(200, "정상적으로 게시글 스크랩을 삭제했습니다."),
     SCRAP_WRONG_ID(400, "해당 ID의 게시글 스크랩을 찾을 수 없습니다."),
 
+    PROFILE_GET_WRITTEN_POSTING_LIST_SUCCESS(200, "정상적으로 작성한 게시글 리스트를 조회했습니다."),
+    PROFILE_GET_LIKED_POSTING_LIST_SUCCESS(200, "정상적으로 좋아요/싫어요를 등록한 게시글 리스트를 조회했습니다."),
     PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS(200, "정상적으로 작성한 리뷰 리스트를 조회했습니다."),
     PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS(200, "정상적으로 좋아요/싫어요를 등록한 리뷰 리스트를 조회했습니다."),
     

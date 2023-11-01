@@ -106,8 +106,13 @@ public class ProfileController {
      */
     @Description("작성한 게시글 목록 조회")
     @GetMapping("/posting/list")
-    public ApiResponse<?> getProfilePostings() {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
+    public ApiResponse<?> getProfilePostings(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestParam("page") int pageNumber
+    ) {
+        return ApiResponse.createSuccess(
+                ResponseCode.PROFILE_GET_WRITTEN_POSTING_LIST_SUCCESS,
+                profileService.getPostingList(accessToken, pageNumber - 1));
     }
 
     @Description("작성한 리뷰 목록 조회")
@@ -122,7 +127,7 @@ public class ProfileController {
         );
     }
 
-    @Description("좋아요한 게시글 목록 조회")
+    @Description("좋아요/싫어요한 게시글 목록 조회")
     @GetMapping("/like/posting/list")
     public ApiResponse<?> getProfileLikedPostings() {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);

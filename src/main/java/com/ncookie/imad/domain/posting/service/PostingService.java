@@ -3,6 +3,7 @@ package com.ncookie.imad.domain.posting.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.like.entity.PostingLike;
+import com.ncookie.imad.domain.like.entity.ReviewLike;
 import com.ncookie.imad.domain.like.service.PostingLikeService;
 import com.ncookie.imad.domain.posting.dto.request.AddPostingRequest;
 import com.ncookie.imad.domain.posting.dto.request.ModifyPostingRequest;
@@ -258,5 +259,18 @@ public class PostingService {
             log.info("게시글 entity 조회 실패 : 해당 ID의 댓글을 찾을 수 없음");
             throw new BadRequestException(ResponseCode.POSTING_NOT_FOUND);
         }
+    }
+
+    public PostingListResponse getPostingListByUser(UserAccount user, int pageNumber) {
+        Sort sort = Sort.by("createdDate").descending();
+        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
+        Page<Posting> postingPage = postingRepository.findAllByUser(user, pageable);
+
+        return PostingListResponse.toDTO(
+                postingPage,
+                convertPostingListToPostingDetailsResponseList(
+                        user,
+                        postingPage.getContent().stream().toList()));
+
     }
 }
