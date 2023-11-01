@@ -46,6 +46,10 @@ public class PostingListElement {
     private LocalDateTime createdAt;        // 리뷰 작성 날짜
     private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
 
+    // 스크랩 정보
+    private Long scrapId;
+    private boolean scrapStatus;
+
 
     public static PostingListElement toDTO(Posting posting) {
         return PostingListElement.builder()

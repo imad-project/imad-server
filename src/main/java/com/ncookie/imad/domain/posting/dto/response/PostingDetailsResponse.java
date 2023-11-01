@@ -47,8 +47,12 @@ public class PostingDetailsResponse {
     private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
 
     // 댓글 정보
-    private int commentCnt;                                                     // 댓글 개수
+    private int commentCnt;                                     // 댓글 개수
     private CommentListResponse commentListResponse;            // 댓글 리스트
+
+    // 스크랩 정보
+    private Long scrapId;
+    private boolean scrapStatus;
 
 
     public static PostingDetailsResponse toDTO(Posting posting, CommentListResponse commentList) {
