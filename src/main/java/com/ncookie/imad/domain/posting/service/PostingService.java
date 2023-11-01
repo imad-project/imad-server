@@ -9,6 +9,8 @@ import com.ncookie.imad.domain.posting.dto.request.ModifyPostingRequest;
 import com.ncookie.imad.domain.posting.dto.response.*;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
+import com.ncookie.imad.domain.profile.entity.PostingScrap;
+import com.ncookie.imad.domain.profile.service.ScrapService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
@@ -39,6 +41,7 @@ public class PostingService {
 
     private final PostingLikeService postingLikeService;
     private final CommentService commentService;
+    private final ScrapService scrapService;
 
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
@@ -60,6 +63,9 @@ public class PostingService {
         // like status 조회
         PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
         int likeStatus = postingLike == null ? 0 : postingLike.getLikeStatus();
+        
+        // 스크랩 여부 조회
+        PostingScrap scrap = scrapService.findByUserAccountAndContents(user, posting);
 
         // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
         // 조회수 갱신
@@ -69,6 +75,8 @@ public class PostingService {
         PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
         postingDetailsResponse.setLikeStatus(likeStatus);
         postingDetailsResponse.setCommentCnt(commentCount);
+        postingDetailsResponse.setScrapId(scrap != null ? scrap.getId() : null);
+        postingDetailsResponse.setScrapStatus(scrap != null);
 
         return postingDetailsResponse;
     }
@@ -129,10 +137,22 @@ public class PostingService {
             // 댓글수 데이터
             int commentCount = commentService.getCommentCount(posting);
 
-            // DTO 클래스 변환 및 like status 설정
+            // 스크랩 여부 조회
+            PostingScrap scrap = scrapService.findByUserAccountAndContents(user, posting);
+
+            // DTO 클래스 변환
             PostingListElement postingDetailsResponse = PostingListElement.toDTO(posting);
+            
+            // like status 설정
             postingDetailsResponse.setLikeStatus(likeStatus);
+            
+            // 댓글 수 설정
             postingDetailsResponse.setCommentCnt(commentCount);
+
+            // 스크랩 설정
+            postingDetailsResponse.setScrapId(scrap != null ? scrap.getId() : null);
+            postingDetailsResponse.setScrapStatus(scrap != null);
+            
             postingDetailsResponseList.add(postingDetailsResponse);
         }
 

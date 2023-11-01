@@ -20,10 +20,10 @@ public class ScrapService {
     public Page<PostingScrap> findAllByUserAccount(UserAccount userAccount, Pageable pageable) {
         return scrapRepository.findAllByUserAccount(userAccount, pageable);
     }
-//
-//    public ContentsBookmark findByUserAccountAndContents(UserAccount userAccount, Contents contents) {
-//        return contentsBookmarkRepository.findByUserAccountAndContents(userAccount, contents);
-//    }
+
+    public PostingScrap findByUserAccountAndContents(UserAccount userAccount, Posting posting) {
+        return scrapRepository.findByUserAccountAndPosting(userAccount, posting);
+    }
 
     public boolean existsByUserAccountAndContents(UserAccount user, Posting posting) {
         return scrapRepository.existsByUserAccountAndPosting(user, posting);
