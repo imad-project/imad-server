@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.profile.controller;
 
 import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
+import com.ncookie.imad.domain.profile.dto.ScrapListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -68,8 +69,12 @@ public class ProfileController {
      */
     @Description("스크랩한 게시글 목록 조회")
     @GetMapping("/scrap/list")
-    public ApiResponse<?> getProfileScraps() {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
+    public ApiResponse<ScrapListResponse> getProfileScraps(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestParam("page") int pageNumber
+    ) {
+        ScrapListResponse scrapListResponse = profileService.getPostingScrapList(accessToken, pageNumber - 1);
+        return ApiResponse.createSuccess(ResponseCode.PROFILE_GET_INFO_SUCCESS, scrapListResponse);
     }
 
     @Description("게시글 스크랩 추가")

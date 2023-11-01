@@ -6,6 +6,8 @@ import com.ncookie.imad.domain.profile.repository.PostingScrapRepository;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -15,9 +17,9 @@ import org.springframework.stereotype.Service;
 public class ScrapService {
     private final PostingScrapRepository scrapRepository;
 
-//    public Page<ContentsBookmark> findAllByUserAccount(UserAccount userAccount, Pageable pageable) {
-//        return contentsBookmarkRepository.findAllByUserAccount(userAccount, pageable);
-//    }
+    public Page<PostingScrap> findAllByUserAccount(UserAccount userAccount, Pageable pageable) {
+        return scrapRepository.findAllByUserAccount(userAccount, pageable);
+    }
 //
 //    public ContentsBookmark findByUserAccountAndContents(UserAccount userAccount, Contents contents) {
 //        return contentsBookmarkRepository.findByUserAccountAndContents(userAccount, contents);

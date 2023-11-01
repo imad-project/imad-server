@@ -6,6 +6,8 @@ import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
 import com.ncookie.imad.domain.profile.dto.BookmarkDetails;
 import com.ncookie.imad.domain.profile.dto.BookmarkListResponse;
+import com.ncookie.imad.domain.profile.dto.ScrapDetails;
+import com.ncookie.imad.domain.profile.dto.ScrapListResponse;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
@@ -99,6 +101,20 @@ public class ProfileService {
      * 스크랩 관련
      * =================================================
      */
+    public ScrapListResponse getPostingScrapList(String accessToken, int pageNumber) {
+        Page<PostingScrap> postingScrapPage = scrapService.findAllByUserAccount(
+                userRetrievalService.getUserFromAccessToken(accessToken),
+                PageRequest.of(pageNumber, Utils.PAGE_SIZE)
+        );
+
+        List<ScrapDetails> scrapDetailsList = new ArrayList<>();
+        for (PostingScrap scrap : postingScrapPage.getContent().stream().toList()) {
+            scrapDetailsList.add(ScrapDetails.toDTO(scrap));
+        }
+
+        return ScrapListResponse.toDTO(postingScrapPage, scrapDetailsList);
+    }
+
     public ResponseCode addPostingScrap(String accessToken, Long postingId) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Posting posting = postingRetrievalService.getPostingEntityById(postingId);
