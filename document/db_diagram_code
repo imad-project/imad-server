@@ -212,6 +212,9 @@ Table Comment {
   parent_id integer       [note: "댓글 부모 ID. 이 댓글이 최상위라면 null 값이 들어감"]
   is_removed boolean      [note: "댓글 삭제 여부"]
 
+  like_cnt integer
+  dislike_cnt integer
+
   created_at datetime
   modified_at datetime
 }
@@ -246,21 +249,19 @@ Table PostingLike {
  * ===============================================
  * 추천이면 +1, 비추천이면 -1, 아무 상태도 아니면 0이므로 해당 데이터 삭제
  */
- Table PostingBookmark {
+ Table PostingScrap {
   posting_bookmark_id integer [primary key]
 
   user_id integer
   posting_id integer
-
-  bookmark_status integer
- }
+}
 
  Table ContentsBookmark {
   contents_bookmark_id integer [primary key]
 
   user_id integer
   contents_id integer
- }
+}
 
 
 /*
@@ -356,8 +357,8 @@ Ref: Posting.posting_id < PostingLike.posting_id
 
 
 // Bookmark : Aritlce / Contents / User
-Ref: User.user_id < PostingBookmark.user_id
-Ref: Posting.posting_id < PostingBookmark.posting_id
+Ref: User.user_id < PostingScrap.user_id
+Ref: Posting.posting_id < PostingScrap.posting_id
 
 Ref: User.user_id < ContentsBookmark.user_id
 Ref: Contents.contents_id < ContentsBookmark.contents_id
