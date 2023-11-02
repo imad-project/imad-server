@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -82,11 +81,11 @@ public class PostingService {
     }
 
     public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        int PAGE_SIZE = 10;
-        PageRequest pageable = PageRequest.of(pageNumber, PAGE_SIZE, sort);
-
-        return getPostingListResponseByPage(accessToken, postingRepository.findAll(pageable));
+        return getPostingListResponseByPage(
+                accessToken,
+                postingRepository.findAll(Utils.getDefaultPageable(pageNumber)),
+                null
+        );
     }
 
     public PostingListResponse getAllPostingListByQuery(String accessToken,
@@ -114,15 +113,16 @@ public class PostingService {
             default -> throw new BadRequestException(ResponseCode.POSTING_WRONG_SEARCH_TYPE);
         };
 
-        return getPostingListResponseByPage(accessToken, postingPage);
+        return getPostingListResponseByPage(accessToken, postingPage, searchType);
     }
 
-    private PostingListResponse getPostingListResponseByPage(String accessToken, Page<Posting> postingPage) {
+    private PostingListResponse getPostingListResponseByPage(String accessToken, Page<Posting> postingPage, Integer searchType) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         return PostingListResponse.toDTO(
                 postingPage,
-                convertPostingListToPostingDetailsResponseList(user, postingPage.stream().toList())
+                convertPostingListToPostingDetailsResponseList(user, postingPage.stream().toList()),
+                searchType
         );
     }
     
@@ -261,22 +261,19 @@ public class PostingService {
     }
 
     public PostingListResponse getPostingListByUser(UserAccount user, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
-        Page<Posting> postingPage = postingRepository.findAllByUser(user, pageable);
+        Page<Posting> postingPage = postingRepository.findAllByUser(user, Utils.getDefaultPageable(pageNumber));
 
         return PostingListResponse.toDTO(
                 postingPage,
                 convertPostingListToPostingDetailsResponseList(
                         user,
-                        postingPage.getContent().stream().toList()));
+                        postingPage.getContent().stream().toList()),
+                null);
 
     }
 
     public PostingListResponse getLikedPostingListByUser(UserAccount user, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
-        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(user, pageable);
+        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(user, Utils.getDefaultPageable(pageNumber));
 
         List<Posting> postingList = new ArrayList<>();
         for (PostingLike postingLike : postingLikePage.getContent().stream().toList()) {
@@ -285,7 +282,8 @@ public class PostingService {
 
         return PostingListResponse.toDTO(
                 postingLikePage,
-                convertPostingListToPostingDetailsResponseList(user, postingList)
+                convertPostingListToPostingDetailsResponseList(user, postingList),
+                null
         );
     }
 }

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.MediaType;
@@ -118,5 +119,11 @@ public class Utils {
         }
 
         return pageable;
+    }
+
+    // createdDate 필드를 기준 내림차순으로 설정한 Pageable 객체를 얻는 메소드
+    public static Pageable getDefaultPageable(int pageNumber) {
+        Sort sort = Sort.by("createdDate").descending();
+        return PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
     }
 }

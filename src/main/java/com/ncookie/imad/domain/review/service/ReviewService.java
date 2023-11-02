@@ -20,7 +20,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -74,9 +73,7 @@ public class ReviewService {
     }
 
     public ReviewListResponse getReviewListByUser(UserAccount user, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
-        Page<Review> reviewPage = reviewRepository.findAllByUserAccount(user, pageable);
+        Page<Review> reviewPage = reviewRepository.findAllByUserAccount(user, Utils.getDefaultPageable(pageNumber));
 
         return ReviewListResponse.toDTO(
                 reviewPage,
@@ -87,9 +84,7 @@ public class ReviewService {
     }
 
     public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber) {
-        Sort sort = Sort.by("createdDate").descending();
-        PageRequest pageable = PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
-        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(user, pageable);
+        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(user, Utils.getDefaultPageable(pageNumber));
 
         List<Review> reviewList = new ArrayList<>();
         for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {
