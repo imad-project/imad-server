@@ -12,7 +12,9 @@ import java.util.List;
 @SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PostingListResponse extends ListResponse<PostingListElement> {
-    public static PostingListResponse toDTO(Page<?> page, List<PostingListElement> postingList) {
+    private Integer searchType;                 // 검색 기준 (제목+내용, 제목, 내용, 글쓴이 등)
+
+    public static PostingListResponse toDTO(Page<?> page, List<PostingListElement> postingList, Integer searchType) {
         SortVariable sortVariable = getSortVariable(page);
         return PostingListResponse.builder()
                 .detailsList(postingList)
@@ -26,6 +28,8 @@ public class PostingListResponse extends ListResponse<PostingListElement> {
 
                 .sortDirection(sortVariable.getSortDirection())
                 .sortProperty(sortVariable.getSortProperty())
+
+                .searchType(searchType)
 
                 .build();
     }

@@ -83,7 +83,8 @@ public class PostingService {
     public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
         return getPostingListResponseByPage(
                 accessToken,
-                postingRepository.findAll(Utils.getDefaultPageable(pageNumber))
+                postingRepository.findAll(Utils.getDefaultPageable(pageNumber)),
+                null
         );
     }
 
@@ -112,15 +113,16 @@ public class PostingService {
             default -> throw new BadRequestException(ResponseCode.POSTING_WRONG_SEARCH_TYPE);
         };
 
-        return getPostingListResponseByPage(accessToken, postingPage);
+        return getPostingListResponseByPage(accessToken, postingPage, searchType);
     }
 
-    private PostingListResponse getPostingListResponseByPage(String accessToken, Page<Posting> postingPage) {
+    private PostingListResponse getPostingListResponseByPage(String accessToken, Page<Posting> postingPage, Integer searchType) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         return PostingListResponse.toDTO(
                 postingPage,
-                convertPostingListToPostingDetailsResponseList(user, postingPage.stream().toList())
+                convertPostingListToPostingDetailsResponseList(user, postingPage.stream().toList()),
+                searchType
         );
     }
     
@@ -265,7 +267,8 @@ public class PostingService {
                 postingPage,
                 convertPostingListToPostingDetailsResponseList(
                         user,
-                        postingPage.getContent().stream().toList()));
+                        postingPage.getContent().stream().toList()),
+                null);
 
     }
 
@@ -279,7 +282,8 @@ public class PostingService {
 
         return PostingListResponse.toDTO(
                 postingLikePage,
-                convertPostingListToPostingDetailsResponseList(user, postingList)
+                convertPostingListToPostingDetailsResponseList(user, postingList),
+                null
         );
     }
 }
