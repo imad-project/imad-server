@@ -18,12 +18,12 @@ import java.util.List;
 public class ListResponse<T> {
     private List<T> detailsList;
 
-    private long totalElements;              // 총 스크랩 개수
+    private long totalElements;              // 총 데이터 개수
     private long totalPages;                 // 총 페이지 수
 
     private int pageNumber;                 // 현재 페이지
-    private int numberOfElements;           // 현재 페이지의 스크랩 개수
-    private int sizeOfPage;                 // 한 페이지 당 최대 스크랩 개수
+    private int numberOfElements;           // 현재 페이지의 데이터 개수
+    private int sizeOfPage;                 // 한 페이지 당 최대 데이터 개수
 
     private int sortDirection;              // 0 : 오름차순, 1 : 내림차순
     private String sortProperty;            // 정렬 기준 (createdDate)
