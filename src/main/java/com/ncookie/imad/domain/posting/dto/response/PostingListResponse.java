@@ -3,12 +3,16 @@ package com.ncookie.imad.domain.posting.dto.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ncookie.imad.domain.common.dto.ListResponse;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 @SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PostingListResponse extends ListResponse<PostingListElement> {
