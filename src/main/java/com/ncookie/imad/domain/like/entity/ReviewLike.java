@@ -19,18 +19,28 @@ public class ReviewLike extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewLikeId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private UserAccount userAccount;
 
-    @ManyToOne
-    @JoinColumn(name = "review_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "review_id")
+    @ToString.Exclude
     private Review review;
 
 
     @Setter
     // 좋아요이면 +1, 싫어요이면 -1, 아무 상태도 아니면 해당 데이터 삭제
     private int likeStatus;
+
+    public void setReview(Review review) {
+        this.review = review;
+    }
+
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
 }
