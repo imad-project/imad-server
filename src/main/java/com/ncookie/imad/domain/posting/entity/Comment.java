@@ -14,24 +14,26 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class
-Comment extends BaseTimeEntity {
+public class Comment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToOne
     @JoinColumn(name = "posting_id")
+    @ToString.Exclude
     private Posting posting;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private UserAccount userAccount;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "parent_comment_id")
     @ToString.Exclude
     private Comment parent;
@@ -47,4 +49,12 @@ Comment extends BaseTimeEntity {
 
     @Setter
     private int dislikeCnt;
+
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
+
+    public void setPosting(Posting posting) {
+        this.posting = posting;
+    }
 }

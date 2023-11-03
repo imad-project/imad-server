@@ -20,14 +20,16 @@ public class CommentLike  extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentLikeId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private UserAccount userAccount;
 
-    @ManyToOne
-    @JoinColumn(name = "comment_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "comment_id")
+    @ToString.Exclude
     private Comment comment;
 
 
