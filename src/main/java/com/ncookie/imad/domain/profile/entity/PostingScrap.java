@@ -5,6 +5,8 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 @Builder
@@ -19,11 +21,15 @@ public class PostingScrap extends BaseTimeEntity {
     @Column(name = "posting_scrap_id", nullable = false)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private UserAccount userAccount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "posting_id")
+    @ToString.Exclude
     private Posting posting;
 }

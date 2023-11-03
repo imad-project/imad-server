@@ -19,14 +19,16 @@ public class Posting extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postingId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToOne
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private UserAccount user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToOne
     @JoinColumn(name = "contents_id")
+    @ToString.Exclude
     private Contents contents;
 
     @Setter

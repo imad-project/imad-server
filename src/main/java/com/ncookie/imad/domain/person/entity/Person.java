@@ -8,9 +8,10 @@ import lombok.*;
 
 @Getter
 @Builder
-@Entity
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Person {
     @Id
     private Long personId;

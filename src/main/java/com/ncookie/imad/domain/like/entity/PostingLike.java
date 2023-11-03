@@ -19,18 +19,28 @@ public class PostingLike extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postingLikeId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private UserAccount userAccount;
 
-    @ManyToOne
-    @JoinColumn(name = "posting_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "posting_id")
+    @ToString.Exclude
     private Posting posting;
 
 
     @Setter
     // 좋아요이면 +1, 싫어요이면 -1, 아무 상태도 아니면 해당 데이터 삭제
     private int likeStatus;
+
+    public void setPosting(Posting posting) {
+        this.posting = posting;
+    }
+
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
 }

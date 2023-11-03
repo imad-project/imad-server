@@ -3,6 +3,8 @@ package com.ncookie.imad.domain.ranking.entity;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -17,8 +19,10 @@ public class WeeklyScore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long weeklyScoreId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "contents_id")
+    @ToString.Exclude
     private Contents contents;
 
     private LocalDate refDate;

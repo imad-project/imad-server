@@ -91,7 +91,6 @@ public class RevokeService {
 
     private void deleteUserAccount(UserAccount userAccount) {
         // 유저 관련 데이터 DB에서 삭제
-        // TODO: 추후 DB 테이블 추가 시 관련 데이터 삭제 구문 구현 필요
         userRepository.delete(userAccount);
     }
 
