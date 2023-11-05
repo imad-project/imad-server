@@ -11,6 +11,8 @@ import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,9 +60,15 @@ public class UserAccountController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
     }
 
+    private final RedisTemplate<String, String> redisTemplate;
+
     @Description("이메일 중복 검사")
     @PostMapping("/api/user/validation/email")
     public ApiResponse<UserInfoDuplicationResponse> validateUserAccountEmail(@RequestBody UserInfoDuplicationRequest email) {
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        vop.set("yellow", "aaa");
+        vop.set("red", "bbb");
+        vop.set("green", "ccc");
         return ApiResponse.createSuccess(ResponseCode.USER_INFO_VALIDATION , userAccountService.checkUserEmailDuplicated(email));
     }
 
