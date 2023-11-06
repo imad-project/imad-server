@@ -138,6 +138,7 @@ public class TmdbService {
             tmdbDetails = TmdbDetails.builder()
                     .contentsId(tvProgramData.getContentsId())
                     .tmdbId(tvProgramData.getTmdbId())
+                    .tmdbType(tvProgramData.getTmdbType())
 
                     .overview(tvProgramData.getOverview())
                     .tagline(tvProgramData.getTagline())
@@ -184,6 +185,7 @@ public class TmdbService {
             tmdbDetails = TmdbDetails.builder()
                     .contentsId(movieData.getContentsId())
                     .tmdbId(movieData.getTmdbId())
+                    .tmdbType(movieData.getTmdbType())
 
                     .overview(movieData.getOverview())
                     .tagline(movieData.getTagline())
@@ -259,6 +261,7 @@ public class TmdbService {
                         TvProgramData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
                                 .tmdbType(ContentsType.TV)
+
                                 .contentsType(contentsType)
                                 .contentsGenres(tmdbDetails.getGenres())
                                 .certification(tmdbDetails.getCertification())
@@ -312,6 +315,7 @@ public class TmdbService {
                         MovieData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
                                 .tmdbType(ContentsType.MOVIE)
+
                                 .contentsType(contentsType)
                                 .contentsGenres(tmdbDetails.getGenres())
                                 .certification(tmdbDetails.getCertification())
