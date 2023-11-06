@@ -174,17 +174,6 @@ public class TmdbService {
                             .map(DetailsNetworks::toDTO)
                             .collect(Collectors.toList()))
 
-                    .credits(DetailsCredits.builder()
-                            .cast(castList)
-                            .crew(crewList)
-                            .build())
-
-                    .bookmarkId(bookmarkId)
-                    .bookmarkStatus(bookmarkStatus)
-
-                    .reviewId(reviewId)
-                    .reviewStatus(reviewStatus)
-
                     .build();
 
         } else if (type.equals(ContentsType.MOVIE)) {
@@ -215,22 +204,27 @@ public class TmdbService {
                     .releaseDate(getLocalDateString(movieData.getReleaseDate()))
                     .runtime(movieData.getRuntime())
 
-                    .credits(DetailsCredits.builder()
-                            .cast(castList)
-                            .crew(crewList)
-                            .build())
-
-                    .bookmarkId(bookmarkId)
-                    .bookmarkStatus(bookmarkStatus)
-
-                    .reviewId(reviewId)
-                    .reviewStatus(reviewStatus)
-
                     .build();
         }
 
+        // IMAD 자체 데이터
         tmdbDetails.setReviewCnt(contentsEntity.getReviewCnt());
         tmdbDetails.setImadScore(contentsEntity.getImadScore());
+
+        // 배우 및 스태프
+        tmdbDetails.setCredits(
+                DetailsCredits.builder()
+                        .cast(castList)
+                        .crew(crewList)
+                        .build());
+
+        // 북마크
+        tmdbDetails.setBookmarkId(bookmarkId);
+        tmdbDetails.setBookmarkStatus(bookmarkStatus);
+
+        // 작성한 리뷰
+        tmdbDetails.setReviewId(reviewId);
+        tmdbDetails.setReviewStatus(reviewStatus);
 
         return tmdbDetails;
     }
