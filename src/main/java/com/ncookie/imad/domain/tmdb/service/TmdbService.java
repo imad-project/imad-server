@@ -16,6 +16,8 @@ import com.ncookie.imad.domain.person.entity.Person;
 import com.ncookie.imad.domain.person.service.PersonService;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.service.BookmarkService;
+import com.ncookie.imad.domain.review.entity.Review;
+import com.ncookie.imad.domain.review.service.ReviewRetrievalService;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import com.ncookie.imad.domain.season.entity.Season;
 import com.ncookie.imad.domain.season.service.SeasonService;
@@ -55,6 +57,7 @@ public class TmdbService {
     private final PersonService personService;
 
     private final UserRetrievalService userRetrievalService;
+    private final ReviewRetrievalService reviewRetrievalService;
     private final BookmarkService bookmarkService;
 
     @Transactional
@@ -121,9 +124,13 @@ public class TmdbService {
         // bookmark 정보 조회
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         ContentsBookmark contentsBookmark = bookmarkService.findByUserAccountAndContents(user, contentsEntity);
+        Review writtenReview = reviewRetrievalService.findByContentsAndUser(contentsEntity, user);
 
         Long bookmarkId = contentsBookmark != null ? contentsBookmark.getId() : null;
         boolean bookmarkStatus = contentsBookmark != null;
+
+        Long reviewId = writtenReview != null ? writtenReview.getReviewId() : null;
+        boolean reviewStatus = writtenReview != null;
 
 
         ContentsType type = contentsEntity.getTmdbType();
@@ -175,6 +182,9 @@ public class TmdbService {
                     .bookmarkId(bookmarkId)
                     .bookmarkStatus(bookmarkStatus)
 
+                    .reviewId(reviewId)
+                    .reviewStatus(reviewStatus)
+
                     .build();
 
         } else if (type.equals(ContentsType.MOVIE)) {
@@ -212,6 +222,9 @@ public class TmdbService {
 
                     .bookmarkId(bookmarkId)
                     .bookmarkStatus(bookmarkStatus)
+
+                    .reviewId(reviewId)
+                    .reviewStatus(reviewStatus)
 
                     .build();
         }

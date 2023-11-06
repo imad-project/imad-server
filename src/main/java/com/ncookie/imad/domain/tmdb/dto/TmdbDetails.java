@@ -74,6 +74,10 @@ public class TmdbDetails {
     private Long bookmarkId;
     private boolean bookmarkStatus;
 
+    // 리뷰 정보
+    private Long reviewId;
+    private boolean reviewStatus;
+
 
     @JsonCreator
     public TmdbDetails(
