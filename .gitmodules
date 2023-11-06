@@ -1,0 +1,3 @@
+[submodule "src/main/resources/profile"]
+	path = src/main/resources/profile
+	url = https://github.com/NCookies/imad-server-profile.git

@@ -18,6 +18,14 @@ ext {
 	set('springCloudVersion', "2022.0.3")
 }
 
+sourceSets {
+	main {
+		resources{
+			srcDirs "src/main/resources", "src/main/resources/profile"
+		}
+	}
+}
+
 repositories {
 	mavenCentral()
 }
