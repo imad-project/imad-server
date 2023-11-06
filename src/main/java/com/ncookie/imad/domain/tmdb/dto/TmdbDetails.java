@@ -23,6 +23,7 @@ import java.util.Set;
 public class TmdbDetails {
     private long contentsId;                        // IMAD 자체적으로 사용하는 id
     private long tmdbId;                            // TMDB 내부적으로 사용하는 id
+    private ContentsType tmdbType;                  // TMDB 내부적으로 사용하는 작품 type
 
     private String overview;                        // 작품 개요
     private String tagline;                         // 작품의 핵심이 되는 포인트나 제목에 대한 부연설명
@@ -72,6 +73,10 @@ public class TmdbDetails {
     // 북마크 여부
     private Long bookmarkId;
     private boolean bookmarkStatus;
+
+    // 리뷰 정보
+    private Long reviewId;
+    private boolean reviewStatus;
 
 
     @JsonCreator

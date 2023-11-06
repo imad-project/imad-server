@@ -16,6 +16,8 @@ import com.ncookie.imad.domain.person.entity.Person;
 import com.ncookie.imad.domain.person.service.PersonService;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.service.BookmarkService;
+import com.ncookie.imad.domain.review.entity.Review;
+import com.ncookie.imad.domain.review.service.ReviewRetrievalService;
 import com.ncookie.imad.domain.season.dto.DetailsSeason;
 import com.ncookie.imad.domain.season.entity.Season;
 import com.ncookie.imad.domain.season.service.SeasonService;
@@ -55,6 +57,7 @@ public class TmdbService {
     private final PersonService personService;
 
     private final UserRetrievalService userRetrievalService;
+    private final ReviewRetrievalService reviewRetrievalService;
     private final BookmarkService bookmarkService;
 
     @Transactional
@@ -121,9 +124,13 @@ public class TmdbService {
         // bookmark 정보 조회
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         ContentsBookmark contentsBookmark = bookmarkService.findByUserAccountAndContents(user, contentsEntity);
+        Review writtenReview = reviewRetrievalService.findByContentsAndUser(contentsEntity, user);
 
         Long bookmarkId = contentsBookmark != null ? contentsBookmark.getId() : null;
         boolean bookmarkStatus = contentsBookmark != null;
+
+        Long reviewId = writtenReview != null ? writtenReview.getReviewId() : null;
+        boolean reviewStatus = writtenReview != null;
 
 
         ContentsType type = contentsEntity.getTmdbType();
@@ -138,6 +145,7 @@ public class TmdbService {
             tmdbDetails = TmdbDetails.builder()
                     .contentsId(tvProgramData.getContentsId())
                     .tmdbId(tvProgramData.getTmdbId())
+                    .tmdbType(tvProgramData.getTmdbType())
 
                     .overview(tvProgramData.getOverview())
                     .tagline(tvProgramData.getTagline())
@@ -166,14 +174,6 @@ public class TmdbService {
                             .map(DetailsNetworks::toDTO)
                             .collect(Collectors.toList()))
 
-                    .credits(DetailsCredits.builder()
-                            .cast(castList)
-                            .crew(crewList)
-                            .build())
-
-                    .bookmarkId(bookmarkId)
-                    .bookmarkStatus(bookmarkStatus)
-
                     .build();
 
         } else if (type.equals(ContentsType.MOVIE)) {
@@ -184,6 +184,7 @@ public class TmdbService {
             tmdbDetails = TmdbDetails.builder()
                     .contentsId(movieData.getContentsId())
                     .tmdbId(movieData.getTmdbId())
+                    .tmdbType(movieData.getTmdbType())
 
                     .overview(movieData.getOverview())
                     .tagline(movieData.getTagline())
@@ -203,19 +204,27 @@ public class TmdbService {
                     .releaseDate(getLocalDateString(movieData.getReleaseDate()))
                     .runtime(movieData.getRuntime())
 
-                    .credits(DetailsCredits.builder()
-                            .cast(castList)
-                            .crew(crewList)
-                            .build())
-
-                    .bookmarkId(bookmarkId)
-                    .bookmarkStatus(bookmarkStatus)
-
                     .build();
         }
 
+        // IMAD 자체 데이터
         tmdbDetails.setReviewCnt(contentsEntity.getReviewCnt());
         tmdbDetails.setImadScore(contentsEntity.getImadScore());
+
+        // 배우 및 스태프
+        tmdbDetails.setCredits(
+                DetailsCredits.builder()
+                        .cast(castList)
+                        .crew(crewList)
+                        .build());
+
+        // 북마크
+        tmdbDetails.setBookmarkId(bookmarkId);
+        tmdbDetails.setBookmarkStatus(bookmarkStatus);
+
+        // 작성한 리뷰
+        tmdbDetails.setReviewId(reviewId);
+        tmdbDetails.setReviewStatus(reviewStatus);
 
         return tmdbDetails;
     }
@@ -259,6 +268,7 @@ public class TmdbService {
                         TvProgramData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
                                 .tmdbType(ContentsType.TV)
+
                                 .contentsType(contentsType)
                                 .contentsGenres(tmdbDetails.getGenres())
                                 .certification(tmdbDetails.getCertification())
@@ -312,6 +322,7 @@ public class TmdbService {
                         MovieData.builder()
                                 .tmdbId(tmdbDetails.getTmdbId())
                                 .tmdbType(ContentsType.MOVIE)
+
                                 .contentsType(contentsType)
                                 .contentsGenres(tmdbDetails.getGenres())
                                 .certification(tmdbDetails.getCertification())
