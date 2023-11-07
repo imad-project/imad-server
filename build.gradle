@@ -31,13 +31,25 @@ repositories {
 }
 
 dependencies {
+	// Basic
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// 보안
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+
+	// 외부 API 통신 라이브러리
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	// DB
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
 	// 모니터링 위한 spring admin
 	implementation 'de.codecentric:spring-boot-admin-starter-client:3.1.0'
@@ -56,21 +68,15 @@ dependencies {
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
     testImplementation 'org.projectlombok:lombok:1.18.28'
 
-    // DB 관련 설정
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
 	// Utils
 	implementation 'org.apache.commons:commons-lang3:3.0'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-	// Test 관련
+	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
