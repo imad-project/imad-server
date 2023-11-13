@@ -10,15 +10,19 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface PostingRepository extends JpaRepository<Posting, Long> {
+    // 게시글 리스트 전체 조회용
+    Page<Posting> findAllByCategory(Pageable pageable, int category);
+    
+    // 게시글 리스트 조건부 검색용
     Page<Posting> findAllByTitleContainingOrContentContaining(Pageable pageable, String title, String content);
     Page<Posting> findAllByTitleContaining(Pageable pageable, String query);
     Page<Posting> findAllByContentContaining(Pageable pageable, String query);
-    
-    // 프로필 조회용
-    Page<Posting> findAllByUser(UserAccount user, Pageable pageable);
-
     @Query("SELECT p FROM Posting p WHERE p.user.nickname LIKE %:nickname%")
     Page<Posting> findAllByUserNicknameContaining(Pageable pageable, @Param("nickname") String nickname);
+
+
+    // 프로필 조회용
+    Page<Posting> findAllByUser(UserAccount user, Pageable pageable);
 
     @Modifying
     @Query("UPDATE Posting SET likeCnt = :likeCnt WHERE postingId = :postingId")

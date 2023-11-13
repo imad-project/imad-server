@@ -80,20 +80,28 @@ public class PostingService {
         return postingDetailsResponse;
     }
 
-    public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
+    public PostingListResponse getAllPostingList(String accessToken, int pageNumber, int category) {
+        Page<Posting> postingPage;
+        if (category == 0) {
+            postingPage = postingRepository.findAll(Utils.getDefaultPageable(pageNumber));
+        } else {
+            postingPage = postingRepository.findAllByCategory(Utils.getDefaultPageable(pageNumber), category);
+        }
+
         return getPostingListResponseByPage(
                 accessToken,
-                postingRepository.findAll(Utils.getDefaultPageable(pageNumber)),
+                postingPage,
                 null
         );
     }
 
     public PostingListResponse getAllPostingListByQuery(String accessToken,
-                                             int searchType,
-                                             String query,
-                                             int pageNumber,
-                                             String sortString,
-                                             int order) {
+                                                        int searchType,
+                                                        String query,
+                                                        int pageNumber,
+                                                        String sortString,
+                                                        int order,
+                                                        int category) {
         PageRequest pageable = Utils.getPageRequest(pageNumber, sortString, order);
 
         // 검색 타입에 따라 repository에 데이터 요청
