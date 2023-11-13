@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CommentDetailsResponse {
     private Long commentId;
+    private Long postingId;
 
     // 유저 정보
     private Long userId;                    // 유저 ID
@@ -51,6 +52,7 @@ public class CommentDetailsResponse {
 
         return CommentDetailsResponse.builder()
                 .commentId(comment.getCommentId())
+                .postingId(comment.getPosting().getPostingId())
 
                 .userId(user.getId())
                 .userNickname(user.getNickname())
