@@ -162,10 +162,10 @@ public class ProfileService {
         return postingService.getPostingListByUser(user, pageNumber);
     }
 
-    public PostingListResponse getLikedPostingList(String accessToken, int pageNumber) {
+    public PostingListResponse getLikedPostingList(String accessToken, int pageNumber, int likeStatus) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        return postingService.getLikedPostingListByUser(user, pageNumber);
+        return postingService.getLikedPostingListByUser(user, pageNumber, likeStatus);
     }
 
     /*
@@ -179,9 +179,9 @@ public class ProfileService {
         return reviewService.getReviewListByUser(user, pageNumber);
     }
 
-    public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber) {
+    public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber, int likeStatus) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        return reviewService.getLikedReviewListByUser(user, pageNumber);
+        return reviewService.getLikedReviewListByUser(user, pageNumber, likeStatus);
     }
 }

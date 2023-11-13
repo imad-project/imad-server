@@ -272,8 +272,11 @@ public class PostingService {
 
     }
 
-    public PostingListResponse getLikedPostingListByUser(UserAccount user, int pageNumber) {
-        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(user, Utils.getDefaultPageable(pageNumber));
+    public PostingListResponse getLikedPostingListByUser(UserAccount user, int pageNumber, int likeStatus) {
+        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(
+                user,
+                Utils.getDefaultPageable(pageNumber),
+                likeStatus);
 
         List<Posting> postingList = new ArrayList<>();
         for (PostingLike postingLike : postingLikePage.getContent().stream().toList()) {

@@ -43,7 +43,12 @@ public class PostingLikeService implements LikeService<Posting, PostingLike> {
     }
 
     @Override
-    public Page<PostingLike> getLikedListByUser(UserAccount user, Pageable pageable) {
-        return postingLikeRepository.findAllByUserAccount(user, pageable);
+    public Page<PostingLike> getLikedListByUser(UserAccount user, Pageable pageable, int likeStatus) {
+        // likeStatus가 0이면 전체조회, 1이면 좋아요, -1이면 싫어요 등록한 게시글 리스트를 조회함
+        if (likeStatus == 0) {
+            return postingLikeRepository.findAllByUserAccount(user, pageable);
+        } else {
+            return postingLikeRepository.findAllByUserAccountAndLikeStatus(user, pageable, likeStatus);
+        }
     }
 }
