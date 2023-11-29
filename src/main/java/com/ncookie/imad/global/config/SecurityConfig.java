@@ -2,6 +2,7 @@ package com.ncookie.imad.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.jwt.filter.JwtAuthenticationFilter;
@@ -39,6 +40,9 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.PrintWriter;
 
@@ -57,6 +61,7 @@ public class SecurityConfig {
 
     // 로그인을 위한 유저 repository
     private final UserAccountRepository userRepository;
+    private final UserRetrievalService userRetrievalService;
 
     // JWT 관련
     private final JwtService jwtService;
@@ -106,6 +111,7 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .csrf().disable()
+                .cors().configurationSource(corsConfigurationSource()).and()
                 .headers().frameOptions().disable()
                 .and()
 
@@ -154,6 +160,20 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*"); // 허용할 Origin 설정, *은 모든 Origin을 허용하는 것이므로 실제 환경에서는 제한 필요
+        configuration.addAllowedMethod("*"); // 허용할 HTTP Method 설정
+        configuration.addAllowedHeader("*"); // 허용할 HTTP Header 설정
+        configuration.setAllowCredentials(false); // Credentials를 사용할지 여부 설정
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
+
+        return source;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
@@ -179,7 +199,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, userRepository, jwtProperties);
+        return new LoginSuccessHandler(jwtService, jwtProperties, userRetrievalService);
     }
 
     /**
