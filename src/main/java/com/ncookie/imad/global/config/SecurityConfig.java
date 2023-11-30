@@ -165,6 +165,8 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("*"); // 허용할 Origin 설정, *은 모든 Origin을 허용하는 것이므로 실제 환경에서는 제한 필요
         configuration.addAllowedMethod("*"); // 허용할 HTTP Method 설정
         configuration.addAllowedHeader("*"); // 허용할 HTTP Header 설정
+        configuration.addExposedHeader("Authorization");
+        configuration.addExposedHeader("Authorization-refresh");
         configuration.setAllowCredentials(false); // Credentials를 사용할지 여부 설정
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
