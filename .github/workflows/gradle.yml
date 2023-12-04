@@ -17,8 +17,8 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   PROJECT_NAME: imad-server
-  S3_BUCKET_NAME: ncookie-github-actions-s3-bucket
-  CODE_DEPLOY_APP_NAME: codedeploy-app
+  S3_BUCKET_NAME: ryuforaws01-github-actions-s3-bucket
+  CODE_DEPLOY_APP_NAME: spring-boot-codedeploy-app
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: codedeploy-deployment-group
 
 permissions:
@@ -53,7 +53,7 @@ jobs:
           echo "copy properties"
           echo "${{ secrets.AWS_PROPERTIES }}" > ./application-aws.yml
         shell: bash
-        
+
       # create key.p8 file
       - name: make apple key.p8 file
         if: contains(github.ref, 'release')
