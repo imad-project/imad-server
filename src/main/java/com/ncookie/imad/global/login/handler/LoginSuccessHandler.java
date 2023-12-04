@@ -2,7 +2,7 @@ package com.ncookie.imad.global.login.handler;
 
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.jwt.property.JwtProperties;
 import com.ncookie.imad.global.jwt.service.JwtService;
@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @EnableConfigurationProperties({ JwtProperties.class })
@@ -25,9 +24,9 @@ import java.util.Optional;
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtService jwtService;
-    private final UserAccountRepository userRepository;
-
     private final JwtProperties jwtProperties;
+
+    private final UserRetrievalService userRetrievalService;
 
 
     @Override
@@ -39,36 +38,24 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String refreshToken = jwtService.createRefreshToken();
 
         // 로그인 시 response에 유저 정보 첨부
-        Optional<UserAccount> optionalUserAccount = userRepository.findByEmail(email);
-        if (optionalUserAccount.isPresent()) {
-            UserAccount user = optionalUserAccount.get();
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+        UserInfoResponse userInfoResponse = UserInfoResponse.toDTO(user);
 
-            UserInfoResponse userInfoResponse = UserInfoResponse.builder()
-                    .email(user.getEmail())
-                    .nickname(user.getNickname())
-                    .authProvider(user.getAuthProvider())
-                    .gender(user.getGender())
-                    .ageRange(user.getAgeRange())
-                    .profileImage(user.getProfileImage())
-                    .role(user.getRole())
-                    .build();
+        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
+        jwtService.updateRefreshToken(user.getEmail(), refreshToken);
 
-            jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
-            jwtService.updateRefreshToken(user.getEmail(), refreshToken);
-
-            try {
-                Utils.sendLoginSuccessResponseWithUserInfo(response, userInfoResponse);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            log.info("로그인에 성공하였습니다.");
-            log.info("이메일 : {}", email);
-            log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
-            log.info("로그인에 성공하였습니다. RefreshToken : {}", refreshToken);
-            log.info("발급된 AccessToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(jwtProperties.getAccess().getExpiration() / 1000));
-            log.info("발급된 RefreshToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(jwtProperties.getRefresh().getExpiration() / 1000));
+        try {
+            Utils.sendLoginSuccessResponseWithUserInfo(response, userInfoResponse);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+        log.info("로그인에 성공하였습니다.");
+        log.info("이메일 : {}", email);
+        log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
+        log.info("로그인에 성공하였습니다. RefreshToken : {}", refreshToken);
+        log.info("발급된 AccessToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(jwtProperties.getAccess().getExpiration() / 1000));
+        log.info("발급된 RefreshToken 만료 기간 : {}", LocalDateTime.now().plusSeconds(jwtProperties.getRefresh().getExpiration() / 1000));
     }
 
     private String extractUsername(Authentication authentication) {
