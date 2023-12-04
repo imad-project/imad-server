@@ -43,15 +43,17 @@ public class UserAccount extends BaseTimeEntity {
 
     // 유저 선호 장르
     @Setter
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "preferred_tv_genres", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
     @Builder.Default
+    @ToString.Exclude
     private Set<Long> preferredTvGenres = new HashSet<>();
 
     @Setter
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "preferred_movie_genres", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
     @Builder.Default
+    @ToString.Exclude
     private Set<Long> preferredMovieGenres = new HashSet<>();
 
     private String socialId;            // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)

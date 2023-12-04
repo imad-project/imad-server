@@ -83,8 +83,11 @@ public class ReviewService {
         );
     }
 
-    public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber) {
-        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(user, Utils.getDefaultPageable(pageNumber));
+    public ReviewListResponse getLikedReviewListByUser(UserAccount user, int pageNumber, int likeStatus) {
+        Page<ReviewLike> reviewLikePage = reviewLikeService.getLikedListByUser(
+                user,
+                Utils.getDefaultPageable(pageNumber),
+                likeStatus);
 
         List<Review> reviewList = new ArrayList<>();
         for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {

@@ -132,22 +132,24 @@ public class ProfileController {
     @GetMapping("/like/posting/list")
     public ApiResponse<PostingListResponse> getProfileLikedPostings(
             @RequestHeader("Authorization") String accessToken,
-            @RequestParam("page") int pageNumber
+            @RequestParam("page") int pageNumber,
+            @RequestParam("like_status") int likeStatus
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_LIKED_POSTING_LIST_SUCCESS,
-                profileService.getLikedPostingList(accessToken, pageNumber - 1));
+                profileService.getLikedPostingList(accessToken, pageNumber - 1, likeStatus));
     }
 
     @Description("좋아요/싫어요 등록한 리뷰 목록 조회")
     @GetMapping("/like/review/list")
     public ApiResponse<ReviewListResponse> getProfileLikedReviews(
             @RequestHeader("Authorization") String accessToken,
-            @RequestParam("page") int pageNumber
+            @RequestParam("page") int pageNumber,
+            @RequestParam("like_status") int likeStatus
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS,
-                profileService.getLikedReviewList(accessToken, pageNumber - 1)
+                profileService.getLikedReviewList(accessToken, pageNumber - 1, likeStatus)
         );
     }
 }

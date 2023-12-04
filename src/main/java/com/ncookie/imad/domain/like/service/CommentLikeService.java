@@ -43,7 +43,8 @@ public class CommentLikeService implements LikeService<Comment, CommentLike> {
     }
 
     @Override
-    public Page<CommentLike> getLikedListByUser(UserAccount user, Pageable pageable) {
+    public Page<CommentLike> getLikedListByUser(UserAccount user, Pageable pageable, int likeStatus) {
+        // 좋아요/싫어요 등록한 댓글 리스트 조회 기능은 없기 때문에 likeStatus 변수는 사용되지 않음
         return commentLikeRepository.findAllByUserAccount(user, pageable);
     }
 }

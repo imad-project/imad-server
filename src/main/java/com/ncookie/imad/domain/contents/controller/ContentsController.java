@@ -55,7 +55,7 @@ public class ContentsController {
             // 받아온 데이터를 DTO 클래스에 매핑하고, 데이터베이스에 저장함
             return ApiResponse.createSuccess(
                     ResponseCode.CONTENTS_GET_DETAILS_SUCCESS,
-                    tmdbService.saveContentsDetails(contentsDetails, contentsType, contentsCertification));
+                    tmdbService.saveContentsDetails(contentsDetails, contentsType, contentsCertification, accessToken));
         }
     }
 }

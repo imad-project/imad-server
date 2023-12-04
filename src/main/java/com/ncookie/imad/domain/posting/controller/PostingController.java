@@ -56,22 +56,31 @@ public class PostingController {
     @Description("게시글 리스트 전체 조회")
     @GetMapping("/list")
     public ApiResponse<PostingListResponse> postingList(@RequestHeader("Authorization") String accessToken,
-                                                        @RequestParam(value = "page") int page) {
-        return ApiResponse.createSuccess(ResponseCode.POSTING_GET_LIST_SUCCESS, postingService.getAllPostingList(accessToken, page - 1));
+                                                        @RequestParam(value = "page") int page,
+                                                        @RequestParam(value = "category") int category) {
+        return ApiResponse.createSuccess(
+                ResponseCode.POSTING_GET_LIST_SUCCESS,
+                postingService.getAllPostingList(accessToken, page - 1, category));
     }
 
     @Description("게시글 리스트 조건부 조회")
     @GetMapping("/list/search")
     public ApiResponse<PostingListResponse> postingListByQuery(@RequestHeader("Authorization") String accessToken,
-                                                @RequestParam(value = "search_type") int searchType,
-                                                @RequestParam(value = "query") String query,
-                                                @RequestParam(value = "page") int page,
-                                                @RequestParam(value = "sort") String sortString,
-                                                @RequestParam(value = "order") int order) {
-
+                                                               @RequestParam(value = "search_type") int searchType,
+                                                               @RequestParam(value = "query") String query,
+                                                               @RequestParam(value = "page") int page,
+                                                               @RequestParam(value = "sort") String sortString,
+                                                               @RequestParam(value = "order") int order,
+                                                               @RequestParam(value = "category") int category) {
         return ApiResponse.createSuccess(
                 ResponseCode.POSTING_GET_LIST_SUCCESS,
-                postingService.getAllPostingListByQuery(accessToken, searchType, query, page - 1, sortString, order)
+                postingService.getAllPostingListByQuery(accessToken,
+                        searchType,
+                        query,
+                        page - 1,
+                        sortString,
+                        order,
+                        category)
         );
     }
     

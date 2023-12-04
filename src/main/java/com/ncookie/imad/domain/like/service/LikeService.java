@@ -24,5 +24,5 @@ public interface LikeService<E, L> {
     int getDislikeCount(E entity);
 
     // 유저가 like 또는 dislike 한 Entity(리뷰, 게시글 등) 리스트 조회
-    Page<L> getLikedListByUser(UserAccount user, Pageable pageable);
+    Page<L> getLikedListByUser(UserAccount user, Pageable pageable, int likeStatus);
 }

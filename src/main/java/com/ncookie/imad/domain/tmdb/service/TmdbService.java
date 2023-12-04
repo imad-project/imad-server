@@ -63,7 +63,7 @@ public class TmdbService {
     @Transactional
     public TmdbDetails getTmdbDetails(Long id, ContentsType type, String accessToken) {
         Contents contentsEntity = contentsService.getContentsByTmdbIdAndTmdbType(id, type);
-        return loadAndGenerateTmdbDetailsFromEntity(contentsEntity, contentsEntity.getContentsId(), accessToken);
+        return loadAndGenerateTmdbDetailsFromEntity(contentsEntity, accessToken);
     }
 
     @Transactional
@@ -72,14 +72,14 @@ public class TmdbService {
 
         if (optionalContents.isPresent()) {
             Contents contents = optionalContents.get();
-            return loadAndGenerateTmdbDetailsFromEntity(contents, contentsId, accessToken);
+            return loadAndGenerateTmdbDetailsFromEntity(contents, accessToken);
         } else {
             throw new BadRequestException(ResponseCode.CONTENTS_ID_NOT_FOUND);
         }
     }
 
     @Transactional
-    public TmdbDetails loadAndGenerateTmdbDetailsFromEntity(Contents contentsEntity, Long contentsId, String accessToken) {
+    public TmdbDetails loadAndGenerateTmdbDetailsFromEntity(Contents contentsEntity, String accessToken) {
         TmdbDetails tmdbDetails = TmdbDetails.builder().build();
 
         // =========================================================================
@@ -137,7 +137,7 @@ public class TmdbService {
         // Contents(TvProgramData, MovieData), Season, Networks 등의 데이터 조회
         if (type.equals(ContentsType.TV)) {
             log.info("TV 데이터를 DB로부터 조회 시작");
-            TvProgramData tvProgramData = contentsService.findTvProgramDataByContentsId(contentsId);
+            TvProgramData tvProgramData = contentsService.findTvProgramDataByContentsId(contentsEntity.getContentsId());
             List<Season> seasonsEntities = seasonService.getSeasonsEntities(tvProgramData);
             List<Networks> networksEntities = networksService.getNetworksEntities(tvProgramData);
             log.info("TV 데이터를 DB로부터 조회 완료 : [" + tvProgramData.getContentsId() + "] " + tvProgramData.getTranslatedTitle());
@@ -178,7 +178,7 @@ public class TmdbService {
 
         } else if (type.equals(ContentsType.MOVIE)) {
             log.info("영화 데이터를 DB로부터 조회 시작");
-            MovieData movieData = contentsService.findMovieDataByContentsId(contentsId);
+            MovieData movieData = contentsService.findMovieDataByContentsId(contentsEntity.getContentsId());
             log.info("영화 데이터를 DB로부터 조회 완료 : [" + movieData.getContentsId() + "] " + movieData.getTranslatedTitle());
 
             tmdbDetails = TmdbDetails.builder()
@@ -230,8 +230,13 @@ public class TmdbService {
     }
 
     @Transactional
-    public TmdbDetails saveContentsDetails(TmdbDetails tmdbDetails, ContentsType type, String certification) {
-        // DB 변경점 : 장르 관련 테이블 제거
+    public TmdbDetails saveContentsDetails(TmdbDetails tmdbDetails, ContentsType type, String certification, String accessToken) {
+
+        // 이미 DB에 존재하는 작품 정보라면 그 데이터를 불러옴
+        // 간혹 TMDB API 서버에서 데이터가 두 번 날라오는 경우가 있는데, 그와 같은 경우에 데이터 중복 저장을 방지하기 위함
+        if (contentsService.checkDuplicationExists(tmdbDetails.getTmdbId(), tmdbDetails.getTmdbType())) {
+            return getTmdbDetails(tmdbDetails.getTmdbId(), type, accessToken);
+        }
 
         // 애니메이션 장르가 포함되어 있으면 contents_type을 "ANIMATION"으로 설정
         ContentsType contentsType = checkAnimationGenre(tmdbDetails.getGenres(), type);
