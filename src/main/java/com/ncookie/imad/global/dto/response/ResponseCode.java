@@ -20,6 +20,9 @@ public enum ResponseCode {
     TOKEN_INVALID(401, "유효하지 않은 토큰입니다."),
     TOKEN_REISSUE_SUCCESS(201, "정상적으로 토큰을 재발급했습니다"),
 
+    // AWS
+    LOADBALANCER_HEALTH_CHECK_SUCCESS(200, "AWS 로드밸런서 health 체크 성공"),
+
     // 유저
     SIGNUP_SUCCESS(201, "회원가입이 성공적으로 완료되었습니다."),
     LOGIN_SUCCESS(200, "정상적으로 로그인 되었습니다."),
