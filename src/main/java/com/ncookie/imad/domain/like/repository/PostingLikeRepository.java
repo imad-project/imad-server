@@ -13,6 +13,8 @@ public interface PostingLikeRepository extends JpaRepository<PostingLike, Long> 
     PostingLike findByUserAccountAndPosting(UserAccount user, Posting posting);
 
     Page<PostingLike> findAllByUserAccount(UserAccount user, Pageable pageable);
+    @Query("SELECT p FROM PostingLike p WHERE p.userAccount = :user AND p.likeStatus = :likeStatus")
+    Page<PostingLike> findAllByUserAccountAndLikeStatus(@Param("user") UserAccount user, Pageable pageable, @Param("likeStatus") int likeStatus);
 
     @Query("SELECT COUNT(*) FROM PostingLike WHERE posting = :posting AND likeStatus = 1")
     int countLikeByPosting(@Param("posting") Posting posting);

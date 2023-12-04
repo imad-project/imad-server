@@ -44,7 +44,12 @@ public class ReviewLikeService implements LikeService<Review, ReviewLike> {
     }
 
     @Override
-    public Page<ReviewLike> getLikedListByUser(UserAccount user, Pageable pageable) {
-        return reviewLikeRepository.findAllByUserAccount(user, pageable);
+    public Page<ReviewLike> getLikedListByUser(UserAccount user, Pageable pageable, int likeStatus) {
+        // likeStatus가 0이면 전체조회, 1이면 좋아요, -1이면 싫어요 등록한 리뷰 리스트를 조회함
+        if (likeStatus == 0) {
+            return reviewLikeRepository.findAllByUserAccount(user, pageable);
+        } else {
+            return reviewLikeRepository.findAllByUserAccountAndLikeStatus(user, pageable, likeStatus);
+        }
     }
 }

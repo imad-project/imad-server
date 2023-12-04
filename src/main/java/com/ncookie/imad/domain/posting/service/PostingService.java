@@ -80,38 +80,70 @@ public class PostingService {
         return postingDetailsResponse;
     }
 
-    public PostingListResponse getAllPostingList(String accessToken, int pageNumber) {
+    public PostingListResponse getAllPostingList(String accessToken, int pageNumber, int category) {
+        Page<Posting> postingPage;
+        if (category == 0) {
+            postingPage = postingRepository.findAll(Utils.getDefaultPageable(pageNumber));
+        } else {
+            postingPage = postingRepository.findAllByCategory(Utils.getDefaultPageable(pageNumber), category);
+        }
+
         return getPostingListResponseByPage(
                 accessToken,
-                postingRepository.findAll(Utils.getDefaultPageable(pageNumber)),
+                postingPage,
                 null
         );
     }
 
     public PostingListResponse getAllPostingListByQuery(String accessToken,
-                                             int searchType,
-                                             String query,
-                                             int pageNumber,
-                                             String sortString,
-                                             int order) {
+                                                        int searchType,
+                                                        String query,
+                                                        int pageNumber,
+                                                        String sortString,
+                                                        int order,
+                                                        int category) {
         PageRequest pageable = Utils.getPageRequest(pageNumber, sortString, order);
 
         // 검색 타입에 따라 repository에 데이터 요청
-        Page<Posting> postingPage = switch (searchType) {
-            // 제목 + 본문
-            case 0 -> postingRepository.findAllByTitleContainingOrContentContaining(pageable, query, query);
-            
-            // 제목
-            case 1 -> postingRepository.findAllByTitleContaining(pageable, query);
-            
-            // 본문
-            case 2 -> postingRepository.findAllByContentContaining(pageable, query);
-            
-            // 작성자
-            case 3 -> postingRepository.findAllByUserNicknameContaining(pageable, query);
+        Page<Posting> postingPage;
+        if (category == 0) {
+            postingPage = switch (searchType) {
+                // 제목 + 본문
+                case 0 -> postingRepository.findAllByTitleContainingOrContentContaining(pageable, query, query);
+                
+                // 제목
+                case 1 -> postingRepository.findAllByTitleContaining(pageable, query);
 
-            default -> throw new BadRequestException(ResponseCode.POSTING_WRONG_SEARCH_TYPE);
-        };
+                // 본문
+                case 2 -> postingRepository.findAllByContentContaining(pageable, query);
+
+                // 작성자
+                case 3 -> postingRepository.findAllByUserNicknameContaining(pageable, query);
+
+                default -> throw new BadRequestException(ResponseCode.POSTING_WRONG_SEARCH_TYPE);
+            };
+        } else {
+            postingPage = switch (searchType) {
+                // 제목 + 본문 + 카테고리
+                case 0 -> postingRepository.findAllByCategoryAndTitleContainingOrCategoryAndContentContaining(
+                        pageable,
+                        category,
+                        query,
+                        category,
+                        query);
+
+                // 제목 + 카테고리
+                case 1 -> postingRepository.findAllByTitleContainingAndCategory(pageable, query, category);
+
+                // 본문 + 카테고리
+                case 2 -> postingRepository.findAllByContentContainingAndCategory(pageable, query, category);
+
+                // 작성자 + 카테고리
+                case 3 -> postingRepository.findAllByCategoryAndUserNicknameContaining(pageable, category, query);
+
+                default -> throw new BadRequestException(ResponseCode.POSTING_WRONG_SEARCH_TYPE);
+            };
+        }
 
         return getPostingListResponseByPage(accessToken, postingPage, searchType);
     }
@@ -272,8 +304,11 @@ public class PostingService {
 
     }
 
-    public PostingListResponse getLikedPostingListByUser(UserAccount user, int pageNumber) {
-        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(user, Utils.getDefaultPageable(pageNumber));
+    public PostingListResponse getLikedPostingListByUser(UserAccount user, int pageNumber, int likeStatus) {
+        Page<PostingLike> postingLikePage = postingLikeService.getLikedListByUser(
+                user,
+                Utils.getDefaultPageable(pageNumber),
+                likeStatus);
 
         List<Posting> postingList = new ArrayList<>();
         for (PostingLike postingLike : postingLikePage.getContent().stream().toList()) {
