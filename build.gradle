@@ -91,6 +91,13 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+// application profile이 중복으로 가져와서 발생하는 에러 방지
+tasks {
+	processResources {
+		duplicatesStrategy = DuplicatesStrategy.INCLUDE
+	}
+}
+
 // Heroku 설정
 jar {
 	enabled = false
