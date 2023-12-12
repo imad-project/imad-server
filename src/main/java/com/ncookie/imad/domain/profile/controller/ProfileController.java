@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.profile.controller;
 
 import com.ncookie.imad.domain.posting.dto.response.PostingListResponse;
 import com.ncookie.imad.domain.profile.dto.response.BookmarkListResponse;
+import com.ncookie.imad.domain.profile.dto.response.ProfileSummaryInfoResponse;
 import com.ncookie.imad.domain.profile.dto.response.ScrapListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
@@ -19,12 +20,16 @@ import java.util.Map;
 public class ProfileController {
     private final ProfileService profileService;
 
-    @Description("프로필 관련 메인 데이터")
+    @Description("프로필 관련 요약 데이터")
     @GetMapping("")
-    public ApiResponse<?> getProfileInfo() {
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_INFO_SUCCESS);
+    public ApiResponse<ProfileSummaryInfoResponse> getProfileInfo(
+            @RequestHeader("Authorization") String accessToken
+    ) {
+        ProfileSummaryInfoResponse profileSummaryInfo = profileService.getProfileSummaryInfo(accessToken);
+        return ApiResponse.createSuccess(
+                ResponseCode.PROFILE_GET_INFO_SUCCESS,
+                profileSummaryInfo);
     }
-
     
     /*
      * =================================================

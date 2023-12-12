@@ -6,11 +6,16 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface PostingScrapRepository extends JpaRepository<PostingScrap, Long> {
     Page<PostingScrap> findAllByUserAccount(UserAccount userAccount, Pageable pageable);
 
     PostingScrap findByUserAccountAndPosting(UserAccount userAccount, Posting posting);
+
+    // 프로필 조회용
+    @Query("SELECT COUNT(*) FROM PostingScrap WHERE userAccount = :user")
+    int countPostingScrapByUser(UserAccount user);
 
     boolean existsByUserAccountAndPosting(UserAccount userAccount, Posting posting);
 

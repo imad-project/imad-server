@@ -34,6 +34,9 @@ public interface PostingRepository extends JpaRepository<Posting, Long> {
 
 
     // 프로필 조회용
+    @Query("SELECT COUNT(*) FROM Posting WHERE user = :user")
+    int countWrittenPostingByUser(UserAccount user);
+
     Page<Posting> findAllByUser(UserAccount user, Pageable pageable);
 
     @Modifying

@@ -25,6 +25,10 @@ public class ScrapService {
         return scrapRepository.findByUserAccountAndPosting(userAccount, posting);
     }
 
+    public int getScrapCountByUser(UserAccount user) {
+        return scrapRepository.countPostingScrapByUser(user);
+    }
+
     public boolean existsByUserAccountAndContents(UserAccount user, Posting posting) {
         return scrapRepository.existsByUserAccountAndPosting(user, posting);
     }
