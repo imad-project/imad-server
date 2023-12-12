@@ -24,8 +24,8 @@ public class UserInfoResponse {
     private Gender gender;
     
     // 연령대
+    private int birthYear;
     private int ageRange;
-
     private int profileImage;
 
     // 유저의 추가정보 입력여부를 구분하기 위한 플래그 변수
@@ -41,6 +41,7 @@ public class UserInfoResponse {
                 .nickname(userAccount.getNickname())
                 .authProvider(userAccount.getAuthProvider())
                 .gender(userAccount.getGender())
+                .birthYear(userAccount.getBirthYear())
                 .ageRange(userAccount.getAgeRange())
                 .profileImage(userAccount.getProfileImage())
 

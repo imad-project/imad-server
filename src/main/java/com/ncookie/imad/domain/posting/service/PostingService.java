@@ -157,6 +157,10 @@ public class PostingService {
                 searchType
         );
     }
+
+    public int getWrittenPostingCount(UserAccount user) {
+        return postingRepository.countWrittenPostingByUser(user);
+    }
     
     private List<PostingListElement> convertPostingListToPostingDetailsResponseList(UserAccount user, List<Posting> postingList) {
         // Posting 클래스를 PostingDetailsResponse 데이터 형식에 맞게 매핑

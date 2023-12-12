@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -76,8 +77,11 @@ public class UserAccountService {
                     }
                 });
 
+        int ageRange = (LocalDate.now().getYear() - userUpdateRequest.getBirthYear()) / 10;
+
         user.setNickname(userUpdateRequest.getNickname());
-        user.setAgeRange(userUpdateRequest.getAgeRange());
+        user.setBirthYear(userUpdateRequest.getBirthYear());
+        user.setAgeRange(ageRange);
         user.setGender(userUpdateRequest.getGender());
         user.setProfileImage(userUpdateRequest.getProfileImage());
 

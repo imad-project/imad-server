@@ -7,11 +7,10 @@
 
 name: Spring Boot & Gradle CI/CD
 
+# release 브랜치에 push 또는 pull request가 되면 스크립트 실행
 on:
   push:
     branches: [ "release" ]
-  pull_request:
-    branches: [ release ]
 
 # 해당 코드에서 사용될 변수 설정
 env:
@@ -27,6 +26,7 @@ permissions:
 jobs:
   build:
 
+    # Github의 워크플로에서 실행될 OS 선택
     runs-on: ubuntu-latest
 
     steps:

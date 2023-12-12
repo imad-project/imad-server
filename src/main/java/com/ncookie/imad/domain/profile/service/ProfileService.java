@@ -6,10 +6,7 @@ import com.ncookie.imad.domain.posting.dto.response.PostingListResponse;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
 import com.ncookie.imad.domain.posting.service.PostingService;
-import com.ncookie.imad.domain.profile.dto.response.BookmarkDetails;
-import com.ncookie.imad.domain.profile.dto.response.BookmarkListResponse;
-import com.ncookie.imad.domain.profile.dto.response.ScrapDetails;
-import com.ncookie.imad.domain.profile.dto.response.ScrapListResponse;
+import com.ncookie.imad.domain.profile.dto.response.*;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
@@ -45,6 +42,25 @@ public class ProfileService {
     private final BookmarkService bookmarkService;
     private final ScrapService scrapService;
 
+
+    // 프로필 요약 정보
+    public ProfileSummaryInfoResponse getProfileSummaryInfo(String accessToken) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+        BookmarkListResponse contentsBookmarkList = getContentsBookmarkList(accessToken, 0);
+
+        return ProfileSummaryInfoResponse.builder()
+                .userId(user.getId())
+                .userNickname(user.getNickname())
+                .userProfileImage(user.getProfileImage())
+
+                .myReviewCnt(reviewService.getWrittenReviewCount(user))
+                .myPostingCnt(postingService.getWrittenPostingCount(user))
+                .myScrapCnt(scrapService.getScrapCountByUser(user))
+
+                .bookmarkListResponse(contentsBookmarkList)
+
+                .build();
+    }
 
     /*
      * =================================================
