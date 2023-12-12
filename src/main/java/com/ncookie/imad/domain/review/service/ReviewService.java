@@ -100,6 +100,10 @@ public class ReviewService {
         );
     }
 
+    public int getWrittenReviewCount(UserAccount user) {
+        return reviewRepository.countWrittenReviewByUser(user);
+    }
+
     private List<ReviewDetailsResponse> convertReviewListToReviewDetailsResponse(UserAccount user, List<Review> reviewList) {
         // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
         List<ReviewDetailsResponse> reviewDetailsResponseList = new ArrayList<>();

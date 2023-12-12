@@ -23,6 +23,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COUNT(*) FROM Review WHERE contents = :contents")
     Integer countReviewForContents(Contents contents);
 
+    // 프로필 조회용
+    @Query("SELECT COUNT(*) FROM Review WHERE userAccount = :user")
+    int countWrittenReviewByUser(UserAccount user);
+
     @Modifying
     @Query("UPDATE Review SET likeCnt = :likeCnt WHERE reviewId = :reviewId")
     void updateLikeCount(@Param("reviewId") Long reviewId, @Param("likeCnt") int likeCnt);
