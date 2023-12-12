@@ -2,7 +2,6 @@ package com.ncookie.imad.domain.user.scheduled;
 
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
-import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
