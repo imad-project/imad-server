@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -128,6 +129,8 @@ public class SecurityConfig {
 
                 //== URL별 권한 관리 옵션 ==//
                 .authorizeHttpRequests()
+                
+                // 아래 URL로 들어오는 요청들은 Filter 검사에서 제외됨 
                 .requestMatchers(
                         "/api/signup",
                         "/login/**",        // 소셜 로그인 redirect url
@@ -140,7 +143,17 @@ public class SecurityConfig {
                         "/auth/**",
                         "/h2-console/**")
                 .permitAll()
+                
+                // 일부 GET 요청은 Filter 통과 (비회원도 자유롭게 조회 가능)
+                .requestMatchers(HttpMethod.GET, "/api/contents/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/review/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/posting/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/ranking/**").permitAll()
+
+                // 모니터링 관련 데이터에 접근 가능한건 내 로컬 컴퓨터만
                 .requestMatchers("/actuator/**").access(hasIpAddress(myLocalIpAddress))
+
+                // 이 외 나머지 요청은 보안 처리
                 .anyRequest().authenticated()
                 .and()
 
