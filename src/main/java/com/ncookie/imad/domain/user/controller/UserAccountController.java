@@ -9,6 +9,7 @@ import com.ncookie.imad.domain.user.dto.response.UserInfoDuplicationResponse;
 import com.ncookie.imad.domain.user.service.UserAccountService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
+import jakarta.servlet.http.HttpServletResponse;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,8 +26,13 @@ public class UserAccountController {
 
     @Description("회원가입")
     @PostMapping("/api/signup")
-    public ApiResponse<?> createUserAccount(@RequestBody SignUpRequest signUpRequest) {
-        userAccountService.signUp(signUpRequest);
+    public ApiResponse<?> createUserAccount(HttpServletResponse response,
+                                            @RequestBody SignUpRequest signUpRequest) {
+        String email = userAccountService.signUp(signUpRequest);
+        UserAccountService.TokenTuple tokens = userAccountService.getTokenInSignupProcess(email);
+        response.setHeader("Authorization", tokens.accessToken());
+        response.setHeader("Authorization-refresh", tokens.refreshToken());
+
         return ApiResponse.createSuccessWithNoContent(ResponseCode.SIGNUP_SUCCESS);
     }
 

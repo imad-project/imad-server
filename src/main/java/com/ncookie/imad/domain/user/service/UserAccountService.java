@@ -11,6 +11,7 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.jwt.service.JwtService;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +33,12 @@ public class UserAccountService {
     private final UserAccountRepository userAccountRepository;
 
     private final UserRetrievalService userRetrievalService;
+    private final JwtService jwtService;
 
     private final PasswordEncoder passwordEncoder;
 
-
     @Description("일반회원 회원가입")
-    public void signUp(SignUpRequest signUpRequest) {
+    public String signUp(SignUpRequest signUpRequest) {
         if (userAccountRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             log.error("회원가입 실패 : 이미 존재하는 이메일");
             throw new BadRequestException(ResponseCode.SIGNUP_EMAIL_DUPLICATED);
@@ -54,6 +55,19 @@ public class UserAccountService {
         UserAccount entity = userAccountRepository.save(user);
 
         log.info("회원가입 성공 : {}", entity.getId());
+
+        return user.getEmail();
+    }
+
+    // 회원가입 성공 시 JWT 토큰 발급
+    public record TokenTuple(String accessToken, String refreshToken) { }
+    public TokenTuple getTokenInSignupProcess(String email) {
+        String accessToken = jwtService.createAccessToken(email);
+        String refreshToken = jwtService.createRefreshToken();
+
+        jwtService.updateRefreshToken(email, refreshToken);
+
+        return new TokenTuple(accessToken, refreshToken);
     }
 
     @Description("회원정보 조회")
