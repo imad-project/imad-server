@@ -102,7 +102,7 @@ public class ProfileService {
             log.info("북마크 등록 완료");
             
             contentsRankingScoreUpdateService.addRankingScore(contents, BOOKMARK_RANKING_SCORE);
-            log.info("[작품 북마크] 랭킹 점수 반영 완료");
+            log.info("[작품 북마크 추가] 랭킹 점수 반영 완료");
             
             return ResponseCode.BOOKMARK_ADD_SUCCESS;
         } else {
@@ -126,7 +126,7 @@ public class ProfileService {
 
         ContentsBookmark bookmark = bookmarkService.findByIdAndUserAccount(bookmarkId, user);
         contentsRankingScoreUpdateService.subtractRankingScore(bookmark.getContents(), BOOKMARK_RANKING_SCORE);
-        log.info("[작품 북마크] 랭킹 점수 반영 완료");
+        log.info("[작품 북마크 삭제] 랭킹 점수 반영 완료");
     }
 
 
@@ -163,7 +163,7 @@ public class ProfileService {
             log.info("스크랩 등록 완료");
 
             contentsRankingScoreUpdateService.addRankingScore(posting.getContents(), SCRAP_RANKING_SCORE);
-            log.info("[작품 스크랩] 랭킹 점수 반영 완료");
+            log.info("[게시글 스크랩 추가] 랭킹 점수 반영 완료");
 
             return ResponseCode.SCRAP_ADD_SUCCESS;
         } else {
@@ -186,7 +186,7 @@ public class ProfileService {
 
         PostingScrap postingScrap = scrapService.findByIdAndUserAccount(scrapId, user);
         contentsRankingScoreUpdateService.subtractRankingScore(postingScrap.getPosting().getContents(), SCRAP_RANKING_SCORE);
-        log.info("[작품 스크랩] 랭킹 점수 반영 완료");
+        log.info("[게시글 스크랩 취소] 랭킹 점수 반영 완료");
     }
 
     /*
