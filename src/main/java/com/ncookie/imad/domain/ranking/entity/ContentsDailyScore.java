@@ -15,7 +15,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ContentsDailyScore {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long contentsDailyScoreId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
