@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.review.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
+import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
 import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
 import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
@@ -18,6 +19,7 @@ import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.REVIEW_RANKING_SCORE;
 
+
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -38,6 +43,8 @@ public class ReviewService {
     private final ContentsService contentsService;
 
     private final ReviewLikeService reviewLikeService;
+
+    private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
@@ -149,6 +156,9 @@ public class ReviewService {
 
         calculateAndSaveAverageScore(review);
 
+        contentsRankingScoreUpdateService.addRankingScore(contents, REVIEW_RANKING_SCORE);
+        log.info("[리뷰 작성] 랭킹 점수 반영 완료");
+
         return AddReviewResponse.builder()
                 .reviewId(review.getReviewId())
                 .build();
@@ -190,6 +200,9 @@ public class ReviewService {
             if (Objects.equals(review.getUserAccount().getId(), user.getId())) {
                 reviewRepository.delete(review);
                 calculateAndSaveAverageScore(review);
+                
+                contentsRankingScoreUpdateService.addRankingScore(review.getContents(), REVIEW_RANKING_SCORE);
+                log.info("[리뷰 삭제] 랭킹 점수 반영 완료");
             } else {
                 throw new BadRequestException(ResponseCode.REVIEW_NO_PERMISSION);
             }
