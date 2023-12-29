@@ -121,12 +121,12 @@ public class ProfileService {
             log.error("북마크 삭제 실패 : 유효하지 않은 ID");
             throw new BadRequestException(ResponseCode.BOOKMARK_WRONG_ID);
         }
-        bookmarkService.deleteByIdAndUserAccount(bookmarkId, user);
-        log.info("북마크 삭제 완료");
-
         ContentsBookmark bookmark = bookmarkService.findByIdAndUserAccount(bookmarkId, user);
         contentsRankingScoreUpdateService.subtractRankingScore(bookmark.getContents(), BOOKMARK_RANKING_SCORE);
         log.info("[작품 북마크 삭제] 랭킹 점수 반영 완료");
+
+        bookmarkService.deleteByIdAndUserAccount(bookmarkId, user);
+        log.info("북마크 삭제 완료");
     }
 
 
@@ -181,12 +181,12 @@ public class ProfileService {
             log.error("스크랩 삭제 실패 : 유효하지 않은 ID");
             throw new BadRequestException(ResponseCode.SCRAP_WRONG_ID);
         }
-        scrapService.deleteByIdAndUserAccount(scrapId, user);
-        log.info("스크랩 삭제 완료");
-
         PostingScrap postingScrap = scrapService.findByIdAndUserAccount(scrapId, user);
         contentsRankingScoreUpdateService.subtractRankingScore(postingScrap.getPosting().getContents(), SCRAP_RANKING_SCORE);
         log.info("[게시글 스크랩 취소] 랭킹 점수 반영 완료");
+
+        scrapService.deleteByIdAndUserAccount(scrapId, user);
+        log.info("스크랩 삭제 완료");
     }
 
     /*

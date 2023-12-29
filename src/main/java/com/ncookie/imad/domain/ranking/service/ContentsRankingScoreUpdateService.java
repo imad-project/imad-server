@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -44,16 +46,23 @@ public class ContentsRankingScoreUpdateService {
             log.warn("랭킹 점수 반영 실패 : ID에 해당하는 작품이 존재하지 않음");
         }
 
-        int oldScore = contentsDailyScoreRepository
-                .findByContents(contents)
-                .getRankingScore();
+        Optional<ContentsDailyScore> optionalDailyScore = contentsDailyScoreRepository.findByContents(contents);
+        ContentsDailyScore dailyScore;
+        if (optionalDailyScore.isPresent()) {
+            dailyScore = optionalDailyScore.get();
+            int oldScore = dailyScore.getRankingScore();
 
-        contentsDailyScoreRepository.save(
-            ContentsDailyScore.builder()
-                    .contents(contents)
-                    .rankingScore(oldScore + score)
-                    .build()
-        );
+            dailyScore.setRankingScore(oldScore + score);
+            contentsDailyScoreRepository.save(dailyScore);
+        } else {
+            contentsDailyScoreRepository.save(
+                    ContentsDailyScore.builder()
+                            .contents(contents)
+                            .rankingScore(score)
+                            .build()
+            );
+        }
+
         log.info("랭킹 점수 추가 완료");
     }
 
@@ -62,21 +71,25 @@ public class ContentsRankingScoreUpdateService {
             log.warn("랭킹 점수 반영 실패 : ID에 해당하는 작품이 존재하지 않음");
         }
 
-        int oldScore = contentsDailyScoreRepository
-                .findByContents(contents)
-                .getRankingScore();
-
-        if ((oldScore - score) < 0) {
-            log.warn("랭킹 점수는 0점보다 낮을 수 없음");
+        Optional<ContentsDailyScore> optionalDailyScore = contentsDailyScoreRepository.findByContents(contents);
+        ContentsDailyScore dailyScore;
+        int oldScore;
+        if (optionalDailyScore.isPresent()) {
+            dailyScore = optionalDailyScore.get();
+            oldScore = dailyScore.getRankingScore();
+        } else {
+            log.error("해당하는 작품의 랭킹 점수를 찾을 수 없습니다.");
             return;
         }
 
-        contentsDailyScoreRepository.save(
-                ContentsDailyScore.builder()
-                        .contents(contents)
-                        .rankingScore(oldScore - score)
-                        .build()
-        );
+        if ((oldScore - score) <= 0) {
+            log.warn("랭킹 점수는 0점보다 낮으므로 데이터 삭제");
+            contentsDailyScoreRepository.delete(dailyScore);
+            return;
+        }
+
+        dailyScore.setRankingScore(oldScore - score);
+        contentsDailyScoreRepository.save(dailyScore);
         log.info("랭킹 점수 차감 완료");
     }
 }

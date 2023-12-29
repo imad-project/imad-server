@@ -201,7 +201,7 @@ public class ReviewService {
                 reviewRepository.delete(review);
                 calculateAndSaveAverageScore(review);
                 
-                contentsRankingScoreUpdateService.addRankingScore(review.getContents(), REVIEW_RANKING_SCORE);
+                contentsRankingScoreUpdateService.subtractRankingScore(review.getContents(), REVIEW_RANKING_SCORE);
                 log.info("[리뷰 삭제] 랭킹 점수 반영 완료");
             } else {
                 throw new BadRequestException(ResponseCode.REVIEW_NO_PERMISSION);
