@@ -13,6 +13,8 @@ public interface PostingScrapRepository extends JpaRepository<PostingScrap, Long
 
     PostingScrap findByUserAccountAndPosting(UserAccount userAccount, Posting posting);
 
+    PostingScrap findByIdAndUserAccount(Long id, UserAccount userAccount);
+
     // 프로필 조회용
     @Query("SELECT COUNT(*) FROM PostingScrap WHERE userAccount = :user")
     int countPostingScrapByUser(UserAccount user);

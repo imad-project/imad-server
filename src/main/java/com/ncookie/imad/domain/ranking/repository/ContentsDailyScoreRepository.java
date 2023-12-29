@@ -5,5 +5,5 @@ import com.ncookie.imad.domain.ranking.entity.ContentsDailyScore;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ContentsDailyScoreRepository extends JpaRepository<ContentsDailyScore, Long> {
-    public ContentsDailyScore findByContents(Contents contents);
+    ContentsDailyScore findByContents(Contents contents);
 }

@@ -11,6 +11,7 @@ public interface ContentsBookmarkRepository extends JpaRepository<ContentsBookma
     Page<ContentsBookmark> findAllByUserAccount(UserAccount userAccount, Pageable pageable);
 
     ContentsBookmark findByUserAccountAndContents(UserAccount userAccount, Contents contents);
+    ContentsBookmark findByIdAndUserAccount(Long id, UserAccount userAccount);
 
     boolean existsByUserAccountAndContents(UserAccount userAccount, Contents contents);
 

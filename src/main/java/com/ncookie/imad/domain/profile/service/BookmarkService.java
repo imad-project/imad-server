@@ -21,6 +21,10 @@ public class BookmarkService {
         return contentsBookmarkRepository.findAllByUserAccount(userAccount, pageable);
     }
 
+    public ContentsBookmark findByIdAndUserAccount(Long bookmarkId, UserAccount userAccount) {
+        return contentsBookmarkRepository.findByIdAndUserAccount(bookmarkId, userAccount);
+    }
+
     public ContentsBookmark findByUserAccountAndContents(UserAccount userAccount, Contents contents) {
         return contentsBookmarkRepository.findByUserAccountAndContents(userAccount, contents);
     }
