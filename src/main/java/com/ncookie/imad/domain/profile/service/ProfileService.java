@@ -27,6 +27,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.BOOKMARK_RANKING_SCORE;
+import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.SCRAP_RANKING_SCORE;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -98,7 +101,7 @@ public class ProfileService {
             );
             log.info("북마크 등록 완료");
             
-            contentsRankingScoreUpdateService.addRankingScore(contents, ContentsRankingScoreUpdateService.BOOKMARK_SCORE);
+            contentsRankingScoreUpdateService.addRankingScore(contents, BOOKMARK_RANKING_SCORE);
             log.info("[작품 북마크] 랭킹 점수 반영 완료");
             
             return ResponseCode.BOOKMARK_ADD_SUCCESS;
@@ -122,9 +125,7 @@ public class ProfileService {
         log.info("북마크 삭제 완료");
 
         ContentsBookmark bookmark = bookmarkService.findByIdAndUserAccount(bookmarkId, user);
-        contentsRankingScoreUpdateService.subtractRankingScore(
-                bookmark.getContents(),
-                ContentsRankingScoreUpdateService.BOOKMARK_SCORE);
+        contentsRankingScoreUpdateService.subtractRankingScore(bookmark.getContents(), BOOKMARK_RANKING_SCORE);
         log.info("[작품 북마크] 랭킹 점수 반영 완료");
     }
 
@@ -161,7 +162,7 @@ public class ProfileService {
             );
             log.info("스크랩 등록 완료");
 
-            contentsRankingScoreUpdateService.addRankingScore(posting.getContents(), ContentsRankingScoreUpdateService.SCRAP_SCORE);
+            contentsRankingScoreUpdateService.addRankingScore(posting.getContents(), SCRAP_RANKING_SCORE);
             log.info("[작품 스크랩] 랭킹 점수 반영 완료");
 
             return ResponseCode.SCRAP_ADD_SUCCESS;
@@ -184,9 +185,7 @@ public class ProfileService {
         log.info("스크랩 삭제 완료");
 
         PostingScrap postingScrap = scrapService.findByIdAndUserAccount(scrapId, user);
-        contentsRankingScoreUpdateService.subtractRankingScore(
-                postingScrap.getPosting().getContents(),
-                ContentsRankingScoreUpdateService.SCRAP_SCORE);
+        contentsRankingScoreUpdateService.subtractRankingScore(postingScrap.getPosting().getContents(), SCRAP_RANKING_SCORE);
         log.info("[작품 스크랩] 랭킹 점수 반영 완료");
     }
 

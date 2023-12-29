@@ -21,22 +21,22 @@ public class ContentsRankingScoreUpdateService {
 
 
     // 작품 북마크 작성
-    public final static int BOOKMARK_SCORE = 20;
+    public final static int BOOKMARK_RANKING_SCORE = 20;
 
     // 작품 리뷰 작성
-    public final static int REVIEW_SCORE = 10;
+    public final static int REVIEW_RANKING_SCORE = 10;
 
     // 게시글 작성 점수
-    public final static int POSTING_SCORE = 5;
+    public final static int POSTING_RANKING_SCORE = 5;
 
     // 게시글 스크랩 점수
-    public final static int SCRAP_SCORE = 3;
+    public final static int SCRAP_RANKING_SCORE = 3;
 
     // 리뷰/게시글 좋아요 점수
-    public final static int LIKE_SCORE = 3;
+    public final static int LIKE_RANKING_SCORE = 3;
 
     // 게시글 댓글 점수
-    public final static int COMMENT_SCORE = 2;
+    public final static int COMMENT_RANKING_SCORE = 2;
 
 
     public void addRankingScore(Contents contents, int score) {
