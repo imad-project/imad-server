@@ -7,9 +7,15 @@ import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.springframework.context.annotation.Description;
+import org.springframework.data.redis.core.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 @Slf4j
@@ -91,5 +97,32 @@ public class ContentsRankingScoreUpdateService {
         dailyScore.setRankingScore(oldScore - score);
         contentsDailyScoreRepository.save(dailyScore);
         log.info("랭킹 점수 차감 완료");
+    }
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
+    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    public void saveContentsDailyRankingScore() {
+        // 현재 날짜를 가져옴
+        LocalDate currentDate = LocalDate.now();
+
+        // `20231231` 과 같은 형식으로 변환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String key = currentDate.format(formatter);
+
+        // 만약 같은 키의 데이터가 이미 존재한다면 삭제
+        redisTemplate.delete(key);
+        
+        // String 형태의 key를 가지고, Contents 데이터를 value로 가짐
+        ZSetOperations<String, Object> dailyScoreSet = redisTemplate.opsForZSet();
+
+        // MySQL DB에 있는 당일 랭킹 점수를 Redis에 저장함
+        List<ContentsDailyScore> dailyScoreList = contentsDailyScoreRepository.findAll();
+        for (ContentsDailyScore dailyScore : dailyScoreList) {
+            Hibernate.initialize(dailyScore.getContents());
+            dailyScoreSet.add(key, dailyScore.getContents(), dailyScore.getRankingScore());
+            log.info(String.format("[%s][%s] 작품 랭킹 점수 저장 완료", key, dailyScore.getContents().getTranslatedTitle()));
+        }
     }
 }
