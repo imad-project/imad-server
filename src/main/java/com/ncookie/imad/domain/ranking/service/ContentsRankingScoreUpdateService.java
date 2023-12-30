@@ -101,8 +101,8 @@ public class ContentsRankingScoreUpdateService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
-    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
-//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+//    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
+    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void saveContentsDailyRankingScore() {
         // 현재 날짜를 가져옴
         LocalDate currentDate = LocalDate.now();
@@ -115,13 +115,13 @@ public class ContentsRankingScoreUpdateService {
         redisTemplate.delete(key);
         
         // String 형태의 key를 가지고, Contents 데이터를 value로 가짐
-        ZSetOperations<String, Object> dailyScoreSet = redisTemplate.opsForZSet();
+        HashOperations<String, Object, Object> dailyRankingScoreHash = redisTemplate.opsForHash();
 
         // MySQL DB에 있는 당일 랭킹 점수를 Redis에 저장함
         List<ContentsDailyScore> dailyScoreList = contentsDailyScoreRepository.findAll();
         for (ContentsDailyScore dailyScore : dailyScoreList) {
             Hibernate.initialize(dailyScore.getContents());
-            dailyScoreSet.add(key, dailyScore.getContents(), dailyScore.getRankingScore());
+            dailyRankingScoreHash.put(key, dailyScore.getContents(), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 작품 랭킹 점수 저장 완료", key, dailyScore.getContents().getTranslatedTitle()));
         }
     }
