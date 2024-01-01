@@ -150,4 +150,32 @@ public class ContentsRankingScoreUpdateService {
             log.info("일일 작품 랭킹 점수 DB 초기화 완료");
         }
     }
+
+    @Description("주간/월간/전체 작품 랭킹 정산 및 MySQL에 저장")
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+    public void updateScoreAndRanking() {
+
+    }
+
+    @Description("매일 00시 10분에 주간/월간/전체 작품 랭킹을 Redis에 업데이트함")
+    @Scheduled(cron = "0 10 0 * * *")    // 매일 자정 10분 후에 실행
+    public void updateRankingRedisDB() {
+
+    }
+
+    @Description("n일 전까지의 날짜 포맷 스트링을 리스트로 반환. 주간/월간 랭킹 점수를 정산할 때 사용됨")
+    private static List<String> getRecentDates(int days) {
+        List<String> recentDates = new ArrayList<>();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        // 오늘부터 최근 7일 동안의 날짜 생성
+        for (int i = 0; i < days; i++) {
+            LocalDate currentDate = LocalDate.now().minusDays(i);
+            String formattedDate = currentDate.format(formatter);
+            recentDates.add(formattedDate);
+        }
+
+        return recentDates;
+    }
 }
