@@ -3,11 +3,12 @@ package com.ncookie.imad.domain.ranking.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
 import com.ncookie.imad.domain.ranking.entity.ContentsDailyScore;
+import com.ncookie.imad.domain.ranking.entity.ContentsEntireScore;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRepository;
+import com.ncookie.imad.domain.ranking.repository.ContentsEntireScoreRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.context.annotation.Description;
 import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +27,7 @@ public class ContentsRankingScoreUpdateService {
     private final ContentsRetrievalService contentsRetrievalService;
 
     private final ContentsDailyScoreRepository contentsDailyScoreRepository;
+    private final ContentsEntireScoreRepository contentsEntireScoreRepository;
 
 
     // 작품 북마크 작성
@@ -120,9 +122,28 @@ public class ContentsRankingScoreUpdateService {
         // MySQL DB에 있는 당일 랭킹 점수를 Redis에 저장함
         List<ContentsDailyScore> dailyScoreList = contentsDailyScoreRepository.findAll();
         for (ContentsDailyScore dailyScore : dailyScoreList) {
-            Hibernate.initialize(dailyScore.getContents());
-            dailyRankingScoreHash.put(key, dailyScore.getContents(), dailyScore.getRankingScore());
-            log.info(String.format("[%s][%s] 작품 랭킹 점수 저장 완료", key, dailyScore.getContents().getTranslatedTitle()));
+            Contents contents = dailyScore.getContents();
+            
+            // 일일 작품 랭킹 점수 Redis에 저장
+            dailyRankingScoreHash.put(key, contents, dailyScore.getRankingScore());
+            log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
+
+            // 총합 작품 랭킹 점수 MySQL에 저장
+            Optional<ContentsEntireScore> optionalContentsEntireScore = contentsEntireScoreRepository.findByContents(contents);
+            if (optionalContentsEntireScore.isPresent()) {
+                ContentsEntireScore contentsEntireScore = optionalContentsEntireScore.get();
+                int oldScore = contentsEntireScore.getRankingScore();
+                contentsEntireScore.setRankingScore(oldScore + dailyScore.getRankingScore());
+                contentsEntireScoreRepository.save(contentsEntireScore);
+            } else {
+                contentsEntireScoreRepository.save(
+                    ContentsEntireScore.builder()
+                            .contents(contents)
+                            .rankingScore(dailyScore.getRankingScore())
+                            .build()
+                );
+            }
+            log.info(String.format("[%s][%s] 전체 작품 랭킹 점수 저장 완료 (MySQL)", key, contents.getTranslatedTitle()));
         }
     }
 }
