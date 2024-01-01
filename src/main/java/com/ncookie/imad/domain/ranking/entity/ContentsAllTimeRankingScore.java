@@ -12,7 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class ContentsEntireScore {
+public class ContentsAllTimeRankingScore {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

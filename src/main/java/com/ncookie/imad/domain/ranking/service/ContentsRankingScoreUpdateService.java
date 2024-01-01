@@ -2,10 +2,10 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
-import com.ncookie.imad.domain.ranking.entity.ContentsDailyScore;
-import com.ncookie.imad.domain.ranking.entity.ContentsEntireScore;
-import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRepository;
-import com.ncookie.imad.domain.ranking.repository.ContentsEntireScoreRepository;
+import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
+import com.ncookie.imad.domain.ranking.entity.ContentsAllTimeRankingScore;
+import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
+import com.ncookie.imad.domain.ranking.repository.ContentsAllTimeRankingScoreRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ import java.util.*;
 public class ContentsRankingScoreUpdateService {
     private final ContentsRetrievalService contentsRetrievalService;
 
-    private final ContentsDailyScoreRepository contentsDailyScoreRepository;
-    private final ContentsEntireScoreRepository contentsEntireScoreRepository;
+    private final ContentsDailyScoreRankingRepository contentsDailyScoreRankingRepository;
+    private final ContentsAllTimeRankingScoreRepository contentsAllTimeRankingScoreRepository;
 
 
     // 작품 북마크 작성
@@ -54,17 +54,17 @@ public class ContentsRankingScoreUpdateService {
             log.warn("랭킹 점수 반영 실패 : ID에 해당하는 작품이 존재하지 않음");
         }
 
-        Optional<ContentsDailyScore> optionalDailyScore = contentsDailyScoreRepository.findByContents(contents);
-        ContentsDailyScore dailyScore;
+        Optional<ContentsDailyRankingScore> optionalDailyScore = contentsDailyScoreRankingRepository.findByContents(contents);
+        ContentsDailyRankingScore dailyScore;
         if (optionalDailyScore.isPresent()) {
             dailyScore = optionalDailyScore.get();
             int oldScore = dailyScore.getRankingScore();
 
             dailyScore.setRankingScore(oldScore + score);
-            contentsDailyScoreRepository.save(dailyScore);
+            contentsDailyScoreRankingRepository.save(dailyScore);
         } else {
-            contentsDailyScoreRepository.save(
-                    ContentsDailyScore.builder()
+            contentsDailyScoreRankingRepository.save(
+                    ContentsDailyRankingScore.builder()
                             .contents(contents)
                             .rankingScore(score)
                             .build()
@@ -79,8 +79,8 @@ public class ContentsRankingScoreUpdateService {
             log.warn("랭킹 점수 반영 실패 : ID에 해당하는 작품이 존재하지 않음");
         }
 
-        Optional<ContentsDailyScore> optionalDailyScore = contentsDailyScoreRepository.findByContents(contents);
-        ContentsDailyScore dailyScore;
+        Optional<ContentsDailyRankingScore> optionalDailyScore = contentsDailyScoreRankingRepository.findByContents(contents);
+        ContentsDailyRankingScore dailyScore;
         int oldScore;
         if (optionalDailyScore.isPresent()) {
             dailyScore = optionalDailyScore.get();
@@ -92,12 +92,12 @@ public class ContentsRankingScoreUpdateService {
 
         if ((oldScore - score) <= 0) {
             log.warn("랭킹 점수는 0점보다 낮으므로 데이터 삭제");
-            contentsDailyScoreRepository.delete(dailyScore);
+            contentsDailyScoreRankingRepository.delete(dailyScore);
             return;
         }
 
         dailyScore.setRankingScore(oldScore - score);
-        contentsDailyScoreRepository.save(dailyScore);
+        contentsDailyScoreRankingRepository.save(dailyScore);
         log.info("랭킹 점수 차감 완료");
     }
 
@@ -107,7 +107,7 @@ public class ContentsRankingScoreUpdateService {
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void saveContentsDailyRankingScore() {
         // 현재 날짜를 가져옴
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = LocalDate.now().minusDays(1);
 
         // `20231231` 과 같은 형식으로 변환
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -120,8 +120,8 @@ public class ContentsRankingScoreUpdateService {
         HashOperations<String, Object, Object> dailyRankingScoreHash = redisTemplate.opsForHash();
 
         // MySQL DB에 있는 당일 랭킹 점수를 Redis에 저장함
-        List<ContentsDailyScore> dailyScoreList = contentsDailyScoreRepository.findAll();
-        for (ContentsDailyScore dailyScore : dailyScoreList) {
+        List<ContentsDailyRankingScore> dailyScoreList = contentsDailyScoreRankingRepository.findAll();
+        for (ContentsDailyRankingScore dailyScore : dailyScoreList) {
             Contents contents = dailyScore.getContents();
             
             // 일일 작품 랭킹 점수 Redis에 저장
@@ -129,15 +129,15 @@ public class ContentsRankingScoreUpdateService {
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
             // 총합 작품 랭킹 점수 MySQL에 저장
-            Optional<ContentsEntireScore> optionalContentsEntireScore = contentsEntireScoreRepository.findByContents(contents);
+            Optional<ContentsAllTimeRankingScore> optionalContentsEntireScore = contentsAllTimeRankingScoreRepository.findByContents(contents);
             if (optionalContentsEntireScore.isPresent()) {
-                ContentsEntireScore contentsEntireScore = optionalContentsEntireScore.get();
-                int oldScore = contentsEntireScore.getRankingScore();
-                contentsEntireScore.setRankingScore(oldScore + dailyScore.getRankingScore());
-                contentsEntireScoreRepository.save(contentsEntireScore);
+                ContentsAllTimeRankingScore contentsAllTimeRankingScore = optionalContentsEntireScore.get();
+                int oldScore = contentsAllTimeRankingScore.getRankingScore();
+                contentsAllTimeRankingScore.setRankingScore(oldScore + dailyScore.getRankingScore());
+                contentsAllTimeRankingScoreRepository.save(contentsAllTimeRankingScore);
             } else {
-                contentsEntireScoreRepository.save(
-                    ContentsEntireScore.builder()
+                contentsAllTimeRankingScoreRepository.save(
+                    ContentsAllTimeRankingScore.builder()
                             .contents(contents)
                             .rankingScore(dailyScore.getRankingScore())
                             .build()
@@ -146,7 +146,7 @@ public class ContentsRankingScoreUpdateService {
             log.info(String.format("[%s][%s] 전체 작품 랭킹 점수 저장 완료 (MySQL)", key, contents.getTranslatedTitle()));
 
             // 일일 작품 랭킹 점수 DB 초기화
-            contentsDailyScoreRepository.deleteAllInBatch();
+            contentsDailyScoreRankingRepository.deleteAllInBatch();
             log.info("일일 작품 랭킹 점수 DB 초기화 완료");
         }
     }
