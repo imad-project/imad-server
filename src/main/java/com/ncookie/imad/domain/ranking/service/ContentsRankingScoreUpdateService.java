@@ -144,6 +144,10 @@ public class ContentsRankingScoreUpdateService {
                 );
             }
             log.info(String.format("[%s][%s] 전체 작품 랭킹 점수 저장 완료 (MySQL)", key, contents.getTranslatedTitle()));
+
+            // 일일 작품 랭킹 점수 DB 초기화
+            contentsDailyScoreRepository.deleteAllInBatch();
+            log.info("일일 작품 랭킹 점수 DB 초기화 완료");
         }
     }
 }
