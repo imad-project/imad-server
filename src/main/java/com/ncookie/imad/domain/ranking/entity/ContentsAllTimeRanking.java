@@ -12,10 +12,10 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class WeeklyRanking {
+public class ContentsAllTimeRanking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long weeklyRankingId;
+    private Long allTimeRankingId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -24,7 +24,7 @@ public class WeeklyRanking {
     private Contents contents;
 
     @Setter
-    private int weeklyRank;
+    private int allTimeRank;
 
     @Setter
     private int rankChanged;
