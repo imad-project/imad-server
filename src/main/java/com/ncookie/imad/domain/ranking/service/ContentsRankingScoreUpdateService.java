@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
+import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
 import com.ncookie.imad.domain.ranking.entity.ContentsAllTimeRankingScore;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
@@ -28,6 +29,9 @@ public class ContentsRankingScoreUpdateService {
 
     private final ContentsDailyScoreRankingRepository contentsDailyScoreRankingRepository;
     private final ContentsAllTimeRankingScoreRepository contentsAllTimeRankingScoreRepository;
+
+    private final int DAYS_OF_WEEK = 7;
+    private final int DAYS_OF_MONTH = 30;
 
 
     // 작품 북마크 작성
@@ -57,12 +61,14 @@ public class ContentsRankingScoreUpdateService {
         Optional<ContentsDailyRankingScore> optionalDailyScore = contentsDailyScoreRankingRepository.findByContents(contents);
         ContentsDailyRankingScore dailyScore;
         if (optionalDailyScore.isPresent()) {
+
             dailyScore = optionalDailyScore.get();
             int oldScore = dailyScore.getRankingScore();
 
             dailyScore.setRankingScore(oldScore + score);
             contentsDailyScoreRankingRepository.save(dailyScore);
         } else {
+
             contentsDailyScoreRankingRepository.save(
                     ContentsDailyRankingScore.builder()
                             .contents(contents)
@@ -114,10 +120,10 @@ public class ContentsRankingScoreUpdateService {
         String key = currentDate.format(formatter);
 
         // 만약 같은 키의 데이터가 이미 존재한다면 삭제
-        redisTemplate.delete(key);
+//        redisTemplate.delete(key);
         
         // String 형태의 key를 가지고, Contents 데이터를 value로 가짐
-        HashOperations<String, Object, Object> dailyRankingScoreHash = redisTemplate.opsForHash();
+        ZSetOperations<String, Object> dailyScoreSet = redisTemplate.opsForZSet();
 
         // MySQL DB에 있는 당일 랭킹 점수를 Redis에 저장함
         List<ContentsDailyRankingScore> dailyScoreList = contentsDailyScoreRankingRepository.findAll();
@@ -125,7 +131,7 @@ public class ContentsRankingScoreUpdateService {
             Contents contents = dailyScore.getContents();
             
             // 일일 작품 랭킹 점수 Redis에 저장
-            dailyRankingScoreHash.put(key, contents, dailyScore.getRankingScore());
+            dailyScoreSet.add(key, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
             // 총합 작품 랭킹 점수 MySQL에 저장
@@ -145,16 +151,30 @@ public class ContentsRankingScoreUpdateService {
             }
             log.info(String.format("[%s][%s] 전체 작품 랭킹 점수 저장 완료 (MySQL)", key, contents.getTranslatedTitle()));
 
+
             // 일일 작품 랭킹 점수 DB 초기화
-            contentsDailyScoreRankingRepository.deleteAllInBatch();
+            // TODO: 테스트 후 삭제 함수 원상복귀
+//            contentsDailyScoreRankingRepository.deleteAllInBatch();
             log.info("일일 작품 랭킹 점수 DB 초기화 완료");
         }
     }
 
-    @Description("주간/월간/전체 작품 랭킹 정산 및 MySQL에 저장")
-    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-    public void updateScoreAndRanking() {
+    @Description("주간 작품 랭킹 정산 및 MySQL에 저장")
+    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+    public void updateWeeklyScoreAndRanking() {
+        List<String> recentDates = getRecentDates(DAYS_OF_WEEK);
 
+        for (String key : recentDates) {
+            Set<ZSetOperations.TypedTuple<Object>> typedTuples = redisTemplate.opsForZSet()
+                    .reverseRangeWithScores(key, 0, -1);
+        }
+    }
+
+    @Description("월간 작품 랭킹 정산 및 MySQL에 저장")
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+    public void updateMonthlyScoreAndRanking() {
+        List<String> recentDates = getRecentDates(DAYS_OF_MONTH);
     }
 
     @Description("매일 00시 10분에 주간/월간/전체 작품 랭킹을 Redis에 업데이트함")
