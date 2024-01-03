@@ -15,12 +15,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ContentsData implements Serializable {
     private Long contentsId;
+
     private String title;
     private String posterPath;
 
     public static ContentsData toDTO(Contents contents) {
         return ContentsData.builder()
                 .contentsId(contents.getContentsId())
+
                 .title(contents.getTranslatedTitle())
                 .posterPath(contents.getPosterPath())
                 .build();

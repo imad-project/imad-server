@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
@@ -117,11 +118,8 @@ public class ContentsRankingScoreUpdateService {
 
         // `20231231` 과 같은 형식으로 변환
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String key = currentDate.format(formatter);
+        String defaultKey = currentDate.format(formatter);
 
-        // 만약 같은 키의 데이터가 이미 존재한다면 삭제
-//        redisTemplate.delete(key);
-        
         // String 형태의 key를 가지고, Contents 데이터를 value로 가짐
         ZSetOperations<String, Object> dailyScoreSet = redisTemplate.opsForZSet();
 
@@ -129,8 +127,17 @@ public class ContentsRankingScoreUpdateService {
         List<ContentsDailyRankingScore> dailyScoreList = contentsDailyScoreRankingRepository.findAll();
         for (ContentsDailyRankingScore dailyScore : dailyScoreList) {
             Contents contents = dailyScore.getContents();
-            
+            String key = defaultKey;
+
             // 일일 작품 랭킹 점수 Redis에 저장
+            dailyScoreSet.add(defaultKey, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
+
+            // 장르별로 별도의 데이터로 랭킹 점수 저장
+            switch (contents.getContentsType()) {
+                case MOVIE -> key = defaultKey + "_" + ContentsType.MOVIE.getContentsType();
+                case TV -> key = defaultKey + "_" + ContentsType.TV.getContentsType();
+                case ANIMATION -> key = defaultKey + "_" + ContentsType.ANIMATION.getContentsType();
+            }
             dailyScoreSet.add(key, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
@@ -166,6 +173,7 @@ public class ContentsRankingScoreUpdateService {
         List<String> recentDates = getRecentDates(DAYS_OF_WEEK);
 
         for (String key : recentDates) {
+            // 작품 정보와 랭킹 점수를 내림차순(점수 높은 순)으로 정렬하여 받아온다.
             Set<ZSetOperations.TypedTuple<Object>> typedTuples = redisTemplate.opsForZSet()
                     .reverseRangeWithScores(key, 0, -1);
         }
