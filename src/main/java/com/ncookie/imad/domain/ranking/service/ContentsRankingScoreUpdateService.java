@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
+import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ncookie.imad.domain.contents.entity.ContentsType.*;
 
@@ -111,24 +113,21 @@ public class ContentsRankingScoreUpdateService {
     }
 
     private final RedisTemplate<String, Object> redisTemplate;
+
     Map<ContentsType, String> genreString = Map.of(
-                                ContentsType.MOVIE, "_MOVIE",
-                                ContentsType.TV, "_TV",
-                                ContentsType.ANIMATION, "_ANIMATION");
+                                ContentsType.ALL, "ALL_",
+                                ContentsType.MOVIE, "MOVIE_",
+                                ContentsType.TV, "TV_",
+                                ContentsType.ANIMATION, "ANIMATION_");
 
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
 //    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void saveContentsDailyRankingScore() {
-        // 자정이 지났으므로 전날 날짜를 가져옴
-        LocalDate currentDate = LocalDate.now().minusDays(1);
-
-        // `20231231` 과 같은 형식으로 변환
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String defaultKey = currentDate.format(formatter);
+        String defaultKey = getLastDate(1);
 
         // String 형태의 key를 가지고, Contents 데이터를 value로 가짐
-        ZSetOperations<String, Object> dailyScoreSet = redisTemplate.opsForZSet();
+        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
 
         // MySQL DB에 있는 당일 랭킹 점수를 Redis에 저장함
         List<ContentsDailyRankingScore> dailyScoreList = contentsDailyScoreRankingRepository.findAll();
@@ -137,15 +136,15 @@ public class ContentsRankingScoreUpdateService {
             String key = defaultKey;
 
             // 일일 작품 랭킹 점수 Redis에 저장
-            dailyScoreSet.add(defaultKey, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
+            zSetOperations.add(genreString.get(ALL) + defaultKey, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
 
             // 장르별로 별도의 데이터로 랭킹 점수 저장
             switch (contents.getContentsType()) {
-                case MOVIE -> key = defaultKey + genreString.get(MOVIE);
-                case TV -> key = defaultKey + genreString.get(TV);
-                case ANIMATION -> key = defaultKey + genreString.get(ANIMATION);
+                case MOVIE -> key = genreString.get(MOVIE) + defaultKey;
+                case TV -> key = genreString.get(TV) + defaultKey;
+                case ANIMATION -> key = genreString.get(ANIMATION) + defaultKey;
             }
-            dailyScoreSet.add(key, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
+            zSetOperations.add(key, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
             // 총합 작품 랭킹 점수 MySQL에 저장
@@ -177,12 +176,17 @@ public class ContentsRankingScoreUpdateService {
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
 //    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
     public void updateWeeklyScoreAndRanking() {
+        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
         List<String> recentDates = getRecentDates(DAYS_OF_WEEK);
 
-        for (String key : recentDates) {
-            // 작품 정보와 랭킹 점수를 내림차순(점수 높은 순)으로 정렬하여 받아온다.
-            Set<ZSetOperations.TypedTuple<Object>> typedTuples = redisTemplate.opsForZSet()
-                    .reverseRangeWithScores(key, 0, -1);
+        // 주간 랭킹 합산 점수 데이터 생성
+        for (String genre : genreString.values()) {
+            zSetOperations.unionAndStore(
+                    "",
+                    recentDates.stream().map(s -> genre + s).collect(Collectors.toList()),
+                    "weekly_score_" + genre + getLastDate(0),
+                    Aggregate.SUM);
+            log.info(String.format("%s 주간 랭킹 점수 합산 완료", genre));
         }
     }
 
@@ -198,8 +202,9 @@ public class ContentsRankingScoreUpdateService {
 
     }
 
+
     @Description("n일 전까지의 날짜 포맷 스트링을 리스트로 반환. 주간/월간 랭킹 점수를 정산할 때 사용됨")
-    private static List<String> getRecentDates(int days) {
+    private List<String> getRecentDates(int days) {
         List<String> recentDates = new ArrayList<>();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -212,5 +217,16 @@ public class ContentsRankingScoreUpdateService {
         }
 
         return recentDates;
+    }
+
+    @Description("n일 전까지의 날짜 포맷 스트링을 리스트로 반환. 주간/월간 랭킹 점수를 정산할 때 사용됨")
+    private String getLastDate(int n) {
+        // 자정이 지났으므로 전날 날짜를 가져옴
+        LocalDate currentDate = LocalDate.now().minusDays(n);
+
+        // `20231231` 과 같은 형식으로 변환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        return currentDate.format(formatter);
     }
 }
