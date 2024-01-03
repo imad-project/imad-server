@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.ncookie.imad.domain.contents.entity.ContentsType.*;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -109,6 +111,11 @@ public class ContentsRankingScoreUpdateService {
     }
 
     private final RedisTemplate<String, Object> redisTemplate;
+    Map<ContentsType, String> genreString = Map.of(
+                                ContentsType.MOVIE, "_MOVIE",
+                                ContentsType.TV, "_TV",
+                                ContentsType.ANIMATION, "_ANIMATION");
+
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
 //    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
@@ -134,9 +141,9 @@ public class ContentsRankingScoreUpdateService {
 
             // 장르별로 별도의 데이터로 랭킹 점수 저장
             switch (contents.getContentsType()) {
-                case MOVIE -> key = defaultKey + "_" + ContentsType.MOVIE.getContentsType();
-                case TV -> key = defaultKey + "_" + ContentsType.TV.getContentsType();
-                case ANIMATION -> key = defaultKey + "_" + ContentsType.ANIMATION.getContentsType();
+                case MOVIE -> key = defaultKey + genreString.get(MOVIE);
+                case TV -> key = defaultKey + genreString.get(TV);
+                case ANIMATION -> key = defaultKey + genreString.get(ANIMATION);
             }
             dailyScoreSet.add(key, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
