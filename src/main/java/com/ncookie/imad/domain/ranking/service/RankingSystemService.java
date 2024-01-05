@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.ranking.service;
 
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +9,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.ncookie.imad.domain.ranking.service.RankingUtils.genreStringMap;
 import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
 
 
@@ -21,13 +24,18 @@ import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
 public class RankingSystemService {
     private final RedisTemplate<String, Object> redisTemplate;
 
+    public Set<ContentsData> getRankingByContentsType(String rankingType, ContentsType contentsType) {
+        // TODO: null 처리
+        return getRankingFromRedis(rankingType, genreStringMap.get(contentsType));
+    }
+
     // Redis에서 내림차순으로 랭킹 데이터 Set<ContentsData> 형식으로 반환
     private Set<ContentsData> getRankingFromRedis(String periodString, String genreString) {
         String todayDate = getLastDate(0);
         String key = periodString + "_ranking" + genreString + todayDate;
 
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
-        Set<Object> objects = zSetOperations.reverseRangeByScore(
+        Set<Object> objects = zSetOperations.rangeByScore(
                 key,
                 Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
@@ -37,9 +45,13 @@ public class RankingSystemService {
             return null;
         }
 
-        return objects.stream()
-                .filter(ContentsData.class::isInstance)
-                .map(ContentsData.class::cast)
-                .collect(Collectors.toSet());
+        Set<ContentsData> contentsDataSet = new LinkedHashSet<>();
+        for (Object obj : objects) {
+            if (obj instanceof ContentsData) {
+                contentsDataSet.add((ContentsData) obj);
+            }
+        }
+
+        return contentsDataSet;
     }
 }
