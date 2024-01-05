@@ -1,7 +1,6 @@
 package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
-import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
@@ -18,8 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.ncookie.imad.domain.contents.entity.ContentsType.*;
-import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
-import static com.ncookie.imad.domain.ranking.service.RankingUtils.getRecentDates;
+import static com.ncookie.imad.domain.ranking.service.RankingUtils.*;
 
 
 @Slf4j
@@ -34,12 +32,6 @@ public class ContentsRankingScoreUpdateService {
     private final int PERIOD_MONTH = 30;
 
     private final RedisTemplate<String, Object> redisTemplate;
-
-    Map<ContentsType, String> genreStringMap = Map.of(
-            ContentsType.ALL, "_ALL_",
-            ContentsType.MOVIE, "_MOVIE_",
-            ContentsType.TV, "_TV_",
-            ContentsType.ANIMATION, "_ANIMATION_");
 
 
     // 작품 북마크 작성

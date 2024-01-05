@@ -1,13 +1,22 @@
 package com.ncookie.imad.domain.ranking.service;
 
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import org.springframework.context.annotation.Description;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RankingUtils {
+    public static Map<ContentsType, String> genreStringMap = Map.of(
+            ContentsType.ALL, "_ALL_",
+            ContentsType.MOVIE, "_MOVIE_",
+            ContentsType.TV, "_TV_",
+            ContentsType.ANIMATION, "_ANIMATION_");
+
+
     @Description("n일 전까지의 날짜 포맷 스트링을 리스트로 반환. 주간/월간 랭킹 점수를 정산할 때 사용됨")
     public static List<String> getRecentDates(int days) {
         List<String> recentDates = new ArrayList<>();
