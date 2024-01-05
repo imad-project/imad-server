@@ -119,8 +119,8 @@ public class ContentsRankingScoreUpdateService {
                                 ContentsType.ANIMATION, "_ANIMATION_");
 
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
-//    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void saveContentsDailyRankingScore() {
         String defaultKey = getLastDate(1);
 
@@ -145,39 +145,31 @@ public class ContentsRankingScoreUpdateService {
             zSetOperations.add(key, ContentsData.from(dailyScore.getContents()), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
-            // 총합 작품 랭킹 점수 DB 저장
-//            zSetOperations.unionAndStore(
-//                    "alltime_score" + genreStringMap.get(contents.getContentsType()) + defaultKey,
-//                    key,
-//                    "alltime_score" + genreStringMap.get(contents.getContentsType()) + defaultKey);
-//            log.info(String.format("[%s][%s] ALL TIME 장르별 작품 랭킹 점수 저장 완료", key, contents.getTranslatedTitle()));
-
-
             // 일일 작품 랭킹 점수 DB 초기화
             // TODO: 테스트 후 삭제 함수 원상복귀
-//            contentsDailyScoreRankingRepository.deleteAllInBatch();
+            contentsDailyScoreRankingRepository.deleteAllInBatch();
             log.info("일일 작품 랭킹 점수 DB 초기화 완료");
         }
 
     }
 
     @Description("주간 작품 랭킹 정산")
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
-//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
     public void updateWeeklyScoreAndRanking() {
         updateScoreAndRanking("weekly", PERIOD_WEEK);
     }
 
     @Description("월간 작품 랭킹 정산")
-//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateMonthlyScoreAndRanking() {
         updateScoreAndRanking("monthly", PERIOD_MONTH);
     }
 
     @Description("전체 작품 랭킹 정산")
-//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateAllTimeScoreAndRanking() {
         updateScoreAndRanking("alltime", PERIOD_ALLTIME);
     }
