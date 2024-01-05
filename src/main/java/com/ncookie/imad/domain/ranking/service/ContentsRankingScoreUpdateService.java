@@ -2,7 +2,6 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
-import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
@@ -15,12 +14,12 @@ import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.ncookie.imad.domain.contents.entity.ContentsType.*;
+import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
+import static com.ncookie.imad.domain.ranking.service.RankingUtils.getRecentDates;
 
 
 @Slf4j
@@ -28,13 +27,19 @@ import static com.ncookie.imad.domain.contents.entity.ContentsType.*;
 @Transactional
 @Service
 public class ContentsRankingScoreUpdateService {
-    private final ContentsRetrievalService contentsRetrievalService;
-
     private final ContentsDailyScoreRankingRepository contentsDailyScoreRankingRepository;
 
     private final int PERIOD_ALLTIME = 0;
     private final int PERIOD_WEEK = 7;
     private final int PERIOD_MONTH = 30;
+
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    Map<ContentsType, String> genreStringMap = Map.of(
+            ContentsType.ALL, "_ALL_",
+            ContentsType.MOVIE, "_MOVIE_",
+            ContentsType.TV, "_TV_",
+            ContentsType.ANIMATION, "_ANIMATION_");
 
 
     // 작품 북마크 작성
@@ -110,13 +115,6 @@ public class ContentsRankingScoreUpdateService {
         log.info("랭킹 점수 차감 완료");
     }
 
-    private final RedisTemplate<String, Object> redisTemplate;
-
-    Map<ContentsType, String> genreStringMap = Map.of(
-                                ContentsType.ALL, "_ALL_",
-                                ContentsType.MOVIE, "_MOVIE_",
-                                ContentsType.TV, "_TV_",
-                                ContentsType.ANIMATION, "_ANIMATION_");
 
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
     @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
@@ -257,33 +255,5 @@ public class ContentsRankingScoreUpdateService {
                 }
             }
         }
-    }
-
-
-    @Description("n일 전까지의 날짜 포맷 스트링을 리스트로 반환. 주간/월간 랭킹 점수를 정산할 때 사용됨")
-    private List<String> getRecentDates(int days) {
-        List<String> recentDates = new ArrayList<>();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-        // 오늘부터 최근 7일 동안의 날짜 생성
-        for (int i = 0; i < days; i++) {
-            LocalDate currentDate = LocalDate.now().minusDays(i + 1);
-            String formattedDate = currentDate.format(formatter);
-            recentDates.add(formattedDate);
-        }
-
-        return recentDates;
-    }
-
-    @Description("n일 전까지의 날짜 포맷 스트링을 리스트로 반환. 주간/월간 랭킹 점수를 정산할 때 사용됨")
-    private String getLastDate(int n) {
-        // 자정이 지났으므로 전날 날짜를 가져옴
-        LocalDate currentDate = LocalDate.now().minusDays(n);
-
-        // `20231231` 과 같은 형식으로 변환
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-        return currentDate.format(formatter);
     }
 }
