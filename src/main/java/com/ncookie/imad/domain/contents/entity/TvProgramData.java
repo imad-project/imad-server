@@ -1,11 +1,16 @@
 package com.ncookie.imad.domain.contents.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
+@Setter
 @SuperBuilder
 @Getter
 @ToString
@@ -14,15 +19,15 @@ import java.time.LocalDate;
 @DiscriminatorValue("tv")
 @Entity
 public class TvProgramData extends Contents {
-    @Setter
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate firstAirDate;
 
-    @Setter
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate lastAirDate;
 
-    @Setter
     private Integer numberOfEpisodes;
 
-    @Setter
     private Integer numberOfSeasons;
 }
