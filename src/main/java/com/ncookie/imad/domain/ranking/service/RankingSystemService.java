@@ -2,6 +2,9 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
+import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.global.dto.response.ResponseCode;
+import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +26,16 @@ import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
 public class RankingSystemService {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public Set<ContentsData> getRankingByContentsType(String rankingType, ContentsType contentsType) {
+    public Set<ContentsData> getRankingByContentsType(String rankingType, String contentsTypeString) {
+        ContentsType contentsType;
+        try {
+            contentsType  = ContentsType.valueOf(contentsTypeString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.error("옳바르지 않은 contents type string으로 인해 에러 발생");
+            log.error(e.getMessage());
+            throw new BadRequestException(ResponseCode.RANKING_WRONG_CONTENTS_TYPE);
+        }
+
         return getRankingFromRedis(rankingType, genreStringMap.get(contentsType));
     }
 

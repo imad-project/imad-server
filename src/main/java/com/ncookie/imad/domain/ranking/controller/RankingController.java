@@ -4,6 +4,7 @@ import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.dto.RankingInfo;
 import com.ncookie.imad.domain.ranking.service.RankingSystemService;
+import com.ncookie.imad.domain.ranking.service.RankingUtils;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
@@ -22,20 +23,38 @@ import java.util.Set;
 public class RankingController {
     private final RankingSystemService rankingSystemService;
 
-    @Description("랭킹 조회")
-    @GetMapping("/alltime/{contents_type}")
-    public ApiResponse<RankingInfo> rankingGetAllTime(@PathVariable("contents_type") String type) {
-        ContentsType contentsType;
-        try {
-            contentsType  = ContentsType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            log.error("옳바르지 않은 contents type string으로 인해 에러 발생");
-            log.error(e.getMessage());
-            throw new BadRequestException(ResponseCode.RANKING_WRONG_CONTENTS_TYPE);
+    @Description("주간 랭킹 조회")
+    @GetMapping("/weekly/{contents_type}")
+    public ApiResponse<RankingInfo> rankingGetWeekly(@PathVariable("contents_type") String contentsTypeString) {
+        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("weekly", contentsTypeString);
+
+        if (rankingData == null) {
+            log.info("랭킹 데이터가 존재하지 않습니다.");
+            return ApiResponse.createSuccess(ResponseCode.RANKING_GET_NO_DATA, null);
         }
 
-        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("alltime", contentsType);
-        log.info("랭킹 서비스에서 데이터 얻어옴");
+        RankingInfo rankingInfo = RankingInfo.toDTO(rankingData);
+        return ApiResponse.createSuccess(ResponseCode.RANKING_GET_SUCCESS, rankingInfo);
+    }
+
+    @Description("월간 랭킹 조회")
+    @GetMapping("/monthly/{contents_type}")
+    public ApiResponse<RankingInfo> rankingGetMonthly(@PathVariable("contents_type") String contentsTypeString) {
+        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("monthly", contentsTypeString);
+
+        if (rankingData == null) {
+            log.info("랭킹 데이터가 존재하지 않습니다.");
+            return ApiResponse.createSuccess(ResponseCode.RANKING_GET_NO_DATA, null);
+        }
+
+        RankingInfo rankingInfo = RankingInfo.toDTO(rankingData);
+        return ApiResponse.createSuccess(ResponseCode.RANKING_GET_SUCCESS, rankingInfo);
+    }
+
+    @Description("전체 랭킹 조회")
+    @GetMapping("/alltime/{contents_type}")
+    public ApiResponse<RankingInfo> rankingGetAllTime(@PathVariable("contents_type") String contentsTypeString) {
+        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("alltime", contentsTypeString);
 
         if (rankingData == null) {
             log.info("랭킹 데이터가 존재하지 않습니다.");
