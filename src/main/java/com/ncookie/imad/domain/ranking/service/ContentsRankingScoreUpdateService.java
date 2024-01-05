@@ -233,7 +233,7 @@ public class ContentsRankingScoreUpdateService {
                 ContentsData contentsData = (ContentsData) next.getValue();
 
                 // 전날 랭킹 데이터와 비교
-                Long lastRank = zSetOperations.rank(weeklyScoreKey + yesterdayDate, contentsData);
+                Long lastRank = zSetOperations.reverseRank(weeklyScoreKey + yesterdayDate, contentsData);
                 if (lastRank == null) {
                     log.info("어제자 랭킹에서 작품을 찾을 수 없음");
                     continue;
@@ -242,8 +242,9 @@ public class ContentsRankingScoreUpdateService {
                 // 랭킹 데이터 갱신
                 contentsData.setRank(todayRank);
                 contentsData.setRankChanged(lastRank - todayRank);
-                zSetOperations.add(periodString + "_ranking" + genreString + todayDate, contentsData, todayRank + 1);
-                log.info("");
+                String todayRankingKey = periodString + "_ranking" + genreString + todayDate;
+                zSetOperations.add(todayRankingKey, contentsData, todayRank + 1);
+                log.info(String.format("[%s] 랭킹 데이터 갱신", genreString));
                 
                 // 다음 랭킹 데이터 탐색
                 todayRank++;
