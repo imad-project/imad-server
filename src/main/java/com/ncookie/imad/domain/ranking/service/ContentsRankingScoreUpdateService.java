@@ -239,14 +239,17 @@ public class ContentsRankingScoreUpdateService {
 
                 // 전날 랭킹 데이터와 비교
                 Long lastRank = zSetOperations.reverseRank(weeklyScoreKey + yesterdayDate, contentsData);
+                Long changedRank;
                 if (lastRank == null) {
                     log.info("신규 작품 랭킹 진입!");
-                    contentsData.setRankChanged(null);
+                    changedRank = null;
+                } else {
+                    changedRank = lastRank - todayRank;
                 }
 
                 // 랭킹 데이터 갱신
                 contentsData.setRank(todayRank + 1);
-                contentsData.setRankChanged(lastRank - todayRank);
+                contentsData.setRankChanged(changedRank);
                 zSetOperations.add(
                         periodString + "_ranking" + genreString + todayDate,
                         contentsData,
