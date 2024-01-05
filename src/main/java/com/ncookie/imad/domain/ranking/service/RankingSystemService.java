@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.ncookie.imad.domain.ranking.service.RankingUtils.genreStringMap;
 import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
@@ -25,7 +24,6 @@ public class RankingSystemService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     public Set<ContentsData> getRankingByContentsType(String rankingType, ContentsType contentsType) {
-        // TODO: null 처리
         return getRankingFromRedis(rankingType, genreStringMap.get(contentsType));
     }
 
@@ -39,12 +37,14 @@ public class RankingSystemService {
                 key,
                 Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
+        log.info("랭킹 데이터를 Redis로부터 상위권부터 조회");
         
         if (objects == null) {
             log.error("랭킹 데이터를 찾을 수 없음");
             return null;
         }
 
+        // 데이터의 순서를 유지하기 위해 LinkedHashSet 사용
         Set<ContentsData> contentsDataSet = new LinkedHashSet<>();
         for (Object obj : objects) {
             if (obj instanceof ContentsData) {

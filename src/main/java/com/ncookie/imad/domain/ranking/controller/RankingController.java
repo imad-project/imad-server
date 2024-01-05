@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.ranking.controller;
 
 import com.ncookie.imad.domain.contents.entity.ContentsType;
+import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.dto.RankingInfo;
 import com.ncookie.imad.domain.ranking.service.RankingSystemService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -10,6 +11,8 @@ import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 
 @Slf4j
@@ -31,10 +34,15 @@ public class RankingController {
             throw new BadRequestException(ResponseCode.RANKING_WRONG_CONTENTS_TYPE);
         }
 
-        RankingInfo rankingInfo = RankingInfo.toDTO(
-                rankingSystemService.getRankingByContentsType("alltime", contentsType)
-        );
+        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("alltime", contentsType);
+        log.info("랭킹 서비스에서 데이터 얻어옴");
 
+        if (rankingData == null) {
+            log.info("랭킹 데이터가 존재하지 않습니다.");
+            return ApiResponse.createSuccess(ResponseCode.RANKING_GET_NO_DATA, null);
+        }
+
+        RankingInfo rankingInfo = RankingInfo.toDTO(rankingData);
         return ApiResponse.createSuccess(ResponseCode.RANKING_GET_SUCCESS, rankingInfo);
     }
 }
