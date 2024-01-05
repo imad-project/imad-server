@@ -8,6 +8,7 @@ import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
 import com.ncookie.imad.domain.ranking.entity.ContentsAllTimeRankingScore;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
 import com.ncookie.imad.domain.ranking.repository.ContentsAllTimeRankingScoreRepository;
+import com.ncookie.imad.domain.ranking.repository.ContentsWeeklyRankingRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class ContentsRankingScoreUpdateService {
 
     private final ContentsDailyScoreRankingRepository contentsDailyScoreRankingRepository;
     private final ContentsAllTimeRankingScoreRepository contentsAllTimeRankingScoreRepository;
+    private final ContentsWeeklyRankingRepository weeklyRankingRepository;
 
     private final int DAYS_OF_WEEK = 7;
     private final int DAYS_OF_MONTH = 30;
@@ -114,11 +116,11 @@ public class ContentsRankingScoreUpdateService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    Map<ContentsType, String> genreString = Map.of(
-                                ContentsType.ALL, "ALL_",
-                                ContentsType.MOVIE, "MOVIE_",
-                                ContentsType.TV, "TV_",
-                                ContentsType.ANIMATION, "ANIMATION_");
+    Map<ContentsType, String> genreStringMap = Map.of(
+                                ContentsType.ALL, "_ALL_",
+                                ContentsType.MOVIE, "_MOVIE_",
+                                ContentsType.TV, "_TV_",
+                                ContentsType.ANIMATION, "_ANIMATION_");
 
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
 //    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
@@ -136,13 +138,13 @@ public class ContentsRankingScoreUpdateService {
             String key = defaultKey;
 
             // 일일 작품 랭킹 점수 Redis에 저장
-            zSetOperations.add(genreString.get(ALL) + defaultKey, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
+            zSetOperations.add(genreStringMap.get(ALL) + defaultKey, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
 
             // 장르별로 별도의 데이터로 랭킹 점수 저장
             switch (contents.getContentsType()) {
-                case MOVIE -> key = genreString.get(MOVIE) + defaultKey;
-                case TV -> key = genreString.get(TV) + defaultKey;
-                case ANIMATION -> key = genreString.get(ANIMATION) + defaultKey;
+                case MOVIE -> key = genreStringMap.get(MOVIE) + defaultKey;
+                case TV -> key = genreStringMap.get(TV) + defaultKey;
+                case ANIMATION -> key = genreStringMap.get(ANIMATION) + defaultKey;
             }
             zSetOperations.add(key, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
@@ -176,30 +178,77 @@ public class ContentsRankingScoreUpdateService {
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
 //    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
     public void updateWeeklyScoreAndRanking() {
-        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
-        List<String> recentDates = getRecentDates(DAYS_OF_WEEK);
-
-        // 주간 랭킹 합산 점수 데이터 생성
-        for (String genre : genreString.values()) {
-            zSetOperations.unionAndStore(
-                    "",
-                    recentDates.stream().map(s -> genre + s).collect(Collectors.toList()),
-                    "weekly_score_" + genre + getLastDate(0),
-                    Aggregate.SUM);
-            log.info(String.format("%s 주간 랭킹 점수 합산 완료", genre));
-        }
+        updateScoreAndRanking("weekly", DAYS_OF_WEEK);
     }
 
     @Description("월간 작품 랭킹 정산 및 MySQL에 저장")
-    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateMonthlyScoreAndRanking() {
-        List<String> recentDates = getRecentDates(DAYS_OF_MONTH);
+        updateScoreAndRanking("monthly", DAYS_OF_MONTH);
     }
 
-    @Description("매일 00시 10분에 주간/월간/전체 작품 랭킹을 Redis에 업데이트함")
-    @Scheduled(cron = "0 10 0 * * *")    // 매일 자정 10분 후에 실행
-    public void updateRankingRedisDB() {
+    public void updateScoreAndRanking(String periodString, int PERIOD) {
+        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+        List<String> recentDates = getRecentDates(PERIOD);
 
+        // 랭킹 점수 합산 데이터 생성
+        for (String genreString : genreStringMap.values()) {
+            // 테스트용
+            zSetOperations.unionAndStore(
+                    "",
+                    recentDates.stream().map(s -> genreString + s).collect(Collectors.toList()),
+                    periodString + "_score" + genreString + getLastDate(1),
+                    Aggregate.SUM);
+
+            // 점수 데이터를 합산하고 저장함
+            zSetOperations.unionAndStore(
+                    "",
+                    recentDates.stream().map(s -> genreString + s).collect(Collectors.toList()),
+                    periodString + "_score" + genreString + getLastDate(0),
+                    Aggregate.SUM);
+            log.info(String.format("%s 주간 랭킹 점수 합산 완료", genreString));
+        }
+
+        // 랭킹 변화 추적
+        for (String genreString : genreStringMap.values()) {
+            String weeklyScoreKey = periodString + "_score" + genreString;
+
+            // 위에서 저장했던 랭킹 점수 데이터를 점수 기준 내림차순으로 정렬하여 추출
+            Set<ZSetOperations.TypedTuple<Object>> todayRankSet =
+                    zSetOperations.reverseRangeWithScores(
+                            weeklyScoreKey + getLastDate(0),
+                            0,
+                            -1);
+
+            if (todayRankSet == null) {
+                log.error("에러 발생! 주간 랭킹 점수 합산 데이터를 불러올 수 없음");
+                return;
+            }
+
+            Iterator<ZSetOperations.TypedTuple<Object>> iterator = todayRankSet.iterator();
+            Long todayRank = 0L;
+            while (iterator.hasNext()) {
+                ZSetOperations.TypedTuple<Object> next = iterator.next();
+                ContentsData contentsData = (ContentsData) next.getValue();
+
+                // 전날 랭킹 데이터와 비교
+                Long lastRank = zSetOperations.rank(weeklyScoreKey + getLastDate(1), contentsData);
+                if (lastRank == null) {
+                    log.info("어제자 랭킹에서 작품을 찾을 수 없음");
+                    continue;
+                }
+
+                // 랭킹 데이터 갱신
+                contentsData.setRank(todayRank);
+                contentsData.setRankChanged(lastRank - todayRank);
+                zSetOperations.add(periodString + "_ranking" + genreString + getLastDate(0), contentsData, todayRank + 1);
+                log.info("");
+                
+                // 다음 랭킹 데이터 탐색
+                todayRank++;
+            }
+        }
     }
 
 
