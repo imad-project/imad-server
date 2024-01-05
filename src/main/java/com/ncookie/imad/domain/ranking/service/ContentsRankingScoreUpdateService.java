@@ -255,6 +255,11 @@ public class ContentsRankingScoreUpdateService {
                 
                 // 다음 랭킹 데이터 탐색
                 todayRank++;
+
+                if (todayRank >= 100) {
+                    log.info(String.format("[%s][%s] TOP 100 랭킹 정산 완료!", periodString, genreString));
+                    break;
+                }
             }
         }
     }
