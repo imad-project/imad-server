@@ -245,7 +245,7 @@ public class ContentsRankingScoreUpdateService {
                 }
 
                 // 랭킹 데이터 갱신
-                contentsData.setRank(todayRank);
+                contentsData.setRank(todayRank + 1);
                 contentsData.setRankChanged(lastRank - todayRank);
                 zSetOperations.add(
                         periodString + "_ranking" + genreString + todayDate,
