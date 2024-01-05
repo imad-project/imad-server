@@ -11,6 +11,7 @@ import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.profile.service.ScrapService;
+import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
@@ -27,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.POSTING_RANKING_SCORE;
+import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.REVIEW_RANKING_SCORE;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,6 +45,8 @@ public class PostingService {
     private final PostingLikeService postingLikeService;
     private final CommentService commentService;
     private final ScrapService scrapService;
+
+    private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
 
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
@@ -213,6 +219,9 @@ public class PostingService {
                         .build()
         );
 
+        contentsRankingScoreUpdateService.addRankingScore(contents, POSTING_RANKING_SCORE);
+        log.info("[게시글 작성] 랭킹 점수 반영 완료");
+
         return PostingIdResponse.builder()
                 .postingId(posting.getPostingId())
                 .build();
@@ -241,6 +250,9 @@ public class PostingService {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (posting.getUser().getId().equals(user.getId())) {
+            contentsRankingScoreUpdateService.subtractRankingScore(posting.getContents(), POSTING_RANKING_SCORE);
+            log.info("[게시글 삭제] 랭킹 점수 반영 완료");
+            
             postingRepository.delete(posting);
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);

@@ -108,6 +108,11 @@ public enum ResponseCode {
     PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS(200, "정상적으로 작성한 리뷰 리스트를 조회했습니다."),
     PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS(200, "정상적으로 좋아요/싫어요를 등록한 리뷰 리스트를 조회했습니다."),
     
+    // 랭킹
+    RANKING_GET_SUCCESS(200, "정상적으로 랭킹 정보를 조회했습니다."),
+    RANKING_GET_NO_DATA(404, "현재 랭킹 정보가 존재하지 않습니다."),
+    RANKING_WRONG_CONTENTS_TYPE(400, "옳바르지 않은 ContentsType 입니다."),
+    
     // Utils
     WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다.");
 

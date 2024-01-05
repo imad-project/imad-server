@@ -9,6 +9,7 @@ import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.domain.profile.dto.response.*;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
+import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.BOOKMARK_RANKING_SCORE;
+import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.SCRAP_RANKING_SCORE;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,6 +45,8 @@ public class ProfileService {
 
     private final BookmarkService bookmarkService;
     private final ScrapService scrapService;
+
+    private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
 
 
     // 프로필 요약 정보
@@ -94,6 +100,10 @@ public class ProfileService {
                             .build()
             );
             log.info("북마크 등록 완료");
+            
+            contentsRankingScoreUpdateService.addRankingScore(contents, BOOKMARK_RANKING_SCORE);
+            log.info("[작품 북마크 추가] 랭킹 점수 반영 완료");
+            
             return ResponseCode.BOOKMARK_ADD_SUCCESS;
         } else {
             // 해당 북마크가 이미 있을 때
@@ -111,8 +121,12 @@ public class ProfileService {
             log.error("북마크 삭제 실패 : 유효하지 않은 ID");
             throw new BadRequestException(ResponseCode.BOOKMARK_WRONG_ID);
         }
-        log.info("북마크 삭제 완료");
+        ContentsBookmark bookmark = bookmarkService.findByIdAndUserAccount(bookmarkId, user);
+        contentsRankingScoreUpdateService.subtractRankingScore(bookmark.getContents(), BOOKMARK_RANKING_SCORE);
+        log.info("[작품 북마크 삭제] 랭킹 점수 반영 완료");
+
         bookmarkService.deleteByIdAndUserAccount(bookmarkId, user);
+        log.info("북마크 삭제 완료");
     }
 
 
@@ -147,6 +161,10 @@ public class ProfileService {
                             .build()
             );
             log.info("스크랩 등록 완료");
+
+            contentsRankingScoreUpdateService.addRankingScore(posting.getContents(), SCRAP_RANKING_SCORE);
+            log.info("[게시글 스크랩 추가] 랭킹 점수 반영 완료");
+
             return ResponseCode.SCRAP_ADD_SUCCESS;
         } else {
             // 해당 스크랩이 이미 있을 때
@@ -163,8 +181,12 @@ public class ProfileService {
             log.error("스크랩 삭제 실패 : 유효하지 않은 ID");
             throw new BadRequestException(ResponseCode.SCRAP_WRONG_ID);
         }
-        log.info("스크랩 삭제 완료");
+        PostingScrap postingScrap = scrapService.findByIdAndUserAccount(scrapId, user);
+        contentsRankingScoreUpdateService.subtractRankingScore(postingScrap.getPosting().getContents(), SCRAP_RANKING_SCORE);
+        log.info("[게시글 스크랩 취소] 랭킹 점수 반영 완료");
+
         scrapService.deleteByIdAndUserAccount(scrapId, user);
+        log.info("스크랩 삭제 완료");
     }
 
     /*
