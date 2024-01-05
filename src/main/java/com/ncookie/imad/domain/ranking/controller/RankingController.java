@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.ranking.controller;
 
-import com.ncookie.imad.domain.ranking.dto.response.ContentsData;
+import com.ncookie.imad.domain.ranking.data.RankingPeriod;
+import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.dto.response.RankingInfo;
 import com.ncookie.imad.domain.ranking.service.RankingSystemService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -23,7 +24,7 @@ public class RankingController {
     @Description("주간 랭킹 조회")
     @GetMapping("/weekly/{contents_type}")
     public ApiResponse<RankingInfo> rankingGetWeekly(@PathVariable("contents_type") String contentsTypeString) {
-        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("weekly", contentsTypeString);
+        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType(RankingPeriod.WEEKLY, contentsTypeString);
 
         if (rankingData == null) {
             log.info("랭킹 데이터가 존재하지 않습니다.");
@@ -37,7 +38,7 @@ public class RankingController {
     @Description("월간 랭킹 조회")
     @GetMapping("/monthly/{contents_type}")
     public ApiResponse<RankingInfo> rankingGetMonthly(@PathVariable("contents_type") String contentsTypeString) {
-        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("monthly", contentsTypeString);
+        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType(RankingPeriod.MONTHLY, contentsTypeString);
 
         if (rankingData == null) {
             log.info("랭킹 데이터가 존재하지 않습니다.");
@@ -51,7 +52,7 @@ public class RankingController {
     @Description("전체 랭킹 조회")
     @GetMapping("/alltime/{contents_type}")
     public ApiResponse<RankingInfo> rankingGetAllTime(@PathVariable("contents_type") String contentsTypeString) {
-        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType("alltime", contentsTypeString);
+        Set<ContentsData> rankingData = rankingSystemService.getRankingByContentsType(RankingPeriod.ALL_TIME, contentsTypeString);
 
         if (rankingData == null) {
             log.info("랭킹 데이터가 존재하지 않습니다.");

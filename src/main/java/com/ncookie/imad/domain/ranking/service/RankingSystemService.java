@@ -1,7 +1,8 @@
 package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.ContentsType;
-import com.ncookie.imad.domain.ranking.dto.response.ContentsData;
+import com.ncookie.imad.domain.ranking.data.RankingPeriod;
+import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -25,7 +26,7 @@ import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
 public class RankingSystemService {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public Set<ContentsData> getRankingByContentsType(String rankingType, String contentsTypeString) {
+    public Set<ContentsData> getRankingByContentsType(RankingPeriod rankingPeriod, String contentsTypeString) {
         ContentsType contentsType;
         try {
             contentsType  = ContentsType.valueOf(contentsTypeString.toUpperCase());
@@ -35,13 +36,13 @@ public class RankingSystemService {
             throw new BadRequestException(ResponseCode.RANKING_WRONG_CONTENTS_TYPE);
         }
 
-        return getRankingFromRedis(rankingType, genreStringMap.get(contentsType));
+        return getRankingFromRedis(rankingPeriod, genreStringMap.get(contentsType));
     }
 
     // Redis에서 내림차순으로 랭킹 데이터 Set<ContentsData> 형식으로 반환
-    private Set<ContentsData> getRankingFromRedis(String periodString, String genreString) {
+    private Set<ContentsData> getRankingFromRedis(RankingPeriod rankingPeriod, String genreString) {
         String todayDate = getLastDate(0);
-        String key = periodString + "_ranking" + genreString + todayDate;
+        String key = rankingPeriod.getValue() + "_ranking" + genreString + todayDate;
 
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
         Set<Object> objects = zSetOperations.rangeByScore(

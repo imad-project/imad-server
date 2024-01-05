@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.ranking.data.RankingPeriod;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
@@ -147,25 +148,27 @@ public class ContentsRankingScoreUpdateService {
 //    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
     public void updateWeeklyScoreAndRanking() {
-        updateScoreAndRanking("weekly", PERIOD_WEEK);
+        updateScoreAndRanking(RankingPeriod.WEEKLY, PERIOD_WEEK);
     }
 
     @Description("월간 작품 랭킹 정산")
     @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
 //    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateMonthlyScoreAndRanking() {
-        updateScoreAndRanking("monthly", PERIOD_MONTH);
+        updateScoreAndRanking(RankingPeriod.MONTHLY, PERIOD_MONTH);
     }
 
     @Description("전체 작품 랭킹 정산")
     @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
 //    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateAllTimeScoreAndRanking() {
-        updateScoreAndRanking("alltime", PERIOD_ALLTIME);
+        updateScoreAndRanking(RankingPeriod.MONTHLY, PERIOD_ALLTIME);
     }
 
-    public void updateScoreAndRanking(String periodString, int PERIOD) {
+    public void updateScoreAndRanking(RankingPeriod rankingPeriod, int PERIOD) {
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+
+        String periodString = rankingPeriod.getValue();
         List<String> recentDates = getRecentDates(PERIOD);
 
         String todayDate = getLastDate(0);
