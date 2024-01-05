@@ -1,8 +1,7 @@
 package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.ContentsType;
-import com.ncookie.imad.domain.ranking.dto.ContentsData;
-import com.ncookie.imad.global.dto.response.ApiResponse;
+import com.ncookie.imad.domain.ranking.dto.response.ContentsData;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;

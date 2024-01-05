@@ -1,5 +1,6 @@
-package com.ncookie.imad.domain.ranking.dto;
+package com.ncookie.imad.domain.ranking.dto.response;
 
+import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

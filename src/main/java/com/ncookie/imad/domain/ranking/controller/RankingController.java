@@ -1,13 +1,10 @@
 package com.ncookie.imad.domain.ranking.controller;
 
-import com.ncookie.imad.domain.contents.entity.ContentsType;
-import com.ncookie.imad.domain.ranking.dto.ContentsData;
-import com.ncookie.imad.domain.ranking.dto.RankingInfo;
+import com.ncookie.imad.domain.ranking.dto.response.ContentsData;
+import com.ncookie.imad.domain.ranking.dto.response.RankingInfo;
 import com.ncookie.imad.domain.ranking.service.RankingSystemService;
-import com.ncookie.imad.domain.ranking.service.RankingUtils;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
-import com.ncookie.imad.global.exception.BadRequestException;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
