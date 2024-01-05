@@ -134,7 +134,7 @@ public class ContentsRankingScoreUpdateService {
             String key = defaultKey;
 
             // 일일 작품 랭킹 점수 Redis에 저장
-            zSetOperations.add(genreStringMap.get(ALL) + defaultKey, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
+            zSetOperations.add(genreStringMap.get(ALL) + defaultKey, ContentsData.from(dailyScore.getContents()), dailyScore.getRankingScore());
 
             // 장르별로 별도의 데이터로 랭킹 점수 저장
             switch (contents.getContentsType()) {
@@ -142,7 +142,7 @@ public class ContentsRankingScoreUpdateService {
                 case TV -> key = genreStringMap.get(TV) + defaultKey;
                 case ANIMATION -> key = genreStringMap.get(ANIMATION) + defaultKey;
             }
-            zSetOperations.add(key, ContentsData.toDTO(dailyScore.getContents()), dailyScore.getRankingScore());
+            zSetOperations.add(key, ContentsData.from(dailyScore.getContents()), dailyScore.getRankingScore());
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
             // 총합 작품 랭킹 점수 DB 저장

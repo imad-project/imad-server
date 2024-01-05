@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.ranking.dto;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ContentsData implements Serializable {
     private Long contentsId;
+    private ContentsType contentsType;
 
     private String title;
     private String posterPath;
@@ -23,9 +25,10 @@ public class ContentsData implements Serializable {
     private Long rankChanged;
     private Long rank;
 
-    public static ContentsData toDTO(Contents contents) {
+    public static ContentsData from(Contents contents) {
         return ContentsData.builder()
                 .contentsId(contents.getContentsId())
+                .contentsType(contents.getContentsType())
 
                 .title(contents.getTranslatedTitle())
                 .posterPath(contents.getPosterPath())
