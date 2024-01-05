@@ -232,19 +232,26 @@ public class ContentsRankingScoreUpdateService {
                 ZSetOperations.TypedTuple<Object> next = iterator.next();
                 ContentsData contentsData = (ContentsData) next.getValue();
 
+                if (contentsData == null) {
+                    log.info("랭킹에서 작품을 찾을 수 없음");
+                    continue;
+                }
+
                 // 전날 랭킹 데이터와 비교
                 Long lastRank = zSetOperations.reverseRank(weeklyScoreKey + yesterdayDate, contentsData);
                 if (lastRank == null) {
-                    log.info("어제자 랭킹에서 작품을 찾을 수 없음");
-                    continue;
+                    log.info("신규 작품 랭킹 진입!");
+                    contentsData.setRankChanged(null);
                 }
 
                 // 랭킹 데이터 갱신
                 contentsData.setRank(todayRank);
                 contentsData.setRankChanged(lastRank - todayRank);
-                String todayRankingKey = periodString + "_ranking" + genreString + todayDate;
-                zSetOperations.add(todayRankingKey, contentsData, todayRank + 1);
-                log.info(String.format("[%s] 랭킹 데이터 갱신", genreString));
+                zSetOperations.add(
+                        periodString + "_ranking" + genreString + todayDate,
+                        contentsData,
+                        todayRank + 1);
+                log.info(String.format("[%s][%s] 랭킹 데이터 갱신", periodString, genreString));
                 
                 // 다음 랭킹 데이터 탐색
                 todayRank++;
