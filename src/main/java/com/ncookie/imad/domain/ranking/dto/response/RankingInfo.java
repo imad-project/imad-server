@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RankingInfo {
-    Set<ContentsData> contentsDataSet;
+    Set<ContentsData> contentsDataSet;      // 랭킹 순으로 정렬되어 있는 랭킹 데이터
 
     public static RankingInfo toDTO(Set<ContentsData> contentsDataSet) {
         return RankingInfo.builder()

@@ -15,14 +15,16 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContentsData implements Serializable {
-    private Long contentsId;
-    private ContentsType contentsType;
+    private Long contentsId;                    // contents ID
+    private ContentsType contentsType;          // tv / movie / animation
 
-    private String title;
-    private String posterPath;
+    private String title;                       // 제목
+    private String posterPath;                  // 포스터
 
     // 어제자 데이터와의 랭킹 차이. 어제자 랭킹에 없는 작품인 경우 NULL값이 들어감
     private Long rankChanged;
+    
+    // 현재 랭킹
     private Long rank;
 
     public static ContentsData from(Contents contents) {
