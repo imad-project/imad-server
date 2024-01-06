@@ -137,7 +137,6 @@ public class ContentsRankingScoreUpdateService {
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
             // 일일 작품 랭킹 점수 DB 초기화
-            // TODO: 테스트 후 삭제 함수 원상복귀
             contentsDailyScoreRankingRepository.deleteAllInBatch();
             log.info("일일 작품 랭킹 점수 DB 초기화 완료");
         }
