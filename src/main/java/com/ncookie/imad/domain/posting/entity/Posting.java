@@ -39,13 +39,11 @@ public class Posting extends BaseTimeEntity {
 
     @Column(length = 5000)
     @Setter
-    // 본문
-    private String content;
+    private String content;         // 본문
 
 
     @Setter
-    // 스포일러 여부
-    private boolean isSpoiler;
+    private boolean isSpoiler;      // 스포일러 여부
 
     @Setter
     private int viewCnt;
