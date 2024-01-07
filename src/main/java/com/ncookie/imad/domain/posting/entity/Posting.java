@@ -37,6 +37,7 @@ public class Posting extends BaseTimeEntity {
     @Setter
     private String title;
 
+    @Column(length = 5000)
     @Setter
     // 본문
     private String content;

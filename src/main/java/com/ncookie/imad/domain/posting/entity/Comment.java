@@ -38,6 +38,7 @@ public class Comment extends BaseTimeEntity {
     @ToString.Exclude
     private Comment parent;
 
+    @Column(length = 1000)
     @Setter
     private String content;
 
