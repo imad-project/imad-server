@@ -53,10 +53,19 @@ public class ReviewService {
         if (optional.isPresent()) {
             Review review = optional.get();
 
+            // 본인 작성 여부
+            boolean isAuthor;
+            if (user == null) {
+                isAuthor = false;
+            } else {
+                isAuthor = review.getUserAccount().getId().equals(user.getId());
+            }
+
             ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
+            reviewDetailsResponse.setAuthor(isAuthor);
             reviewDetailsResponse.setLikeStatus(likeStatus);
 
             return reviewDetailsResponse;
