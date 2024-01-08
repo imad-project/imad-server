@@ -71,10 +71,6 @@ public class UserAccountController {
     @Description("이메일 중복 검사")
     @PostMapping("/api/user/validation/email")
     public ApiResponse<UserInfoDuplicationResponse> validateUserAccountEmail(@RequestBody UserInfoDuplicationRequest email) {
-        ValueOperations<String, String> vop = redisTemplate.opsForValue();
-        vop.set("yellow", "aaa");
-        vop.set("red", "bbb");
-        vop.set("green", "ccc");
         return ApiResponse.createSuccess(ResponseCode.USER_INFO_VALIDATION , userAccountService.checkUserEmailDuplicated(email));
     }
 
