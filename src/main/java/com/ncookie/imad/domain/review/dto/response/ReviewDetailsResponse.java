@@ -33,6 +33,8 @@ public class ReviewDetailsResponse {
     private String content;                 // 본문
 
     private float score;                    // 리뷰 점수
+    
+    private boolean isAuthor;               // 본인 작성 여부
     private boolean isSpoiler;              // 스포일러 여부
 
     private int likeCnt;                    // 좋아요 수

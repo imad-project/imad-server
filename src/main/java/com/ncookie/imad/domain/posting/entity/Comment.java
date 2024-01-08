@@ -38,6 +38,7 @@ public class Comment extends BaseTimeEntity {
     @ToString.Exclude
     private Comment parent;
 
+    @Column(length = 1000)
     @Setter
     private String content;
 
@@ -49,12 +50,4 @@ public class Comment extends BaseTimeEntity {
 
     @Setter
     private int dislikeCnt;
-
-    public void setUserAccount(UserAccount userAccount) {
-        this.userAccount = userAccount;
-    }
-
-    public void setPosting(Posting posting) {
-        this.posting = posting;
-    }
 }

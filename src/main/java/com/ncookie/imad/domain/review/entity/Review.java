@@ -31,10 +31,10 @@ public class Review extends BaseTimeEntity {
     @ToString.Exclude
     private Contents contents;
 
-
     @Setter
     private String title;
 
+    @Column(length = 5000)
     @Setter
     private String content;
 
