@@ -35,6 +35,7 @@ public class PostingDetailsResponse {
     private String content;                 // 본문
     private int category;                   // 카테고리
 
+    private boolean isAuthor;               // 본인 작성 여부
     private boolean isSpoiler;              // 스포일러 여부
 
     private int viewCnt;                    // 조회수

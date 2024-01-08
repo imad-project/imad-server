@@ -64,6 +64,14 @@ public class PostingService {
                 "createdDate",
                 0);
         int commentCount = commentService.getCommentCount(posting);
+        
+        // 본인 작성 여부
+        boolean isAuthor;
+        if (user == null) {
+            isAuthor = false;
+        } else {
+            isAuthor = posting.getUser().getId().equals(user.getId());
+        }
 
         // like status 조회
         PostingLike postingLike = postingLikeService.findByUserAccountAndE(user, posting);
@@ -78,6 +86,7 @@ public class PostingService {
 
         // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
         PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
+        postingDetailsResponse.setAuthor(isAuthor);
         postingDetailsResponse.setLikeStatus(likeStatus);
         postingDetailsResponse.setCommentCnt(commentCount);
         postingDetailsResponse.setScrapId(scrap != null ? scrap.getId() : null);

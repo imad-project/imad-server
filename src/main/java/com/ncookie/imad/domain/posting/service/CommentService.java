@@ -50,6 +50,14 @@ public class CommentService {
 
     @Description("Comment entity 사용하여 CommentDetailsResponse로 변환하여 반환해주는 메소드")
     private CommentDetailsResponse getCommentDetailsResponse(UserAccount user, Comment comment) {
+        // 본인 작성 여부
+        boolean isAuthor;
+        if (user == null) {
+            isAuthor = false;
+        } else {
+            isAuthor = comment.getUserAccount().getId().equals(user.getId());
+        }
+
         // like status
         CommentLike commentLike = commentLikeService.findByUserAccountAndE(user, comment);
         int likeStatus = commentLike == null ? 0 : commentLike.getLikeStatus();
@@ -57,7 +65,12 @@ public class CommentService {
         // 답글 개수
         int childCnt = commentRepository.countCommentByParent(comment);
 
-        return CommentDetailsResponse.toDTO(comment, likeStatus, childCnt);
+        CommentDetailsResponse commentDetailsResponse = CommentDetailsResponse.toDTO(comment);
+        commentDetailsResponse.setAuthor(isAuthor);
+        commentDetailsResponse.setLikeStatus(likeStatus);
+        commentDetailsResponse.setChildCnt(childCnt);
+
+        return commentDetailsResponse;
     }
 
     public CommentListResponse getCommentListByPosting(String accessToken,
