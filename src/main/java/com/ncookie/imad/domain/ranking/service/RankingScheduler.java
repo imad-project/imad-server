@@ -79,8 +79,8 @@ public class RankingScheduler {
     }
 
     @Description("주간 작품 랭킹 정산")
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
 //    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateWeeklyScoreAndRanking() {
         updateScoreAndRanking(RankingPeriod.WEEKLY, PERIOD_WEEK);
     }
