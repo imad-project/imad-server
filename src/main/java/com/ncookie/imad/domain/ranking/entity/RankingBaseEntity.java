@@ -11,6 +11,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "CONTENTS_TYPE")
+@Table(indexes = {
+        @Index(columnList = "rank")
+})
 public class RankingBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
