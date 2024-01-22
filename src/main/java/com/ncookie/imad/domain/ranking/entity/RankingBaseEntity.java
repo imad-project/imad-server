@@ -3,7 +3,10 @@ package com.ncookie.imad.domain.ranking.entity;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -14,6 +17,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(indexes = {
         @Index(columnList = "rank")
 })
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RankingBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
