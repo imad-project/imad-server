@@ -1,12 +1,8 @@
 package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.ContentsType;
-import com.ncookie.imad.domain.contents.repository.ContentsRepository;
 import com.ncookie.imad.domain.ranking.data.RankingPeriod;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
-import com.ncookie.imad.domain.ranking.entity.RankingAllTime;
-import com.ncookie.imad.domain.ranking.entity.RankingBaseEntity;
-import com.ncookie.imad.domain.ranking.repository.RankingAllTimeRepository;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
@@ -29,9 +25,6 @@ import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
 @Service
 public class RankingSystemService {
     private final RedisTemplate<String, Object> redisTemplate;
-    private final RankingAllTimeRepository rankingAllTimeRepository;
-    private final ContentsRepository contentsRepository;
-
     public Set<ContentsData> getRankingByContentsType(RankingPeriod rankingPeriod, String contentsTypeString) {
         ContentsType contentsType;
         try {
@@ -41,14 +34,6 @@ public class RankingSystemService {
             log.error(e.getMessage());
             throw new BadRequestException(ResponseCode.RANKING_WRONG_CONTENTS_TYPE);
         }
-
-        rankingAllTimeRepository.save(
-                RankingAllTime.builder()
-                        .contents(null)
-                        .rankChanged((long) -2)
-                        .rank(5L)
-                        .build()
-        );
 
         return getRankingFromRedis(rankingPeriod, genreStringMap.get(contentsType));
     }
