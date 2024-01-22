@@ -93,10 +93,10 @@ public class RankingScheduler {
     }
 
     @Description("전체 작품 랭킹 정산")
-    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateAllTimeScoreAndRanking() {
-        updateScoreAndRanking(RankingPeriod.MONTHLY, PERIOD_ALLTIME);
+        updateScoreAndRanking(RankingPeriod.ALL_TIME, PERIOD_ALLTIME);
     }
 
     @Description("주간/월간/전체 작품 랭킹 최종 데이터의 정산 및 저장하는 메소드")
