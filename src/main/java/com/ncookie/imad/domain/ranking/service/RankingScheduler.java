@@ -119,7 +119,6 @@ public class RankingScheduler {
                         destKey,
                         genreString + yesterdayDate,
                         destKey);
-                log.info("ALL TIME 장르별 작품 랭킹 점수 저장 완료");
             } else {
                 // 장르별 랭킹 점수 데이터를 합산 및 저장함
                 zSetOperations.unionAndStore(
@@ -127,8 +126,8 @@ public class RankingScheduler {
                         recentDates.stream().map(s -> genreString + s).collect(Collectors.toList()),
                         destKey,
                         Aggregate.SUM);
-                log.info(String.format("%s 랭킹 점수 합산 완료", genreString));
             }
+            log.info(String.format("[%s][%s] 랭킹 점수 합산 완료", periodString, genreString));
 
             // 랭킹 점수 데이터 만료기간 설정
             redisTemplate.expire(destKey, expirationDays, TimeUnit.DAYS);
