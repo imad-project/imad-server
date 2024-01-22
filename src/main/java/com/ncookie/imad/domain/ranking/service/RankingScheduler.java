@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.ncookie.imad.domain.contents.entity.ContentsType.*;
@@ -36,6 +37,7 @@ public class RankingScheduler {
     private final int PERIOD_ALLTIME = 0;
     private final int PERIOD_WEEK = 7;
     private final int PERIOD_MONTH = 30;
+    private final int expirationDays = 40;
 
 
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
@@ -66,8 +68,13 @@ public class RankingScheduler {
             log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 완료 (Redis)", key, contents.getTranslatedTitle()));
 
             // 일일 작품 랭킹 점수 DB 초기화
-            contentsDailyScoreRankingRepository.deleteAllInBatch();
+//            contentsDailyScoreRankingRepository.deleteAllInBatch();
             log.info("일일 작품 랭킹 점수 DB 초기화 완료");
+        }
+
+        // 일일 랭킹 데이터의 만료기간 설정 (40일)
+        for (String genreString : genreStringMap.values()) {
+            redisTemplate.expire(genreString + defaultKey, expirationDays, TimeUnit.DAYS);
         }
     }
 
@@ -104,23 +111,27 @@ public class RankingScheduler {
 
         // 랭킹 점수 합산 데이터 생성
         for (String genreString : genreStringMap.values()) {
+            String destKey = periodString + "_score" + genreString + todayDate;
+
             if (PERIOD == PERIOD_ALLTIME) {
                 // 총합 랭킹 점수 데이터를 합산 및 저장함
                 zSetOperations.unionAndStore(
-                        periodString + "_score" + genreString + todayDate,
+                        destKey,
                         genreString + yesterdayDate,
-                        periodString + "_score" + genreString + todayDate);
+                        destKey);
                 log.info("ALL TIME 장르별 작품 랭킹 점수 저장 완료");
             } else {
                 // 장르별 랭킹 점수 데이터를 합산 및 저장함
                 zSetOperations.unionAndStore(
                         "",
                         recentDates.stream().map(s -> genreString + s).collect(Collectors.toList()),
-                        periodString + "_score" + genreString + todayDate,
+                        destKey,
                         Aggregate.SUM);
+                log.info(String.format("%s 랭킹 점수 합산 완료", genreString));
             }
 
-            log.info(String.format("%s 랭킹 점수 합산 완료", genreString));
+            // 랭킹 점수 데이터 만료기간 설정
+            redisTemplate.expire(destKey, expirationDays, TimeUnit.DAYS);
         }
 
         // 랭킹 변화 추적
