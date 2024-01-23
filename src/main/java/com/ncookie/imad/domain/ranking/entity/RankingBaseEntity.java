@@ -2,25 +2,21 @@ package com.ncookie.imad.domain.ranking.entity;
 
 
 import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "CONTENTS_TYPE")
-@Table(indexes = {
-        @Index(columnList = "rank")
-})
+@MappedSuperclass
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RankingBaseEntity {
+public abstract class RankingBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,9 +27,15 @@ public class RankingBaseEntity {
     @ToString.Exclude
     private Contents contents;
 
-    // 어제자 데이터와의 랭킹 차이. 어제자 랭킹에 없는 작품인 경우 NULL값이 들어감
-    private Long rankChanged;
+    // ALL, MOVIE, TV, ANIMATION 등이 있음
+    private ContentsType contentsType;
 
     // 현재 랭킹
-    private Long rank;
+    private Long ranking;
+
+    // 어제자 데이터와의 랭킹 차이. 어제자 랭킹에 없는 작품인 경우 NULL값이 들어감
+    private Long rankingChanged;
+
+    private Long rankingScore;
 }
+

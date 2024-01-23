@@ -1,10 +1,15 @@
 package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
 import com.ncookie.imad.domain.ranking.data.RankingPeriod;
 import com.ncookie.imad.domain.ranking.dto.ContentsData;
-import com.ncookie.imad.domain.ranking.entity.ContentsDailyRankingScore;
+import com.ncookie.imad.domain.ranking.dto.RankingScoreDTO;
+import com.ncookie.imad.domain.ranking.entity.*;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
+import com.ncookie.imad.domain.ranking.repository.RankingAllTimeRepository;
+import com.ncookie.imad.domain.ranking.repository.RankingMonthlyRepository;
+import com.ncookie.imad.domain.ranking.repository.RankingWeeklyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
@@ -14,9 +19,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -30,7 +33,12 @@ import static com.ncookie.imad.domain.ranking.service.RankingUtils.genreStringMa
 @RequiredArgsConstructor
 @Component
 public class RankingScheduler {
+    private final ContentsRetrievalService contentsRetrievalService;
+
     private final ContentsDailyScoreRankingRepository contentsDailyScoreRankingRepository;
+    private final RankingWeeklyRepository rankingWeeklyRepository;
+    private final RankingMonthlyRepository rankingMonthlyRepository;
+    private final RankingAllTimeRepository rankingAllTimeRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -83,6 +91,13 @@ public class RankingScheduler {
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateWeeklyScoreAndRanking() {
         updateScoreAndRanking(RankingPeriod.WEEKLY, PERIOD_WEEK);
+
+        rankingWeeklyRepository.deleteAllInBatch();
+        List<RankingBaseEntity> rankingBaseEntities = saveRankingData(RankingPeriod.WEEKLY);
+        List<RankingWeekly> rankingWeeklyList = rankingBaseEntities.stream()
+                .map(data -> (RankingWeekly) data)
+                .toList();
+        rankingWeeklyRepository.saveAll(rankingWeeklyList);
     }
 
     @Description("월간 작품 랭킹 정산")
@@ -90,6 +105,13 @@ public class RankingScheduler {
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateMonthlyScoreAndRanking() {
         updateScoreAndRanking(RankingPeriod.MONTHLY, PERIOD_MONTH);
+
+        rankingMonthlyRepository.deleteAllInBatch();
+        List<RankingBaseEntity> rankingBaseEntities = saveRankingData(RankingPeriod.MONTHLY);
+        List<RankingMonthly> rankingMonthlyList = rankingBaseEntities.stream()
+                .map(data -> (RankingMonthly) data)
+                .toList();
+        rankingMonthlyRepository.saveAll(rankingMonthlyList);
     }
 
     @Description("전체 작품 랭킹 정산")
@@ -97,6 +119,13 @@ public class RankingScheduler {
     @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateAllTimeScoreAndRanking() {
         updateScoreAndRanking(RankingPeriod.ALL_TIME, PERIOD_ALLTIME);
+
+        rankingAllTimeRepository.deleteAllInBatch();
+        List<RankingBaseEntity> rankingBaseEntities = saveRankingData(RankingPeriod.ALL_TIME);
+        List<RankingAllTime> rankingAllTimeList = rankingBaseEntities.stream()
+                .map(data -> (RankingAllTime) data)
+                .toList();
+        rankingAllTimeRepository.saveAll(rankingAllTimeList);
     }
 
     @Description("주간/월간/전체 작품 랭킹 최종 데이터의 정산 및 저장하는 메소드")
@@ -132,25 +161,37 @@ public class RankingScheduler {
             // 랭킹 점수 데이터 만료기간 설정
             redisTemplate.expire(destKey, expirationDays, TimeUnit.DAYS);
         }
+    }
 
-        // 랭킹 변화 추적
+    private List<RankingBaseEntity> saveRankingData(RankingPeriod rankingPeriod) {
+        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+
+        String periodString = rankingPeriod.getValue();
+
+        String todayDate = getLastDate(0);
+        String yesterdayDate = getLastDate(1);
+
+        // 최종 랭킹 데이터
+        List<RankingBaseEntity> rankingList = new ArrayList<>();
+
+        // 작품 타입별로 랭킹 변화 추적 및 데이터 저장
         for (String genreString : genreStringMap.values()) {
-            String weeklyScoreKey = periodString + "_score" + genreString;
+            String scoreDataKey = periodString + "_score" + genreString;
 
-            // 위에서 저장했던 랭킹 점수 데이터를 점수 기준 내림차순으로 정렬하여 추출
+            // 랭킹 점수 데이터를 랭킹 점수 기준으로 내림차순으로 정렬하여 추출
             Set<ZSetOperations.TypedTuple<Object>> todayRankSet =
                     zSetOperations.reverseRangeWithScores(
-                            weeklyScoreKey + todayDate,
+                            scoreDataKey + todayDate,
                             0,
                             -1);
 
             if (todayRankSet == null) {
                 log.error("에러 발생! 주간 랭킹 점수 합산 데이터를 불러올 수 없음");
-                return;
+                continue;
             }
 
             Iterator<ZSetOperations.TypedTuple<Object>> iterator = todayRankSet.iterator();
-            Long todayRank = 0L;
+            long todayRank = 0L;
             while (iterator.hasNext()) {
                 ZSetOperations.TypedTuple<Object> next = iterator.next();
                 ContentsData contentsData = (ContentsData) next.getValue();
@@ -161,7 +202,7 @@ public class RankingScheduler {
                 }
 
                 // 전날 랭킹 데이터와 비교
-                Long lastRank = zSetOperations.reverseRank(weeklyScoreKey + yesterdayDate, contentsData);
+                Long lastRank = zSetOperations.reverseRank(scoreDataKey + yesterdayDate, contentsData);
                 Long changedRank;
                 if (lastRank == null) {
                     log.info("신규 작품 랭킹 진입!");
@@ -170,23 +211,31 @@ public class RankingScheduler {
                     changedRank = lastRank - todayRank;
                 }
 
-                // 랭킹 데이터 갱신
-                contentsData.setRank(todayRank + 1);
-                contentsData.setRankChanged(changedRank);
-                zSetOperations.add(
-                        periodString + "_ranking" + genreString + todayDate,
-                        contentsData,
-                        todayRank + 1);
-                log.info(String.format("[%s][%s] 랭킹 데이터 갱신", periodString, genreString));
+                final Contents contents = contentsRetrievalService.
+                        getContentsById(contentsData.getContentsId());
+                RankingScoreDTO dto = RankingScoreDTO.builder()
+                        .contents(contents)
+                        .contentsType(contents.getContentsType())
+                        .rank(todayRank + 1)
+                        .rankChanged(changedRank)
+                        .rankingScore(Objects.requireNonNull(next.getScore()).longValue())
+                        .build();
+                switch (rankingPeriod) {
+                    case WEEKLY -> rankingList.add(RankingWeekly.toEntity(dto));
+                    case MONTHLY -> rankingList.add(RankingMonthly.toEntity(dto));
+                    case ALL_TIME -> rankingList.add(RankingAllTime.toEntity(dto));
+                }
 
                 // 다음 랭킹 데이터 탐색
                 todayRank++;
 
-                if (todayRank >= 100) {
-                    log.info(String.format("[%s][%s] TOP 100 랭킹 정산 완료!", periodString, genreString));
-                    break;
-                }
+//                if (todayRank >= 100) {
+//                    log.info(String.format("[%s][%s] TOP 100 랭킹 정산 완료!", periodString, genreString));
+//                    break;
+//                }
             }
         }
+
+        return rankingList;
     }
 }
