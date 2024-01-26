@@ -7,7 +7,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RankingWeeklyRepository extends JpaRepository<RankingWeekly, Long> {
-    Page<RankingWeekly> findAll(Pageable pageable, ContentsType contentsType);
-
     Page<RankingWeekly> findAllByContentsType(Pageable pageable, ContentsType contentsType);
 }

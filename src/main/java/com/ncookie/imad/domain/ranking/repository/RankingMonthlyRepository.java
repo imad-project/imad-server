@@ -7,6 +7,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RankingMonthlyRepository extends JpaRepository<RankingMonthly, Long> {
-    Page<RankingMonthly> findAll(Pageable pageable, ContentsType contentsType);
     Page<RankingMonthly> findAllByContentsType(Pageable pageable, ContentsType contentsType);
 }

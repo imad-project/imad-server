@@ -7,6 +7,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RankingAllTimeRepository extends JpaRepository<RankingAllTime, Long> {
-    Page<RankingAllTime> findAll(Pageable pageable, ContentsType contentsType);
     Page<RankingAllTime> findAllByContentsType(Pageable pageable, ContentsType contentsType);
 }
