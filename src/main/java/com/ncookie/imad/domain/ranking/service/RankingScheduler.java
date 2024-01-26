@@ -7,9 +7,6 @@ import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.dto.RankingScoreDTO;
 import com.ncookie.imad.domain.ranking.entity.*;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
-import com.ncookie.imad.domain.ranking.repository.RankingAllTimeRepository;
-import com.ncookie.imad.domain.ranking.repository.RankingMonthlyRepository;
-import com.ncookie.imad.domain.ranking.repository.RankingWeeklyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
@@ -32,11 +29,9 @@ import static com.ncookie.imad.domain.ranking.service.RankingUtils.*;
 @Component
 public class RankingScheduler {
     private final ContentsRetrievalService contentsRetrievalService;
+    private final RankingRepositoryService rankingRepositoryService;
 
     private final ContentsDailyScoreRankingRepository contentsDailyScoreRankingRepository;
-    private final RankingWeeklyRepository rankingWeeklyRepository;
-    private final RankingMonthlyRepository rankingMonthlyRepository;
-    private final RankingAllTimeRepository rankingAllTimeRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -83,13 +78,14 @@ public class RankingScheduler {
     public void updateWeeklyScoreAndRanking() {
         updateRankingScore(RankingPeriod.WEEKLY, PERIOD_WEEK);
 
-        rankingWeeklyRepository.deleteAllInBatch();
+        rankingRepositoryService.rankingWeeklyDeleteAll();
         List<RankingBaseEntity> rankingBaseEntities = saveRankingData(RankingPeriod.WEEKLY);
 
         List<RankingWeekly> rankingWeeklyList = rankingBaseEntities.stream()
                 .map(data -> (RankingWeekly) data)
                 .toList();
-        rankingWeeklyRepository.saveAll(rankingWeeklyList);
+        rankingRepositoryService.rankingWeeklySaveAll(rankingWeeklyList);
+
     }
 
     @Description("월간 작품 랭킹 정산")
@@ -98,13 +94,13 @@ public class RankingScheduler {
     public void updateMonthlyScoreAndRanking() {
         updateRankingScore(RankingPeriod.MONTHLY, PERIOD_MONTH);
 
-        rankingMonthlyRepository.deleteAllInBatch();
+        rankingRepositoryService.rankingMonthlyDeleteAll();
         List<RankingBaseEntity> rankingBaseEntities = saveRankingData(RankingPeriod.MONTHLY);
 
         List<RankingMonthly> rankingMonthlyList = rankingBaseEntities.stream()
                 .map(data -> (RankingMonthly) data)
                 .toList();
-        rankingMonthlyRepository.saveAll(rankingMonthlyList);
+        rankingRepositoryService.rankingMonthlySaveAll(rankingMonthlyList);
     }
 
     @Description("전체 작품 랭킹 정산")
@@ -113,13 +109,13 @@ public class RankingScheduler {
     public void updateAllTimeScoreAndRanking() {
         updateRankingScore(RankingPeriod.ALL_TIME, PERIOD_ALLTIME);
 
-        rankingAllTimeRepository.deleteAllInBatch();
+        rankingRepositoryService.rankingAllTimeDeleteAll();
         List<RankingBaseEntity> rankingBaseEntities = saveRankingData(RankingPeriod.ALL_TIME);
 
         List<RankingAllTime> rankingAllTimeList = rankingBaseEntities.stream()
                 .map(data -> (RankingAllTime) data)
                 .toList();
-        rankingAllTimeRepository.saveAll(rankingAllTimeList);
+        rankingRepositoryService.rankingAllTimeSaveAll(rankingAllTimeList);
     }
 
     @Description("기간별(주간/월간/전체) 랭킹 점수 합산 및 Redis 저장")
