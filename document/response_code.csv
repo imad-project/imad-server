@@ -72,6 +72,8 @@
 200, "PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS", "정상적으로 작성한 리뷰 리스트를 조회했습니다."
 200, "PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS", "정상적으로 좋아요/싫어요를 등록한 리뷰 리스트를 조회했습니다."
 200, "RANKING_GET_SUCCESS", "정상적으로 랭킹 정보를 조회했습니다."
+200, "RANKING_NOTICE_RANKING_UPDATE_TIME", "현재 랭킹 데이터 갱신 중입니다."
 404, "RANKING_GET_NO_DATA", "현재 랭킹 정보가 존재하지 않습니다."
 400, "RANKING_WRONG_CONTENTS_TYPE", "옳바르지 않은 ContentsType 입니다."
+400, "RANKING_WRONG_PERIOD", "옯바르지 않은 랭킹 기간입니다."
 400, "WRONG_SORT_STRING", "옳바르지 않은 정렬 기준입니다."
