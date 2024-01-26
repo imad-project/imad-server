@@ -36,6 +36,7 @@ public abstract class RankingBaseEntity {
     // 어제자 데이터와의 랭킹 차이. 어제자 랭킹에 없는 작품인 경우 NULL값이 들어감
     private Long rankingChanged;
 
+    // 랭킹 점수
     private Long rankingScore;
 }
 
