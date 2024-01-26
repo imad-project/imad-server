@@ -110,6 +110,7 @@ public enum ResponseCode {
     
     // 랭킹
     RANKING_GET_SUCCESS(200, "정상적으로 랭킹 정보를 조회했습니다."),
+    RANKING_NOTICE_RANKING_UPDATE_TIME(200, "현재 랭킹 데이터 갱신 중입니다."),
     RANKING_GET_NO_DATA(404, "현재 랭킹 정보가 존재하지 않습니다."),
     RANKING_WRONG_CONTENTS_TYPE(400, "옳바르지 않은 ContentsType 입니다."),
     RANKING_WRONG_PERIOD(400, "옯바르지 않은 랭킹 기간입니다."),

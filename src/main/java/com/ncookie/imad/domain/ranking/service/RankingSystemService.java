@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,11 @@ public class RankingSystemService {
 
 
     public RankingListResponse getRankingList(RankingPeriod rankingPeriod, String contentsTypeString, int pageNumber) {
+        // 현재 시각이 오전 12시부터 12시 5분 사이라면 랭킹 정보를 반환하지 않음
+        if (isWithinUpdateTime()) {
+            return null;
+        }
+
         PageRequest rankingPageRequest = getRankingPageRequest(pageNumber);
         ContentsType contentsType = getContentsTypeByString(contentsTypeString);
 
@@ -66,6 +72,17 @@ public class RankingSystemService {
         }
 
         return rankingListResponse;
+    }
+
+    private boolean isWithinUpdateTime() {
+        // 현재 시각 가져오기
+        LocalTime currentTime = LocalTime.now();
+
+        // 판단할 시간 범위 설정
+        LocalTime startTime = LocalTime.of(0, 0); // 12시 0분
+        LocalTime endTime = LocalTime.of(0, 5);   // 12시 5분
+
+        return !currentTime.isBefore(startTime) && currentTime.isBefore(endTime);
     }
 
     private ContentsType getContentsTypeByString(String s) {

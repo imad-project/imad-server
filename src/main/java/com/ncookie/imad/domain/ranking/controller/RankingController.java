@@ -25,6 +25,9 @@ public class RankingController {
             @RequestParam(value = "page") int pageNumber,
             @RequestParam(value = "type") String contentsTypeString) {
         RankingListResponse rankingList = rankingSystemService.getRankingList(RankingPeriod.WEEKLY, contentsTypeString, pageNumber - 1);
+        if (rankingList == null) {
+            return ApiResponse.createSuccess(ResponseCode.RANKING_NOTICE_RANKING_UPDATE_TIME, null);
+        }
 
         return ApiResponse.createSuccess(ResponseCode.RANKING_GET_SUCCESS, rankingList);
     }
@@ -35,6 +38,9 @@ public class RankingController {
             @RequestParam(value = "page") int pageNumber,
             @RequestParam(value = "type") String contentsTypeString) {
         RankingListResponse rankingList = rankingSystemService.getRankingList(RankingPeriod.MONTHLY, contentsTypeString, pageNumber - 1);
+        if (rankingList == null) {
+            return ApiResponse.createSuccess(ResponseCode.RANKING_NOTICE_RANKING_UPDATE_TIME, null);
+        }
 
         return ApiResponse.createSuccess(ResponseCode.RANKING_GET_SUCCESS, rankingList);
     }
@@ -45,6 +51,9 @@ public class RankingController {
             @RequestParam(value = "page") int pageNumber,
             @RequestParam(value = "type") String contentsTypeString) {
         RankingListResponse rankingList = rankingSystemService.getRankingList(RankingPeriod.ALL_TIME, contentsTypeString, pageNumber - 1);
+        if (rankingList == null) {
+            return ApiResponse.createSuccess(ResponseCode.RANKING_NOTICE_RANKING_UPDATE_TIME, null);
+        }
 
         return ApiResponse.createSuccess(ResponseCode.RANKING_GET_SUCCESS, rankingList);
     }
