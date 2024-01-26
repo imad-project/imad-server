@@ -208,6 +208,7 @@ public class RankingScheduler {
                     .rank(todayRank + 1)
                     .rankChanged(changedRank)
                     .rankingScore(Objects.requireNonNull(next.getScore()).longValue())
+
                     .build();
             switch (rankingPeriod) {
                 case WEEKLY -> rankingList.add(RankingWeekly.toEntity(dto));
