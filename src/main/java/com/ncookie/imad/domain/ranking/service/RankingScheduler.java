@@ -73,10 +73,16 @@ public class RankingScheduler {
         log.info("일일 작품 랭킹 점수 DB 초기화 완료");
     }
 
+    @Scheduled(cron = "0 2 0 * * *")    // 매일 자정 2분 후에 실행
+    //    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    public void updateRankingData() {
+        updateWeeklyRankingData();
+        updateMonthlyRankingData();
+        updateAllTimeRankingData();
+    }
+
     @Description("주간 작품 랭킹 정산")
-    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
-    public void updateWeeklyScoreAndRanking() {
+    public void updateWeeklyRankingData() {
         updateRankingScore(RankingPeriod.WEEKLY, PERIOD_WEEK);
 
         rankingRepositoryService.rankingWeeklyDeleteAll();
@@ -89,9 +95,7 @@ public class RankingScheduler {
     }
 
     @Description("월간 작품 랭킹 정산")
-    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
-    public void updateMonthlyScoreAndRanking() {
+    public void updateMonthlyRankingData() {
         updateRankingScore(RankingPeriod.MONTHLY, PERIOD_MONTH);
 
         rankingRepositoryService.rankingMonthlyDeleteAll();
@@ -104,9 +108,7 @@ public class RankingScheduler {
     }
 
     @Description("전체 작품 랭킹 정산")
-    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
-    public void updateAllTimeScoreAndRanking() {
+    public void updateAllTimeRankingData() {
         updateRankingScore(RankingPeriod.ALL_TIME, PERIOD_ALLTIME);
 
         rankingRepositoryService.rankingAllTimeDeleteAll();
