@@ -44,8 +44,8 @@ public class RankingScheduler {
 
 
     @Description("매일 자정마다 Redis에 작품 랭킹 점수 저장")
-//    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void saveContentsDailyRankingScore() {
         String redisKey = dailyRankingScoreString + getLastDate(1);
 
@@ -68,13 +68,14 @@ public class RankingScheduler {
         redisTemplate.expire(redisKey, expirationDays, TimeUnit.DAYS);
 
         // 일일 작품 랭킹 점수 DB 초기화
-//            contentsDailyScoreRankingRepository.deleteAllInBatch();
+//      TODO: 릴리즈 시 주석 해제
+//        contentsDailyScoreRankingRepository.deleteAllInBatch();
         log.info("일일 작품 랭킹 점수 DB 초기화 완료");
     }
 
     @Description("주간 작품 랭킹 정산")
-//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateWeeklyScoreAndRanking() {
         updateRankingScore(RankingPeriod.WEEKLY, PERIOD_WEEK);
 
@@ -85,12 +86,11 @@ public class RankingScheduler {
                 .map(data -> (RankingWeekly) data)
                 .toList();
         rankingRepositoryService.rankingWeeklySaveAll(rankingWeeklyList);
-
     }
 
     @Description("월간 작품 랭킹 정산")
-//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateMonthlyScoreAndRanking() {
         updateRankingScore(RankingPeriod.MONTHLY, PERIOD_MONTH);
 
@@ -104,8 +104,8 @@ public class RankingScheduler {
     }
 
     @Description("전체 작품 랭킹 정산")
-//    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
-    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
+    @Scheduled(cron = "0 5 0 * * *")    // 매일 자정 5분 후에 실행
+//    @Scheduled(cron = "0 * * * * *") // 매 분마다 실행
     public void updateAllTimeScoreAndRanking() {
         updateRankingScore(RankingPeriod.ALL_TIME, PERIOD_ALLTIME);
 
@@ -181,7 +181,7 @@ public class RankingScheduler {
             ContentsData contentsData = (ContentsData) next.getValue();
 
             if (contentsData == null) {
-                log.info("랭킹에서 작품을 찾을 수 없음");
+                log.error("랭킹 데이터에서 작품을 찾을 수 없음");
                 continue;
             }
 
@@ -195,8 +195,12 @@ public class RankingScheduler {
                 changedRank = lastRank - todayRank;
             }
 
-            final Contents contents = contentsRetrievalService.
-                    getContentsById(contentsData.getContentsId());
+            final Contents contents = contentsRetrievalService.getContentsById(contentsData.getContentsId());
+            if (contents == null) {
+                log.warn("ID에 해당하는 작품을 찾을 수 없음");
+                continue;
+            }
+            
             RankingScoreDTO dto = RankingScoreDTO.builder()
                     .contents(contents)
                     .contentsType(contents.getContentsType())
