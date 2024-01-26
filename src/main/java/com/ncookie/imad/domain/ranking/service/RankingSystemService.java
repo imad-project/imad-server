@@ -2,21 +2,25 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.ranking.data.RankingPeriod;
-import com.ncookie.imad.domain.ranking.dto.ContentsData;
+import com.ncookie.imad.domain.ranking.dto.response.RankingDetailsResponse;
+import com.ncookie.imad.domain.ranking.dto.response.RankingListResponse;
+import com.ncookie.imad.domain.ranking.entity.RankingAllTime;
+import com.ncookie.imad.domain.ranking.entity.RankingMonthly;
+import com.ncookie.imad.domain.ranking.entity.RankingWeekly;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import static com.ncookie.imad.domain.ranking.service.RankingUtils.genreStringMap;
-import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -24,46 +28,107 @@ import static com.ncookie.imad.domain.ranking.service.RankingUtils.getLastDate;
 @Transactional
 @Service
 public class RankingSystemService {
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RankingRepositoryService rankingRepositoryService;
 
-    public Set<ContentsData> getRankingByContentsType(RankingPeriod rankingPeriod, String contentsTypeString) {
+
+    public RankingListResponse getRankingList(RankingPeriod rankingPeriod, String contentsTypeString, int pageNumber) {
+        // 현재 시각이 오전 12시부터 12시 5분 사이라면 랭킹 정보를 반환하지 않음
+        if (isWithinUpdateTime()) {
+            return null;
+        }
+
+        PageRequest rankingPageRequest = getRankingPageRequest(pageNumber);
+        ContentsType contentsType = getContentsTypeByString(contentsTypeString);
+
+        RankingListResponse rankingListResponse;
+        switch (rankingPeriod) {
+            case WEEKLY: {
+                Page<RankingWeekly> weeklyRanking = rankingRepositoryService.getWeeklyRanking(rankingPageRequest, contentsType);
+                rankingListResponse = RankingListResponse.toDTO(
+                        weeklyRanking,
+                        convertRankingWeeklyPageToRankingDetailsResponse(weeklyRanking.stream().toList())
+                );
+                break;
+            }
+            case MONTHLY: {
+                Page<RankingMonthly> monthlyRanking = rankingRepositoryService.getMonthlyRanking(rankingPageRequest, contentsType);
+                rankingListResponse = RankingListResponse.toDTO(
+                        monthlyRanking,
+                        convertRankingMonthlyPageToRankingDetailsResponse(monthlyRanking.stream().toList())
+                );
+                break;
+            }
+            case ALL_TIME: {
+                Page<RankingAllTime> allTimeRanking = rankingRepositoryService.getAllTimeRanking(rankingPageRequest, contentsType);
+                rankingListResponse = RankingListResponse.toDTO(
+                        allTimeRanking,
+                        convertRankingAllTimePageToRankingDetailsResponse(allTimeRanking.stream().toList())
+                );
+                break;
+            }
+            default: {
+                throw new BadRequestException(ResponseCode.RANKING_WRONG_PERIOD);
+            }
+        }
+
+        return rankingListResponse;
+    }
+
+    private boolean isWithinUpdateTime() {
+        // 현재 시각 가져오기
+        LocalTime currentTime = LocalTime.now();
+
+        // 판단할 시간 범위 설정
+        LocalTime startTime = LocalTime.of(0, 0); // 12시 0분
+        LocalTime endTime = LocalTime.of(0, 5);   // 12시 5분
+
+        return !currentTime.isBefore(startTime) && currentTime.isBefore(endTime);
+    }
+
+    private ContentsType getContentsTypeByString(String s) {
         ContentsType contentsType;
+
         try {
-            contentsType  = ContentsType.valueOf(contentsTypeString.toUpperCase());
+            contentsType  = ContentsType.valueOf(s.toUpperCase());
         } catch (IllegalArgumentException e) {
             log.error("옳바르지 않은 contents type string으로 인해 에러 발생");
             log.error(e.getMessage());
             throw new BadRequestException(ResponseCode.RANKING_WRONG_CONTENTS_TYPE);
         }
 
-        return getRankingFromRedis(rankingPeriod, genreStringMap.get(contentsType));
+        return contentsType;
     }
 
-    // Redis에서 내림차순으로 랭킹 데이터 Set<ContentsData> 형식으로 반환
-    private Set<ContentsData> getRankingFromRedis(RankingPeriod rankingPeriod, String genreString) {
-        String todayDate = getLastDate(0);
-        String key = rankingPeriod.getValue() + "_ranking" + genreString + todayDate;
-
-        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
-        Set<Object> objects = zSetOperations.rangeByScore(
-                key,
-                Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY);
-        log.info("랭킹 데이터를 Redis로부터 상위권부터 조회");
-        
-        if (objects == null) {
-            log.error("랭킹 데이터를 찾을 수 없음");
-            return null;
-        }
-
-        // 데이터의 순서를 유지하기 위해 LinkedHashSet 사용
-        Set<ContentsData> contentsDataSet = new LinkedHashSet<>();
-        for (Object obj : objects) {
-            if (obj instanceof ContentsData) {
-                contentsDataSet.add((ContentsData) obj);
-            }
-        }
-
-        return contentsDataSet;
+    private PageRequest getRankingPageRequest(int pageNumber) {
+        Sort sort = Sort.by("ranking").ascending();
+        return PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
     }
+
+    private List<RankingDetailsResponse> convertRankingWeeklyPageToRankingDetailsResponse(List<RankingWeekly> rankingList) {
+        List<RankingDetailsResponse> rankingDetailsResponseList = new ArrayList<>();
+        for (RankingWeekly ranking : rankingList) {
+            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking));
+        }
+
+        return rankingDetailsResponseList;
+    }
+
+    private List<RankingDetailsResponse> convertRankingMonthlyPageToRankingDetailsResponse(List<RankingMonthly> rankingList) {
+        List<RankingDetailsResponse> rankingDetailsResponseList = new ArrayList<>();
+        for (RankingMonthly ranking : rankingList) {
+            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking));
+        }
+
+        return rankingDetailsResponseList;
+    }
+
+    private List<RankingDetailsResponse> convertRankingAllTimePageToRankingDetailsResponse(List<RankingAllTime> rankingList) {
+        List<RankingDetailsResponse> rankingDetailsResponseList = new ArrayList<>();
+        for (RankingAllTime ranking : rankingList) {
+            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking));
+        }
+
+        return rankingDetailsResponseList;
+    }
+
 }
