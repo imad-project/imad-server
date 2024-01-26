@@ -30,8 +30,8 @@ public class RankingSystemService {
     private final RankingRepositoryService rankingRepositoryService;
 
 
-    public RankingListResponse getRankingList(RankingPeriod rankingPeriod, String contentsTypeString) {
-        PageRequest rankingPageRequest = getRankingPageRequest(0);
+    public RankingListResponse getRankingList(RankingPeriod rankingPeriod, String contentsTypeString, int pageNumber) {
+        PageRequest rankingPageRequest = getRankingPageRequest(pageNumber);
         ContentsType contentsType = getContentsTypeByString(contentsTypeString);
 
         RankingListResponse rankingListResponse;
