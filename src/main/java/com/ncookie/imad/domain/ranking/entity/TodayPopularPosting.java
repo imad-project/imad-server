@@ -2,16 +2,14 @@ package com.ncookie.imad.domain.ranking.entity;
 
 import com.ncookie.imad.domain.posting.entity.Posting;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 
+@Builder
 @Entity
-@SuperBuilder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class TodayPopularPosting {
@@ -23,5 +21,6 @@ public class TodayPopularPosting {
     private Posting posting;
     
     // 인기 게시글 점수
+    @Setter
     private Long popularScore;
 }
