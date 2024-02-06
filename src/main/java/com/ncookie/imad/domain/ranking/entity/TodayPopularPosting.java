@@ -14,6 +14,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 public class TodayPopularPosting {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "posting_id")

@@ -44,4 +44,29 @@ public class TodayPopularReviewService {
         
         log.info("리뷰 인기 점수 추가 완료");
     }
+
+    public void subtractPopularScore(Review review, int score) {
+        if (review == null) {
+            log.warn("인기 점수 반영 실패 : ID에 해당하는 리뷰가 존재하지 않음");
+            return;
+        }
+
+        Optional<TodayPopularReview> popularReviewOptional = todayPopularReviewsRepository.findByReview(review);
+        if (popularReviewOptional.isPresent()) {
+            TodayPopularReview todayPopularReview = popularReviewOptional.get();
+            Long oldScore = todayPopularReview.getPopularScore();
+
+            todayPopularReview.setPopularScore(oldScore - score);
+            todayPopularReviewsRepository.save(todayPopularReview);
+        } else {
+            todayPopularReviewsRepository.save(
+                    TodayPopularReview.builder()
+                            .review(review)
+                            .popularScore((long) score)
+                            .build()
+            );
+        }
+
+        log.info("리뷰 인기 점수 차감 완료");
+    }
 }

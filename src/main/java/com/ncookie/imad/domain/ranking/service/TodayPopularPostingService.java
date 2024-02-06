@@ -48,4 +48,29 @@ public class TodayPopularPostingService {
         
         log.info("게시글 인기 점수 추가 완료");
     }
+
+    public void subtractPopularScore(Posting posting, int score) {
+        if (posting == null) {
+            log.warn("인기 점수 반영 실패 : ID에 해당하는 리뷰가 존재하지 않음");
+            return;
+        }
+
+        Optional<TodayPopularPosting> popularPostingOptional = todayPopularPostingsRepository.findByPosting(posting);
+        if (popularPostingOptional.isPresent()) {
+            TodayPopularPosting todayPopularPosting = popularPostingOptional.get();
+            Long oldScore = todayPopularPosting.getPopularScore();
+
+            todayPopularPosting.setPopularScore(oldScore - score);
+            todayPopularPostingsRepository.save(todayPopularPosting);
+        } else {
+            todayPopularPostingsRepository.save(
+                    TodayPopularPosting.builder()
+                            .posting(posting)
+                            .popularScore((long) score)
+                            .build()
+            );
+        }
+
+        log.info("게시글 인기 점수 추가 완료");
+    }
 }

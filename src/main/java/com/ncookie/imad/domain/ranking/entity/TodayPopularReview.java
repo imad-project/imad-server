@@ -14,6 +14,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 public class TodayPopularReview {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "review_id")
