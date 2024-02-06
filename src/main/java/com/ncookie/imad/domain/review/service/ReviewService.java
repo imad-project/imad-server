@@ -3,6 +3,7 @@ package com.ncookie.imad.domain.review.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
+import com.ncookie.imad.domain.ranking.service.TodayPopularReviewService;
 import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
 import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
@@ -45,6 +46,7 @@ public class ReviewService {
     private final ReviewLikeService reviewLikeService;
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
+    private final TodayPopularReviewService todayPopularReviewService;
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
@@ -253,6 +255,13 @@ public class ReviewService {
                         throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
                     }
                 }
+            }
+
+            // 리뷰 인기 점수 추가
+            if (likeStatus == 1) {
+                todayPopularReviewService.addPopularScore(review, TodayPopularReviewService.POPULAR_LIKE_SCORE);
+            } else if (likeStatus == 0) {
+                todayPopularReviewService.subtractPopularScore(review, TodayPopularReviewService.POPULAR_LIKE_SCORE);
             }
 
             // like, dislike count 갱신

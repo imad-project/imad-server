@@ -12,6 +12,7 @@ import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.profile.service.ScrapService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
+import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
@@ -47,6 +48,7 @@ public class PostingService {
     private final ScrapService scrapService;
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
+    private final TodayPopularPostingService todayPopularPostingService;
 
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
@@ -83,6 +85,7 @@ public class PostingService {
         // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
         // 조회수 갱신
         postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
+        todayPopularPostingService.addPopularScore(posting, TodayPopularPostingService.POPULAR_VIEW_CNT_SCORE);
 
         // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
         PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
@@ -298,6 +301,13 @@ public class PostingService {
                     throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
                 }
             }
+        }
+
+        // 게시글 인기 점수 추가
+        if (likeStatus == 1) {
+            todayPopularPostingService.addPopularScore(posting, TodayPopularPostingService.POPULAR_LIKE_SCORE);
+        } else if (likeStatus == 0) {
+            todayPopularPostingService.subtractPopularScore(posting, TodayPopularPostingService.POPULAR_LIKE_SCORE);
         }
 
         // like, dislike count 갱신
