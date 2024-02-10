@@ -2,13 +2,16 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.ranking.entity.TodayPopularReview;
 import com.ncookie.imad.domain.ranking.repository.TodayPopularReviewsRepository;
+import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.entity.Review;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 
 @Slf4j
@@ -19,6 +22,22 @@ public class TodayPopularReviewService {
     private final TodayPopularReviewsRepository todayPopularReviewsRepository;
 
     public final static int POPULAR_LIKE_SCORE = 5;
+
+    public ReviewDetailsResponse getTodayPopularReview() {
+        List<TodayPopularReview> popularReviewList = todayPopularReviewsRepository.findTopByPopularScore();
+        // 인기 리뷰 데이터가 존재하지 않으면 null 반환
+        if (popularReviewList.isEmpty()) {
+            return null;
+        }
+
+        // 인기 리뷰 점수가 가장 높은 리뷰가 2개 이상일 때 랜덤으로 반환
+        if (popularReviewList.size() > 1) {
+            Random random = new Random();
+            int randomNum = random.nextInt(popularReviewList.size());
+            return ReviewDetailsResponse.toDTO(popularReviewList.get(randomNum).getReview());
+        }
+        return ReviewDetailsResponse.toDTO(popularReviewList.get(0).getReview());
+    }
 
     public void addPopularScore(Review review, int score) {
         if (review == null) {

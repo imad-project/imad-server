@@ -119,6 +119,16 @@ public class ReviewService {
         );
     }
 
+    public ReviewDetailsResponse getMostLikeReview() {
+        ReviewLike mostLikeReview = reviewLikeService.getMostReviewLike();
+
+        if (mostLikeReview != null) {
+            return ReviewDetailsResponse.toDTO(mostLikeReview.getReview());
+        } else {
+            return null;
+        }
+    }
+
     public int getWrittenReviewCount(UserAccount user) {
         return reviewRepository.countWrittenReviewByUser(user);
     }

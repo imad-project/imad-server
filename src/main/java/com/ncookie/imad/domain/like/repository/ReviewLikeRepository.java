@@ -9,12 +9,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
     ReviewLike findByUserAccountAndReview(UserAccount user, Review review);
 
     Page<ReviewLike> findAllByUserAccount(UserAccount user, Pageable pageable);
     @Query("SELECT r FROM ReviewLike r WHERE r.userAccount = :user AND r.likeStatus = :likeStatus")
     Page<ReviewLike> findAllByUserAccountAndLikeStatus(@Param("user") UserAccount user, Pageable pageable, @Param("likeStatus") int likeStatus);
+
+    @Query("SELECT r FROM ReviewLike r " +
+            "WHERE r.likeStatus = 1 GROUP BY r.review ORDER BY COUNT(r.review) DESC")
+    Page<ReviewLike> getTopReviewLikeByLike(Pageable pageable);
 
     @Query("SELECT COUNT(*) FROM ReviewLike WHERE review = :review AND likeStatus = 1")
     int countLikeByReview(@Param("review") Review review);
