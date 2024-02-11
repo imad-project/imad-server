@@ -120,13 +120,17 @@ public class ReviewService {
     }
 
     public ReviewDetailsResponse getMostLikeReview() {
-        ReviewLike mostLikeReview = reviewLikeService.getMostReviewLike();
+        List<Review> mostLikeReviewList = reviewRepository.findMostLikeReview();
 
-        if (mostLikeReview != null) {
-            return ReviewDetailsResponse.toDTO(mostLikeReview.getReview());
-        } else {
+        if (mostLikeReviewList.isEmpty()) {
             return null;
         }
+
+        if (mostLikeReviewList.size() > 1) {
+            int randomNum = Utils.getRandomNum(mostLikeReviewList.size());
+            return ReviewDetailsResponse.toDTO(mostLikeReviewList.get(randomNum));
+        }
+        return ReviewDetailsResponse.toDTO(mostLikeReviewList.get(0));
     }
 
     public int getWrittenReviewCount(UserAccount user) {

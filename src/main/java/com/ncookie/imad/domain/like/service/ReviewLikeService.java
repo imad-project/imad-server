@@ -8,11 +8,8 @@ import com.ncookie.imad.domain.user.entity.UserAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -53,17 +50,6 @@ public class ReviewLikeService implements LikeService<Review, ReviewLike> {
             return reviewLikeRepository.findAllByUserAccount(user, pageable);
         } else {
             return reviewLikeRepository.findAllByUserAccountAndLikeStatus(user, pageable, likeStatus);
-        }
-    }
-
-    public ReviewLike getMostReviewLike() {
-        Page<ReviewLike> topReviewLikeByLike = reviewLikeRepository.getTopReviewLikeByLike(PageRequest.of(0, 1));
-
-        List<ReviewLike> list = topReviewLikeByLike.getContent().stream().toList();
-        if (list.isEmpty()) {
-            return null;
-        } else {
-            return list.get(0);
         }
     }
 }
