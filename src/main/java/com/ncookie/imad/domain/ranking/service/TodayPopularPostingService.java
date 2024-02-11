@@ -1,13 +1,17 @@
 package com.ncookie.imad.domain.ranking.service;
 
+import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
+import com.ncookie.imad.domain.posting.dto.response.PostingListElement;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.ranking.entity.TodayPopularPosting;
 import com.ncookie.imad.domain.ranking.repository.TodayPopularPostingsRepository;
+import com.ncookie.imad.global.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -23,6 +27,22 @@ public class TodayPopularPostingService {
     public final static int POPULAR_COMMENT_SCORE = 2;
     public final static int POPULAR_VIEW_CNT_SCORE = 1;
 
+
+    public PostingListElement getTodayPopularPosting() {
+        List<TodayPopularPosting> popularPostingList = todayPopularPostingsRepository.findTopByPopularScore();
+        
+        // 인기 게시글 데이터가 존재하지 않으면 null 반환
+        if (popularPostingList.isEmpty()) {
+            return null;
+        }
+
+        // 인기 점수가 가장 높은 게시글이 2개 이상일 때 랜덤으로 반환
+        if (popularPostingList.size() > 1) {
+            int randomNum = Utils.getRandomNum(popularPostingList.size());
+            return PostingListElement.toDTO(popularPostingList.get(randomNum).getPosting());
+        }
+        return PostingListElement.toDTO(popularPostingList.get(0).getPosting());
+    }
 
     public void addPopularScore(Posting posting, int score) {
         if (posting == null) {

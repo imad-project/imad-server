@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface PostingRepository extends JpaRepository<Posting, Long> {
     /* 게시글 리스트 전체 조회용 */
     Page<Posting> findAllByCategory(Pageable pageable, int category);
@@ -50,4 +52,8 @@ public interface PostingRepository extends JpaRepository<Posting, Long> {
     @Modifying
     @Query("UPDATE Posting SET viewCnt = :viewCnt WHERE postingId = :postingId")
     void updateViewCount(@Param("postingId") Long postingId, @Param("viewCnt") int viewCnt);
+
+    @Query("SELECT p FROM Posting p " +
+            "WHERE p.likeCnt = (SELECT MAX(p2.likeCnt) FROM Posting p2)")
+    List<Posting> findMostLikePosting();
 }

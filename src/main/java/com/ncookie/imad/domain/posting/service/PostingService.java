@@ -213,6 +213,20 @@ public class PostingService {
         return postingDetailsResponseList;
     }
 
+    public PostingListElement getMostLikePosting() {
+        List<Posting> mostLikePostingList = postingRepository.findMostLikePosting();
+
+        if (mostLikePostingList.isEmpty()) {
+            return null;
+        }
+
+        if (mostLikePostingList.size() > 1) {
+            int randomNum = Utils.getRandomNum(mostLikePostingList.size());
+            return PostingListElement.toDTO(mostLikePostingList.get(randomNum));
+        }
+        return PostingListElement.toDTO(mostLikePostingList.get(0));
+    }
+
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
         Contents contents = contentsService.getContentsEntityById(addPostingRequest.getContentsId());
