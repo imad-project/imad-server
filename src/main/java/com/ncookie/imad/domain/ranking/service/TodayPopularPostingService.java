@@ -1,6 +1,5 @@
 package com.ncookie.imad.domain.ranking.service;
 
-import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
 import com.ncookie.imad.domain.posting.dto.response.PostingListElement;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.ranking.entity.TodayPopularPosting;
