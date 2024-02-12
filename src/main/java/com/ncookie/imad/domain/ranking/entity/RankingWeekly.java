@@ -23,6 +23,7 @@ public class RankingWeekly extends RankingBaseEntity {
                 .ranking(dto.getRank())
                 .rankingChanged(dto.getRankChanged())
                 .rankingScore(dto.getRankingScore())
+
                 .build();
     }
 }

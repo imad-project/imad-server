@@ -149,6 +149,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/review/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/posting/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ranking/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/popular/**").permitAll()
 
                 // 모니터링 관련 데이터에 접근 가능한건 내 로컬 컴퓨터만
                 .requestMatchers("/actuator/**").access(hasIpAddress(myLocalIpAddress))

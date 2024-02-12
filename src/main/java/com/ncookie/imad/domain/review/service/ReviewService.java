@@ -3,6 +3,8 @@ package com.ncookie.imad.domain.review.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
+import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
+import com.ncookie.imad.domain.ranking.service.TodayPopularReviewService;
 import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
 import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
@@ -45,6 +47,7 @@ public class ReviewService {
     private final ReviewLikeService reviewLikeService;
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
+    private final TodayPopularReviewService todayPopularReviewService;
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
@@ -114,6 +117,20 @@ public class ReviewService {
                 reviewLikePage,
                 convertReviewListToReviewDetailsResponse(user, reviewList)
         );
+    }
+
+    public ReviewDetailsResponse getMostLikeReview() {
+        List<Review> mostLikeReviewList = reviewRepository.findMostLikeReview();
+
+        if (mostLikeReviewList.isEmpty()) {
+            return null;
+        }
+
+        if (mostLikeReviewList.size() > 1) {
+            int randomNum = Utils.getRandomNum(mostLikeReviewList.size());
+            return ReviewDetailsResponse.toDTO(mostLikeReviewList.get(randomNum));
+        }
+        return ReviewDetailsResponse.toDTO(mostLikeReviewList.get(0));
     }
 
     public int getWrittenReviewCount(UserAccount user) {
@@ -241,6 +258,12 @@ public class ReviewService {
                         .likeStatus(likeStatus)
                         .build());
             } else {
+                // 기존의 좋아요를 좋아요 취소 또는 싫어요로 변경했을 때 인기 점수 차감
+                int previousLikeStatus = reviewLike.getLikeStatus();
+                if (previousLikeStatus == 1 && (likeStatus == 0 || likeStatus == -1)) {
+                    todayPopularReviewService.subtractPopularScore(review, TodayPopularPostingService.POPULAR_LIKE_SCORE);
+                }
+
                 // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
                 if (likeStatus == 0) {
                     reviewLikeService.deleteLikeStatus(reviewLike);
@@ -253,6 +276,11 @@ public class ReviewService {
                         throw new BadRequestException(ResponseCode.LIKE_STATUS_INVALID);
                     }
                 }
+            }
+
+            // 리뷰 인기 점수 추가
+            if (likeStatus == 1) {
+                todayPopularReviewService.addPopularScore(review, TodayPopularReviewService.POPULAR_LIKE_SCORE);
             }
 
             // like, dislike count 갱신
