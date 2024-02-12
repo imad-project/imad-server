@@ -143,7 +143,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .ifPresentOrElse(user -> {
                     saveAuthentication(user);
                     log.info("JWT 인증 성공");
-                }, () -> log.error("JWT 인증 실패 : 존재하지 않는 회원"));
+                }, () -> log.info("JWT 인증 실패 : 존재하지 않는 회원"));
 
         filterChain.doFilter(request, response);
     }
