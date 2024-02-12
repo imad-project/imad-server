@@ -88,4 +88,8 @@ public class TodayPopularReviewService {
 
         log.info("리뷰 인기 점수 차감 완료");
     }
+
+    public void clearDaily() {
+        todayPopularReviewsRepository.deleteAllInBatch();
+    }
 }

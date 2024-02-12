@@ -93,4 +93,8 @@ public class TodayPopularPostingService {
 
         log.info("게시글 인기 점수 추가 완료");
     }
+
+    public void clearDaily() {
+        todayPopularPostingsRepository.deleteAllInBatch();
+    }
 }
