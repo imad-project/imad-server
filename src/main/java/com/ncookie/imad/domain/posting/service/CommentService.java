@@ -10,6 +10,7 @@ import com.ncookie.imad.domain.posting.dto.response.CommentListResponse;
 import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.CommentRepository;
+import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
@@ -39,6 +40,8 @@ public class CommentService {
 
     private final UserRetrievalService userRetrievalService;
     private final PostingRetrievalService postingRetrievalService;
+
+    private final TodayPopularPostingService todayPopularPostingService;
 
 
     public CommentDetailsResponse getComment(String accessToken, Long commentId) {
@@ -128,6 +131,9 @@ public class CommentService {
 
         Comment save = commentRepository.save(comment);
         log.info("댓글(답글) 등록 완료");
+
+        // 게시글 인기 점수 추가
+        todayPopularPostingService.addPopularScore(posting, TodayPopularPostingService.POPULAR_COMMENT_SCORE);
 
         return CommentIdResponse.builder()
                 .commentId(save.getCommentId())

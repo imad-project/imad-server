@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findAllByContents(Contents contents, Pageable pageable);
     Page<Review> findAllByUserAccount(UserAccount userAccount, Pageable pageable);
@@ -27,11 +29,18 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COUNT(*) FROM Review WHERE userAccount = :user")
     int countWrittenReviewByUser(UserAccount user);
 
+    // 좋아요 개수 업데이트
     @Modifying
     @Query("UPDATE Review SET likeCnt = :likeCnt WHERE reviewId = :reviewId")
     void updateLikeCount(@Param("reviewId") Long reviewId, @Param("likeCnt") int likeCnt);
 
+    // 싫어요 개수 업데이트
     @Modifying
     @Query("UPDATE Review SET dislikeCnt = :dislikeCnt WHERE reviewId = :reviewId")
     void updateDislikeCount(@Param("reviewId") Long reviewId, @Param("dislikeCnt") int dislikeCnt);
+
+    // 인기 리뷰 조회용
+    @Query("SELECT r FROM Review r " +
+            "WHERE r.likeCnt = (SELECT MAX(r2.likeCnt) FROM Review r2)")
+    List<Review> findMostLikeReview();
 }

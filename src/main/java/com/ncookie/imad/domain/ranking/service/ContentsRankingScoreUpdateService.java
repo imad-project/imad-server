@@ -40,19 +40,18 @@ public class ContentsRankingScoreUpdateService {
     public void addRankingScore(Contents contents, int score) {
         if (contents == null) {
             log.warn("랭킹 점수 반영 실패 : ID에 해당하는 작품이 존재하지 않음");
+            return;
         }
 
         Optional<ContentsDailyRankingScore> optionalDailyScore = contentsDailyScoreRankingRepository.findByContents(contents);
         ContentsDailyRankingScore dailyScore;
         if (optionalDailyScore.isPresent()) {
-
             dailyScore = optionalDailyScore.get();
             int oldScore = dailyScore.getRankingScore();
 
             dailyScore.setRankingScore(oldScore + score);
             contentsDailyScoreRankingRepository.save(dailyScore);
         } else {
-
             contentsDailyScoreRankingRepository.save(
                     ContentsDailyRankingScore.builder()
                             .contents(contents)

@@ -114,7 +114,11 @@ public enum ResponseCode {
     RANKING_GET_NO_DATA(404, "현재 랭킹 정보가 존재하지 않습니다."),
     RANKING_WRONG_CONTENTS_TYPE(400, "옳바르지 않은 ContentsType 입니다."),
     RANKING_WRONG_PERIOD(400, "옯바르지 않은 랭킹 기간입니다."),
-    
+
+    POPULAR_REVIEW_GET_SUCCESS(200, "정상적으로 오늘의 리뷰를 조회했습니다."),
+    POPULAR_REVIEW_NULL_AND_GET_REVIEW(200, "오늘의 리뷰 데이터가 없으므로 좋아요가 가장 많은 리뷰를 좋아했습니다."),
+    POPULAR_REVIEW_ALL_NULL(200, "오늘의 리뷰와 리뷰 좋아요 데이터 모두 존재하지 않습니다."),
+
     // Utils
     WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다.");
 

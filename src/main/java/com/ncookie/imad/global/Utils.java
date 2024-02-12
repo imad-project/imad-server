@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 @Slf4j
 public class Utils {
@@ -125,5 +126,10 @@ public class Utils {
     public static Pageable getDefaultPageable(int pageNumber) {
         Sort sort = Sort.by("createdDate").descending();
         return PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
+    }
+
+    public static int getRandomNum(int num) {
+        Random random = new Random();
+        return random.nextInt(num);
     }
 }

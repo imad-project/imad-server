@@ -10,6 +10,7 @@ import com.ncookie.imad.domain.profile.dto.response.*;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
+import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -47,6 +48,7 @@ public class ProfileService {
     private final ScrapService scrapService;
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
+    private final TodayPopularPostingService todayPopularPostingService;
 
 
     // 프로필 요약 정보
@@ -163,6 +165,7 @@ public class ProfileService {
             log.info("스크랩 등록 완료");
 
             contentsRankingScoreUpdateService.addRankingScore(posting.getContents(), SCRAP_RANKING_SCORE);
+            todayPopularPostingService.addPopularScore(posting, TodayPopularPostingService.POPULAR_SCRAP_SCORE);
             log.info("[게시글 스크랩 추가] 랭킹 점수 반영 완료");
 
             return ResponseCode.SCRAP_ADD_SUCCESS;
@@ -183,6 +186,7 @@ public class ProfileService {
         }
         PostingScrap postingScrap = scrapService.findByIdAndUserAccount(scrapId, user);
         contentsRankingScoreUpdateService.subtractRankingScore(postingScrap.getPosting().getContents(), SCRAP_RANKING_SCORE);
+        todayPopularPostingService.subtractPopularScore(postingScrap.getPosting(), TodayPopularPostingService.POPULAR_SCRAP_SCORE);
         log.info("[게시글 스크랩 취소] 랭킹 점수 반영 완료");
 
         scrapService.deleteByIdAndUserAccount(scrapId, user);

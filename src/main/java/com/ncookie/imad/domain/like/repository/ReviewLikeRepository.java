@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
     ReviewLike findByUserAccountAndReview(UserAccount user, Review review);
 
