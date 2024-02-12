@@ -19,11 +19,13 @@ public class TodayPopularScheduler {
     @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
     public void clearPopularReviewDaily() {
         todayPopularReviewService.clearDaily();
+        log.info("오늘의 리뷰 데이터 리셋 완료");
     }
 
     @Description("매일 자정마다 인기 게시글 데이터 리셋")
     @Scheduled(cron = "0 0 0 * * ?")    // 자정마다 실행
     public void clearPopularPostingDaily() {
         todayPopularPostingService.clearDaily();
+        log.info("오늘의 게시글 데이터 리셋 완료");
     }
 }
