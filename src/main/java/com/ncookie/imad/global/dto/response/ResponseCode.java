@@ -11,6 +11,7 @@ public enum ResponseCode {
     ENTITY_NOT_FOUND(400,  " Entity Not Found"),
     INTERNAL_SERVER_ERROR(500, "Server Error"),
     INVALID_TYPE_VALUE(400, " Invalid Type Value"),
+    INVALID_CONTENT_TYPE(400, "잘못된 Content-Type 유형입니다."),
 
     // Spring Security
     UNAUTHORIZED_REQUEST(401, "잘못된 요청이거나 올바르지 않은 인증정보입니다."),
