@@ -13,6 +13,7 @@ import com.ncookie.imad.global.login.filter.CustomJsonUsernamePasswordAuthentica
 import com.ncookie.imad.global.login.handler.LoginFailureHandler;
 import com.ncookie.imad.global.login.handler.LoginSuccessHandler;
 import com.ncookie.imad.global.login.service.LoginService;
+import com.ncookie.imad.global.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.ncookie.imad.global.oauth2.handler.OAuth2LoginFailureHandler;
 import com.ncookie.imad.global.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.ncookie.imad.global.oauth2.service.CustomOAuth2UserService;
@@ -77,6 +78,8 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Value("${ip.local.address}")
     private String myLocalIpAddress;
@@ -160,6 +163,9 @@ public class SecurityConfig {
 
                 //== 소셜 로그인 설정 ==//
                 .oauth2Login()
+                .authorizationEndpoint()
+                    .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository())
+                    .and()
                 .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
                 .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
                 .userInfoEndpoint().userService(customOAuth2UserService); // customUserService 설정
@@ -246,6 +252,11 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationProcessingFilter() {
         return new JwtAuthenticationFilter(jwtService, userRepository);
+    }
+
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieOAuth2AuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
     private static AuthorizationManager<RequestAuthorizationContext> hasIpAddress(String ipAddress) {
