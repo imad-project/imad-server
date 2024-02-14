@@ -1,9 +1,10 @@
 package com.ncookie.imad.global.login.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncookie.imad.global.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.AuthenticationServiceException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -15,17 +16,21 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import static com.ncookie.imad.global.dto.response.ResponseCode.INVALID_CONTENT_TYPE;
+
 /**
  * 스프링 시큐리티의 폼 기반의 UsernamePasswordAuthenticationFilter를 참고하여 만든 커스텀 필터
  * 거의 구조가 같고, Type이 Json인 Login만 처리하도록 설정한 부분만 다르다. (커스텀 API용 필터 구현)
  * Username : 회원 아이디 -> email로 설정
  * "/api/login" 요청 왔을 때 JSON 값을 매핑 처리하는 필터
  */
+@Slf4j
 public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String DEFAULT_LOGIN_REQUEST_URL = "/api/login"; // "/login"으로 오는 요청을 처리
     private static final String HTTP_METHOD = "POST"; // 로그인 HTTP 메소드는 POST
     private static final String CONTENT_TYPE = "application/json"; // JSON 타입의 데이터로 오는 로그인 요청만 처리
+    private static final String CONTENT_TYPE_WITH_CHARSET = "application/json; charset=UTF-8"; // JSON 타입의 데이터로 오는 로그인 요청만 처리
     private static final String USERNAME_KEY = "email"; // 회원 로그인 시 이메일 요청 JSON Key : "email"
     private static final String PASSWORD_KEY = "password"; // 회원 로그인 시 비밀번호 요청 JSon Key : "password"
     private static final AntPathRequestMatcher DEFAULT_LOGIN_PATH_REQUEST_MATCHER =
@@ -60,8 +65,11 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
      */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
-        if(request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)  ) {
-            throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
+        // Request의 Content-Type이 null이거나, CONTENT_TYPE, CONTENT_TYPE_WITH_CHARSET와 일치하지 않으면 예외처리 수행
+        if (request.getContentType() == null
+                || (!request.getContentType().equals(CONTENT_TYPE) && !request.getContentType().equals(CONTENT_TYPE_WITH_CHARSET))) {
+            log.error("Authentication Content-Type not supported: " + request.getContentType());
+            throw new BadRequestException(INVALID_CONTENT_TYPE);
         }
 
         String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
@@ -76,5 +84,4 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
 
         return this.getAuthenticationManager().authenticate(authRequest);
     }
-
 }
