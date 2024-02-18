@@ -35,20 +35,29 @@ public class AppleController {
         String redirectUri = request.getParameter("state");
 
         UserAccount user = appleService.login(request.getParameter("code"));
+        boolean isValidRedirectUri = (redirectUri != null && !redirectUri.isEmpty());
 
-        // 애플 회원가입 또는 로그인 실패
-        if (user == null) {
-            return ApiResponse.createError(ResponseCode.LOGIN_FAILURE);
+        // 로그인 성공
+        if (user != null) {
+            // 리액트로 로그인한 경우
+            if (isValidRedirectUri) {
+                redirectStrategy.sendRedirect(request, response, appleService.determineSuccessRedirectUrl(user, redirectUri));
+                return null;
+            }
+
+            // 네이티브 앱이나 기타 경로에서 로그인한 경우
+            appleService.loginSuccess(user, response);
+            return ApiResponse.createSuccess(ResponseCode.LOGIN_SUCCESS, UserInfoResponse.toDTO(user));
         }
-
-        // 리액트로 로그인한 경우
-        if (redirectUri != null && !redirectUri.isEmpty()) {
-            redirectStrategy.sendRedirect(request, response, appleService.determineRedirectUrl(user, redirectUri));
-            return null;
+        // 로그인 실패
+        else {
+            // 리액트로 로그인한 경우
+            if (isValidRedirectUri) {
+                redirectStrategy.sendRedirect(request, response, appleService.determineFailureRedirectUrl(redirectUri));
+                return null;
+            } else {
+                return ApiResponse.createError(ResponseCode.LOGIN_FAILURE);
+            }
         }
-
-        // 네이티브 앱이나 기타 경로에서 로그인한 경우
-        appleService.loginSuccess(user, response);
-        return ApiResponse.createSuccess(ResponseCode.LOGIN_SUCCESS, UserInfoResponse.toDTO(user));
     }
 }

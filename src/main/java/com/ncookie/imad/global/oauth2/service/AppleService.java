@@ -51,7 +51,7 @@ public class AppleService {
 
     private final static String APPLE_AUTH_URL = "https://appleid.apple.com";
 
-    public String getAppleLoginUrl(String redirectUri) throws UnsupportedEncodingException {
+    public String getAppleLoginUrl(String redirectUri) {
         String loginUrl = APPLE_AUTH_URL + "/auth/authorize"
                 + "?client_id=" + appleProperties.getClientId()
                 + "&redirect_uri=" + appleProperties.getRedirectUrl()
@@ -130,15 +130,22 @@ public class AppleService {
         jwtService.updateRefreshToken(user.getEmail(), refreshToken);
     }
 
-    public String determineRedirectUrl(UserAccount user, String baseUrl) {
+    public String determineSuccessRedirectUrl(UserAccount user, String baseUrl) {
         String accessToken = jwtService.createAccessToken(user.getEmail());
         String refreshToken = jwtService.createRefreshToken();
 
         jwtService.updateRefreshToken(user.getEmail(), refreshToken);
 
         return UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/success")
                 .queryParam("token", accessToken)
                 .queryParam("refresh_token", refreshToken)
+                .build().toUriString();
+    }
+
+    public String determineFailureRedirectUrl(String baseUrl) {
+        return UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/fail")
                 .build().toUriString();
     }
 
