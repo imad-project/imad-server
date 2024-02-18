@@ -135,12 +135,12 @@ public class SecurityConfig {
                 // 아래 URL로 들어오는 요청들은 Filter 검사에서 제외됨 
                 .requestMatchers(
                         "/api/signup",
-                        "/login/**",        // 소셜 로그인 redirect url
                         "/api/user/validation/**",
                         "/api/callback/**",
                         "/api/test/**",
                         "/aws",
-                        "/auth/**",
+                        "/login/**",        // 소셜 로그인 redirect url
+                        "/oauth2/login/apple",
                         "/h2-console/**")
                 .permitAll()
                 
