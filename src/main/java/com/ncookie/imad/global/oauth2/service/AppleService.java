@@ -29,6 +29,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.security.PrivateKey;
@@ -50,14 +51,22 @@ public class AppleService {
 
     private final static String APPLE_AUTH_URL = "https://appleid.apple.com";
 
-    public String getAppleLoginUrl() {
-        return APPLE_AUTH_URL + "/auth/authorize"
+    public String getAppleLoginUrl(String redirectUri) {
+        String loginUrl = APPLE_AUTH_URL + "/auth/authorize"
                 + "?client_id=" + appleProperties.getClientId()
                 + "&redirect_uri=" + appleProperties.getRedirectUrl()
                 + "&response_type=code%20id_token&scope=name%20email&response_mode=form_post";
+
+        if (redirectUri != null && !redirectUri.isEmpty()) {
+            loginUrl = loginUrl + "&state=" + redirectUri;
+            log.info("리액트에서 애플 로그인 요청 시도 : redirect_uri를 state 파라미터에 추가");
+        }
+
+        log.info("애플 로그인 URL 반환");
+        return loginUrl;
     }
 
-    public UserAccount login(String code, HttpServletResponse response) {
+    public UserAccount login(String code) {
         String userId;
         String email;
         String accessToken;
@@ -104,7 +113,6 @@ public class AppleService {
                 user = userRepository.save(findUser);
             }
 
-            loginSuccess(user, response);
             return user;
 
         } catch (ParseException | JsonProcessingException e) {
@@ -114,12 +122,31 @@ public class AppleService {
         }
     }
 
-    public void loginSuccess(UserAccount user, HttpServletResponse response) throws IOException {
+    public void loginSuccess(UserAccount user, HttpServletResponse response) {
         String accessToken = jwtService.createAccessToken(user.getEmail());
         String refreshToken = jwtService.createRefreshToken();
 
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
         jwtService.updateRefreshToken(user.getEmail(), refreshToken);
+    }
+
+    public String determineSuccessRedirectUrl(UserAccount user, String baseUrl) {
+        String accessToken = jwtService.createAccessToken(user.getEmail());
+        String refreshToken = jwtService.createRefreshToken();
+
+        jwtService.updateRefreshToken(user.getEmail(), refreshToken);
+
+        return UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/success")
+                .queryParam("token", accessToken)
+                .queryParam("refresh_token", refreshToken)
+                .build().toUriString();
+    }
+
+    public String determineFailureRedirectUrl(String baseUrl) {
+        return UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/fail")
+                .build().toUriString();
     }
 
     public String generateAuthToken(String code) throws IOException {
