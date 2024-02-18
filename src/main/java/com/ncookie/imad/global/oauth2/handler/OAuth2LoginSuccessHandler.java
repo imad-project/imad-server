@@ -57,6 +57,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         // 리액트에서 로그인 시도한 경우
         if (cookieRedirectUrl.isPresent()) {
             String redirectUrl = UriComponentsBuilder.fromUriString(cookieRedirectUrl.get())
+                    .path("/success")
                     .queryParam("token", accessToken)
                     .queryParam("refresh_token", refreshToken)
                     .build().toUriString();

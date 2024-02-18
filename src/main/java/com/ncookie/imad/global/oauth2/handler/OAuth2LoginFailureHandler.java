@@ -33,7 +33,7 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
         // 리액트에서 로그인 시도한 경우
         if (cookieRedirectUrl.isPresent()) {
             String redirectUrl = UriComponentsBuilder.fromUriString(cookieRedirectUrl.get())
-                    .queryParam("error", exception.getLocalizedMessage())
+                    .path("/fail")
                     .build().toUriString();
 
             log.info("리액트 서버의 소셜 로그인 실패 : redirect 수행");
