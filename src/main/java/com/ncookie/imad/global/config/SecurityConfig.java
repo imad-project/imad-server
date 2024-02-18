@@ -79,7 +79,6 @@ public class SecurityConfig {
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
 
-    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Value("${ip.local.address}")
     private String myLocalIpAddress;
@@ -137,11 +136,9 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/api/signup",
                         "/login/**",        // 소셜 로그인 redirect url
-                        "/api/oauth2/**",
                         "/api/user/validation/**",
                         "/api/callback/**",
                         "/api/test/**",
-                        "/oauth2/**",
                         "/aws",
                         "/auth/**",
                         "/h2-console/**")
@@ -164,6 +161,7 @@ public class SecurityConfig {
                 //== 소셜 로그인 설정 ==//
                 .oauth2Login()
                 .authorizationEndpoint()
+                    .baseUri("/oauth2/authorization")
                     .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository())
                     .and()
                 .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
