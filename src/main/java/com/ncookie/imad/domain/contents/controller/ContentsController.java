@@ -42,6 +42,7 @@ public class ContentsController {
             @RequestParam(value = "id") Long id,
             @RequestParam(value = "type") String type) {
         ContentsType contentsType = ContentsType.valueOf(type.toUpperCase());
+
         // 이전에 저장했던 데이터라면 TMDB API 사용하지 않고 로컬 DB 조회하여 반환
         if (contentsService.checkDuplicationExists(id, contentsType)) {
             return ApiResponse.createSuccess(
@@ -49,8 +50,8 @@ public class ContentsController {
                     tmdbService.getTmdbDetails(id, contentsType, accessToken));
         } else {
             // TMDB API 사용하여 details 및 certification 정보 받아옴
-            TmdbDetails contentsDetails = contentsService.getContentsDetails(id, type);
-            String contentsCertification = contentsService.getContentsCertification(id, type);
+            TmdbDetails contentsDetails = contentsService.fetchContentsDetails(id, type);
+            String contentsCertification = contentsService.fetchContentsCertification(id, type);
 
             // 받아온 데이터를 DTO 클래스에 매핑하고, 데이터베이스에 저장함
             return ApiResponse.createSuccess(

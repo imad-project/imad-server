@@ -41,7 +41,7 @@ public class TmdbApiClient {
     }
 
     // 작품 상세 정보 조회
-    public TmdbDetails getContentsDetails(Long id, String type) {
+    public TmdbDetails fetchContentsDetails(Long id, String type) {
         try {
 
             if (type.equals("tv")) {
@@ -49,13 +49,13 @@ public class TmdbApiClient {
                         apiProperties.getApiKey(),
                         id,
                         language,
-                        listStringTocommaSeparatedString(appendResponseForDetails));
+                        listStringToCommaSeparatedString(appendResponseForDetails));
             } else if (type.equals("movie")) {
                 return feignClient.getMovieDetailsById(
                         apiProperties.getApiKey(),
                         id,
                         language,
-                        listStringTocommaSeparatedString(appendResponseForDetails));
+                        listStringToCommaSeparatedString(appendResponseForDetails));
             } else {
                 throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
             }
@@ -64,7 +64,7 @@ public class TmdbApiClient {
         }
     }
 
-    public String getContentsCertification(Long id, String type) {
+    public String fetchContentsCertification(Long id, String type) {
         ObjectMapper objectMapper = new ObjectMapper();
         String certification = "";
         
@@ -116,7 +116,7 @@ public class TmdbApiClient {
 
 
     // append_to_response에 들어갈 값을 List<String>에서 추출함
-    private String listStringTocommaSeparatedString(List<String> list) {
+    private String listStringToCommaSeparatedString(List<String> list) {
         return String.join(",", list);
     }
 }

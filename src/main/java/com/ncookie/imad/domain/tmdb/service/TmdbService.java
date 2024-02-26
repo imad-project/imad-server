@@ -63,7 +63,7 @@ public class TmdbService {
     @Transactional
     public TmdbDetails getTmdbDetails(Long id, ContentsType type, String accessToken) {
         Contents contentsEntity = contentsService.getContentsByTmdbIdAndTmdbType(id, type);
-        return loadAndGenerateTmdbDetailsFromEntity(contentsEntity, accessToken);
+        return convertContentsEntityToTmdbDetails(contentsEntity, accessToken);
     }
 
     @Transactional
@@ -72,14 +72,14 @@ public class TmdbService {
 
         if (optionalContents.isPresent()) {
             Contents contents = optionalContents.get();
-            return loadAndGenerateTmdbDetailsFromEntity(contents, accessToken);
+            return convertContentsEntityToTmdbDetails(contents, accessToken);
         } else {
             throw new BadRequestException(ResponseCode.CONTENTS_ID_NOT_FOUND);
         }
     }
 
     @Transactional
-    public TmdbDetails loadAndGenerateTmdbDetailsFromEntity(Contents contentsEntity, String accessToken) {
+    public TmdbDetails convertContentsEntityToTmdbDetails(Contents contentsEntity, String accessToken) {
         TmdbDetails tmdbDetails = TmdbDetails.builder().build();
 
         // =========================================================================

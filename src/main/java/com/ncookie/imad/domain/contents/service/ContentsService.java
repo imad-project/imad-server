@@ -35,12 +35,12 @@ public class ContentsService {
         return apiClient.searchByQuery(query, type, page);
     }
 
-    public TmdbDetails getContentsDetails(Long id, String type) {
-        return apiClient.getContentsDetails(id, type);
+    public TmdbDetails fetchContentsDetails(Long id, String type) {
+        return apiClient.fetchContentsDetails(id, type);
     }
 
-    public String getContentsCertification(Long id, String type) {
-        return apiClient.getContentsCertification(id, type);
+    public String fetchContentsCertification(Long id, String type) {
+        return apiClient.fetchContentsCertification(id, type);
     }
 
     // 프로필에서 작품 북마크 관련으로 사용하는 메소드
