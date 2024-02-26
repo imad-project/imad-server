@@ -234,7 +234,7 @@ public class TmdbService {
 
         // 이미 DB에 존재하는 작품 정보라면 그 데이터를 불러옴
         // 간혹 TMDB API 서버에서 데이터가 두 번 날라오는 경우가 있는데, 그와 같은 경우에 데이터 중복 저장을 방지하기 위함
-        if (contentsService.checkDuplicationExists(tmdbDetails.getTmdbId(), tmdbDetails.getTmdbType())) {
+        if (contentsService.checkDuplicationExists(tmdbDetails.getTmdbId(), type)) {
             return getTmdbDetails(tmdbDetails.getTmdbId(), type, accessToken);
         }
 
