@@ -50,8 +50,8 @@ public class ContentsController {
                     tmdbService.getTmdbDetails(id, contentsType, accessToken));
         } else {
             // TMDB API 사용하여 details 및 certification 정보 받아옴
-            TmdbDetails contentsDetails = contentsService.fetchContentsDetails(id, type);
-            String contentsCertification = contentsService.fetchContentsCertification(id, type);
+            TmdbDetails contentsDetails = contentsService.fetchContentsDetails(id, contentsType);
+            String contentsCertification = contentsService.fetchContentsCertification(id, contentsType);
 
             // 받아온 데이터를 DTO 클래스에 매핑하고, 데이터베이스에 저장함
             return ApiResponse.createSuccess(

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
@@ -41,16 +42,16 @@ public class TmdbApiClient {
     }
 
     // 작품 상세 정보 조회
-    public TmdbDetails fetchContentsDetails(Long id, String type) {
+    public TmdbDetails fetchContentsDetails(Long id, ContentsType type) {
         try {
 
-            if (type.equals("tv")) {
+            if (type.equals(ContentsType.TV)) {
                 return feignClient.getTvDetailsById(
                         apiProperties.getApiKey(),
                         id,
                         language,
                         listStringToCommaSeparatedString(appendResponseForDetails));
-            } else if (type.equals("movie")) {
+            } else if (type.equals(ContentsType.MOVIE)) {
                 return feignClient.getMovieDetailsById(
                         apiProperties.getApiKey(),
                         id,
@@ -64,13 +65,13 @@ public class TmdbApiClient {
         }
     }
 
-    public String fetchContentsCertification(Long id, String type) {
+    public String fetchContentsCertification(Long id, ContentsType type) {
         ObjectMapper objectMapper = new ObjectMapper();
         String certification = "";
         
         // TV와 MOVIE의 시청등급을 얻어오는 방법이 다름
         try {
-            if (type.equals("tv")) {
+            if (type.equals(ContentsType.TV)) {
                 JsonNode rootNode = objectMapper.readTree(
                         feignClient.getTvCertification(apiProperties.getApiKey(), id));
                 JsonNode resultsNode = rootNode.get("results");
@@ -83,7 +84,7 @@ public class TmdbApiClient {
                     }
                 }
 
-            } else if (type.equals("movie")) {
+            } else if (type.equals(ContentsType.MOVIE)) {
                 JsonNode rootNode = objectMapper.readTree(
                         feignClient.getMovieCertification(apiProperties.getApiKey(), id));
                 JsonNode resultsNode = rootNode.get("results");

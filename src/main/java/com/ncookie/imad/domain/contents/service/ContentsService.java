@@ -35,11 +35,11 @@ public class ContentsService {
         return apiClient.searchByQuery(query, type, page);
     }
 
-    public TmdbDetails fetchContentsDetails(Long id, String type) {
+    public TmdbDetails fetchContentsDetails(Long id, ContentsType type) {
         return apiClient.fetchContentsDetails(id, type);
     }
 
-    public String fetchContentsCertification(Long id, String type) {
+    public String fetchContentsCertification(Long id, ContentsType type) {
         return apiClient.fetchContentsCertification(id, type);
     }
 
