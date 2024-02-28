@@ -9,13 +9,18 @@ import com.ncookie.imad.domain.contents.repository.ContentsRepository;
 import com.ncookie.imad.domain.contents.repository.MovieDataRepository;
 import com.ncookie.imad.domain.contents.repository.TvProgramDataRepository;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
+import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.global.openfeign.TmdbApiClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 
@@ -97,4 +102,29 @@ public class ContentsService {
         contentsRepository.save(contents);
     }
 
+    /*
+     * 작품 검색용
+     */
+    public Page<TvProgramData> searchTvProgramData() {
+        Sort sort = Sort.by("contentsId").descending();
+        PageRequest pageRequest = PageRequest.of(0, Utils.PAGE_SIZE, sort);
+        Page<TvProgramData> ingB =
+                tvProgramDataRepository.findAllByTranslatedTitleContaining(pageRequest, "");
+        Page<TvProgramData> tvProgramData =
+                tvProgramDataRepository.searchTvProgramData(
+                        pageRequest,
+                        "",
+                        ContentsType.TV,
+                        null,
+                        null,
+                        true,
+                        0.0F,
+                        10.0F,
+                        LocalDate.of(2000, 1, 1),
+                        LocalDate.of(2500, 1, 1)
+                        );
+        return null;
+        // 왜 Out 작품은 조회가 안되나?
+        // listSize 파라미터가 굳이 필요한가? IS NULL로 대체 안돼?
+    }
 }
