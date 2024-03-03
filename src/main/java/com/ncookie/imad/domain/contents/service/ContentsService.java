@@ -117,14 +117,12 @@ public class ContentsService {
                         ContentsType.TV,
                         null,
                         null,
-                        true,
+                        LocalDate.of(2000, 1, 1),
+                        LocalDate.of(2500, 1, 1),
                         0.0F,
                         10.0F,
-                        LocalDate.of(2000, 1, 1),
-                        LocalDate.of(2500, 1, 1)
+                        true
                         );
         return null;
-        // 왜 Out 작품은 조회가 안되나?
-        // listSize 파라미터가 굳이 필요한가? IS NULL로 대체 안돼?
     }
 }
