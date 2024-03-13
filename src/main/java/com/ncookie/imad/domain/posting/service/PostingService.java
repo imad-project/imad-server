@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.POSTING_RANKING_SCORE;
-import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.REVIEW_RANKING_SCORE;
 
 
 @Slf4j
@@ -213,7 +212,7 @@ public class PostingService {
         return postingDetailsResponseList;
     }
 
-    public PostingListElement getMostLikePosting() {
+    public PostingDetailsResponse getMostLikePosting() {
         List<Posting> mostLikePostingList = postingRepository.findMostLikePosting();
 
         if (mostLikePostingList.isEmpty()) {
@@ -222,9 +221,9 @@ public class PostingService {
 
         if (mostLikePostingList.size() > 1) {
             int randomNum = Utils.getRandomNum(mostLikePostingList.size());
-            return PostingListElement.toDTO(mostLikePostingList.get(randomNum));
+            return PostingDetailsResponse.toDTO(mostLikePostingList.get(randomNum), null);
         }
-        return PostingListElement.toDTO(mostLikePostingList.get(0));
+        return PostingDetailsResponse.toDTO(mostLikePostingList.get(0), null);
     }
 
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {

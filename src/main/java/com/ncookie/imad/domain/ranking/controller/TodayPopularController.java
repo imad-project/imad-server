@@ -1,6 +1,6 @@
 package com.ncookie.imad.domain.ranking.controller;
 
-import com.ncookie.imad.domain.posting.dto.response.PostingListElement;
+import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
 import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularReviewService;
@@ -52,13 +52,13 @@ public class TodayPopularController {
 
     @Description("인기 게시글 조회")
     @GetMapping("/posting")
-    public ApiResponse<PostingListElement> getPopularPosting() {
-        PostingListElement todayPopularPosting = todayPopularPostingService.getTodayPopularPosting();
+    public ApiResponse<PostingDetailsResponse> getPopularPosting() {
+        PostingDetailsResponse todayPopularPosting = todayPopularPostingService.getTodayPopularPosting();
 
         // 현재 인기 게시글 데이터가 없는 상태이므로 좋아요가 가장 많은 게시글 데이터 반환
         if (todayPopularPosting == null) {
             log.info("인기 리뷰 데이터가 없으므로 좋아요가 가장 많은 리뷰를 조회합니다...");
-            PostingListElement mostLikePosting = postingService.getMostLikePosting();
+            PostingDetailsResponse mostLikePosting = postingService.getMostLikePosting();
 
             // 리뷰 좋아요 데이터도 없는 경우
             if (mostLikePosting == null) {
