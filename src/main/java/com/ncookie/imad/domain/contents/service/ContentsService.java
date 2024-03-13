@@ -8,6 +8,7 @@ import com.ncookie.imad.domain.contents.entity.TvProgramData;
 import com.ncookie.imad.domain.contents.repository.ContentsRepository;
 import com.ncookie.imad.domain.contents.repository.MovieDataRepository;
 import com.ncookie.imad.domain.contents.repository.TvProgramDataRepository;
+import com.ncookie.imad.domain.search.dto.request.SearchContentsRequest;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -21,7 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
 
 
 @RequiredArgsConstructor
@@ -105,24 +106,37 @@ public class ContentsService {
     /*
      * 작품 검색용
      */
-    public Page<TvProgramData> searchTvProgramData() {
+    public Page<TvProgramData> searchTvProgramData(SearchContentsRequest searchContentsRequest) {
         Sort sort = Sort.by("contentsId").descending();
         PageRequest pageRequest = PageRequest.of(0, Utils.PAGE_SIZE, sort);
-        Page<TvProgramData> ingB =
-                tvProgramDataRepository.findAllByTranslatedTitleContaining(pageRequest, "");
+
+        List<Integer> integers = new ArrayList<>();
+        integers.add(18);
+        integers.add(80);
+        List<String> us = new ArrayList<>();
+        us.add("US");
+        List<Integer> genreList = searchContentsRequest.getGenreList();
+        List<String> countryList = searchContentsRequest.getCountryList();
+
+        // countryList를 String 형태의 리스트로 변환
+        List<String> countryCodes = countryList.stream()
+                .map(countryCode -> "'" + countryCode + "'")
+                .toList();
+
         Page<TvProgramData> tvProgramData =
                 tvProgramDataRepository.searchTvProgramData(
                         pageRequest,
-                        "",
-                        ContentsType.TV,
-                        null,
-                        null,
-                        LocalDate.of(2000, 1, 1),
+                        searchContentsRequest.getQuery(),
+                        searchContentsRequest.getContentsType(),
+                        new HashSet<>(Arrays.asList(18, 80)),
+                        List.of("US"),
+                        LocalDate.of(1500, 1, 1),
                         LocalDate.of(2500, 1, 1),
-                        0.0F,
-                        10.0F,
-                        true
-                        );
+                        searchContentsRequest.getScoreMin(),
+                        searchContentsRequest.getScoreMax(),
+                        searchContentsRequest.isNullScoreOk()
+                );
+
         return null;
     }
 }

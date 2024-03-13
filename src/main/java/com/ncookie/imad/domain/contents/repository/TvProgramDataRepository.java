@@ -5,13 +5,15 @@ import com.ncookie.imad.domain.contents.entity.TvProgramData;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
-public interface TvProgramDataRepository extends JpaRepository<TvProgramData, Long> {
+public interface TvProgramDataRepository extends JpaRepository<TvProgramData, Long>, JpaSpecificationExecutor {
     TvProgramData findByContentsId(Long id);
 
     /*
@@ -44,7 +46,7 @@ public interface TvProgramDataRepository extends JpaRepository<TvProgramData, Lo
     Page<TvProgramData> searchTvProgramData(Pageable pageable,
                                             @Param("query") String query,
                                             @Param("contentsType") ContentsType contentsType,
-                                            @Param("genreList") List<Integer> genreList,
+                                            @Param("genreList") Set<Integer> genreList,
                                             @Param("countryList") List<String> countryList,
                                             @Param("releaseDateMin") LocalDate releaseDateMin,
                                             @Param("releaseDateMax") LocalDate releaseDateMax,
@@ -53,4 +55,65 @@ public interface TvProgramDataRepository extends JpaRepository<TvProgramData, Lo
                                             @Param("isNullScoreOk") boolean isNullScoreOk);
 
     Page<TvProgramData> findAllByTranslatedTitleContaining(Pageable pageable, String query);
+
+    default List<TvProgramData> searchTv(ContentsType contentsType,
+                                                   String query,
+                                                   Set<Integer> genreList,
+                                                   List<String> countryList,
+                                                   LocalDate releaseDateMin,
+                                                   LocalDate releaseDateMax,
+                                                   Float scoreMin,
+                                                   Float scoreMax,
+                                                   boolean isNullScoreOk) {
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TvProgramData> criteriaQuery = criteriaBuilder.createQuery(TvProgramData.class);
+        Root<TvProgramData> tvRoot = criteriaQuery.from(TvProgramData.class);
+
+        criteriaQuery.select(tvRoot).distinct(true);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (contentsType != null) {
+            predicates.add(criteriaBuilder.equal(tvRoot.get("contentsType"), contentsType));
+        }
+
+        if (query != null && !query.isEmpty()) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(tvRoot.get("translatedTitle")), "%" + query.toLowerCase() + "%"));
+        }
+
+        if (genreList != null && !genreList.isEmpty()) {
+            Join<TvProgramData, Integer> genreJoin = tvRoot.join("contentsGenres");
+            predicates.add(genreJoin.get("id").in(genreList));
+        }
+
+        if (countryList != null && !countryList.isEmpty()) {
+            Join<TvProgramData, String> countryJoin = tvRoot.join("productionCountries");
+            predicates.add(countryJoin.in(countryList));
+        }
+
+        if (releaseDateMin != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(tvRoot.get("firstAirDate"), releaseDateMin));
+        }
+
+        if (releaseDateMax != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(tvRoot.get("firstAirDate"), releaseDateMax));
+        }
+
+        if (isNullScoreOk) {
+            predicates.add(criteriaBuilder.or(
+                    criteriaBuilder.isNull(tvRoot.get("imadScore")),
+                    criteriaBuilder.between(tvRoot.get("imadScore"), scoreMin, scoreMax)
+            ));
+        } else {
+            predicates.add(criteriaBuilder.and(
+                    criteriaBuilder.isNotNull(tvRoot.get("imadScore")),
+                    criteriaBuilder.between(tvRoot.get("imadScore"), scoreMin, scoreMax)
+            ));
+        }
+
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
+    }
 }
