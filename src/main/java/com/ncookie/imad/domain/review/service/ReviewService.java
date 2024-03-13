@@ -3,8 +3,7 @@ package com.ncookie.imad.domain.review.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
-import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
-import com.ncookie.imad.domain.ranking.service.TodayPopularReviewService;
+import com.ncookie.imad.domain.ranking.service.TodayPopularScoreService;
 import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
 import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
@@ -47,7 +46,7 @@ public class ReviewService {
     private final ReviewLikeService reviewLikeService;
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
-    private final TodayPopularReviewService todayPopularReviewService;
+    private final TodayPopularScoreService todayPopularScoreService;
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
@@ -261,7 +260,7 @@ public class ReviewService {
                 // 기존의 좋아요를 좋아요 취소 또는 싫어요로 변경했을 때 인기 점수 차감
                 int previousLikeStatus = reviewLike.getLikeStatus();
                 if (previousLikeStatus == 1 && (likeStatus == 0 || likeStatus == -1)) {
-                    todayPopularReviewService.subtractPopularScore(review, TodayPopularPostingService.POPULAR_LIKE_SCORE);
+                    todayPopularScoreService.subtractPopularScore(review, TodayPopularScoreService.POPULAR_REVIEW_LIKE_SCORE);
                 }
 
                 // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
@@ -280,7 +279,7 @@ public class ReviewService {
 
             // 리뷰 인기 점수 추가
             if (likeStatus == 1) {
-                todayPopularReviewService.addPopularScore(review, TodayPopularReviewService.POPULAR_LIKE_SCORE);
+                todayPopularScoreService.addPopularScore(review, TodayPopularScoreService.POPULAR_REVIEW_LIKE_SCORE);
             }
 
             // like, dislike count 갱신

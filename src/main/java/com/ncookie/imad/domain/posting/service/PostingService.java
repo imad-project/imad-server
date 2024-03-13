@@ -12,7 +12,7 @@ import com.ncookie.imad.domain.posting.repository.PostingRepository;
 import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.profile.service.ScrapService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
-import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
+import com.ncookie.imad.domain.ranking.service.TodayPopularScoreService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.POSTING_RANKING_SCORE;
-import static com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService.REVIEW_RANKING_SCORE;
 
 
 @Slf4j
@@ -48,10 +47,10 @@ public class PostingService {
     private final ScrapService scrapService;
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
-    private final TodayPopularPostingService todayPopularPostingService;
+    private final TodayPopularScoreService todayPopularScoreService;
 
 
-    public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
+    public PostingDetailsResponse getPosting(String accessToken, Long postingId, boolean isPopularPosting) {
         Posting posting = getPostingEntityById(postingId);
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
@@ -83,9 +82,12 @@ public class PostingService {
         PostingScrap scrap = scrapService.findByUserAccountAndContents(user, posting);
 
         // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
-        // 조회수 갱신
-        postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
-        todayPopularPostingService.addPopularScore(posting, TodayPopularPostingService.POPULAR_VIEW_CNT_SCORE);
+        // 인기 게시글 조회 시 사용하는 경우가 아닐 때만 조회수 업데이트
+        if (!isPopularPosting) {
+            // 조회수 갱신
+            postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
+            todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_VIEW_CNT_SCORE);
+        }
 
         // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
         PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
@@ -213,18 +215,21 @@ public class PostingService {
         return postingDetailsResponseList;
     }
 
-    public PostingListElement getMostLikePosting() {
+    public PostingDetailsResponse getMostLikePosting(String accessToken) {
         List<Posting> mostLikePostingList = postingRepository.findMostLikePosting();
 
         if (mostLikePostingList.isEmpty()) {
             return null;
         }
 
+        // 좋아요를 가장 많이 받은 게시글이 2개 이상일 때
         if (mostLikePostingList.size() > 1) {
             int randomNum = Utils.getRandomNum(mostLikePostingList.size());
-            return PostingListElement.toDTO(mostLikePostingList.get(randomNum));
+            return getPosting(accessToken, mostLikePostingList.get(randomNum).getPostingId(), true);
         }
-        return PostingListElement.toDTO(mostLikePostingList.get(0));
+        
+        // 좋아요를 가장 많이 받은 게시글이 1개일 때
+        return getPosting(accessToken, mostLikePostingList.get(0).getPostingId(), true);
     }
 
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
@@ -306,7 +311,7 @@ public class PostingService {
             // 기존의 좋아요를 좋아요 취소 또는 싫어요로 변경했을 때 인기 점수 차감
             int previousLikeStatus = postingLike.getLikeStatus();
             if (previousLikeStatus == 1 && (likeStatus == 0 || likeStatus == -1)) {
-                todayPopularPostingService.subtractPopularScore(posting, TodayPopularPostingService.POPULAR_LIKE_SCORE);
+                todayPopularScoreService.subtractPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_LIKE_SCORE);
             }
 
             // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
@@ -325,7 +330,7 @@ public class PostingService {
 
         // 게시글 인기 점수 추가
         if (likeStatus == 1) {
-            todayPopularPostingService.addPopularScore(posting, TodayPopularPostingService.POPULAR_LIKE_SCORE);
+            todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_LIKE_SCORE);
         }
 
         // like, dislike count 갱신

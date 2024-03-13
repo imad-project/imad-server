@@ -24,7 +24,7 @@ public class PostingController {
     public ApiResponse<PostingDetailsResponse> postingDetails(@RequestHeader("Authorization") String accessToken,
                                                               @PathVariable Long id) {
         return ApiResponse.createSuccess(ResponseCode.POSTING_GET_DETAILS_SUCCESS,
-                postingService.getPosting(accessToken, id));
+                postingService.getPosting(accessToken, id, false));
     }
 
     @Description("게시글 등록")
