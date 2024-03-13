@@ -19,13 +19,13 @@ public class TodayPopularScoreService {
     private final TodayPopularPostingsRepository todayPopularPostingsRepository;
 
 
-    public final static int POPULAR_SCRAP_SCORE = 10;
-    public final static int POPULAR_LIKE_SCORE = 5;
-    public final static int POPULAR_COMMENT_SCORE = 2;
-    public final static int POPULAR_VIEW_CNT_SCORE = 1;
+    public final static int POPULAR_POSTING_SCRAP_SCORE = 10;
+    public final static int POPULAR_POSTING_LIKE_SCORE = 5;
+    public final static int POPULAR_POSTING_COMMENT_SCORE = 2;
+    public final static int POPULAR_POSTING_VIEW_CNT_SCORE = 1;
 
 
-    public void addPopularScore(Posting posting, int score) {
+    public void addPopularPostingScore(Posting posting, int score) {
         if (posting == null) {
             log.warn("인기 점수 반영 실패 : ID에 해당하는 리뷰가 존재하지 않음");
             return;
@@ -50,7 +50,7 @@ public class TodayPopularScoreService {
         log.info("게시글 인기 점수 추가 완료");
     }
 
-    public void subtractPopularScore(Posting posting, int score) {
+    public void subtractPopularPostingScore(Posting posting, int score) {
         if (posting == null) {
             log.warn("인기 점수 반영 실패 : ID에 해당하는 리뷰가 존재하지 않음");
             return;

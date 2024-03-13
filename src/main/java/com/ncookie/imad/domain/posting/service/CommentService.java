@@ -133,7 +133,7 @@ public class CommentService {
         log.info("댓글(답글) 등록 완료");
 
         // 게시글 인기 점수 추가
-        todayPopularScoreService.addPopularScore(posting, TodayPopularScoreService.POPULAR_COMMENT_SCORE);
+        todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_COMMENT_SCORE);
 
         return CommentIdResponse.builder()
                 .commentId(save.getCommentId())

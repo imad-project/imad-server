@@ -165,7 +165,7 @@ public class ProfileService {
             log.info("스크랩 등록 완료");
 
             contentsRankingScoreUpdateService.addRankingScore(posting.getContents(), SCRAP_RANKING_SCORE);
-            todayPopularScoreService.addPopularScore(posting, TodayPopularScoreService.POPULAR_SCRAP_SCORE);
+            todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_SCRAP_SCORE);
             log.info("[게시글 스크랩 추가] 랭킹 점수 반영 완료");
 
             return ResponseCode.SCRAP_ADD_SUCCESS;
@@ -186,7 +186,7 @@ public class ProfileService {
         }
         PostingScrap postingScrap = scrapService.findByIdAndUserAccount(scrapId, user);
         contentsRankingScoreUpdateService.subtractRankingScore(postingScrap.getPosting().getContents(), SCRAP_RANKING_SCORE);
-        todayPopularScoreService.subtractPopularScore(postingScrap.getPosting(), TodayPopularScoreService.POPULAR_SCRAP_SCORE);
+        todayPopularScoreService.subtractPopularPostingScore(postingScrap.getPosting(), TodayPopularScoreService.POPULAR_POSTING_SCRAP_SCORE);
         log.info("[게시글 스크랩 취소] 랭킹 점수 반영 완료");
 
         scrapService.deleteByIdAndUserAccount(scrapId, user);
