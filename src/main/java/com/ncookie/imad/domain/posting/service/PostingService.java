@@ -50,7 +50,7 @@ public class PostingService {
     private final TodayPopularScoreService todayPopularScoreService;
 
 
-    public PostingDetailsResponse getPosting(String accessToken, Long postingId) {
+    public PostingDetailsResponse getPosting(String accessToken, Long postingId, boolean isPopularPosting) {
         Posting posting = getPostingEntityById(postingId);
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
@@ -82,9 +82,12 @@ public class PostingService {
         PostingScrap scrap = scrapService.findByUserAccountAndContents(user, posting);
 
         // TODO: 특정 기준(accessToken에 조회 여부 저장 등)을 통해 중복 조회수를 필터링 해야함
-        // 조회수 갱신
-        postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
-        todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_VIEW_CNT_SCORE);
+        // 인기 게시글 조회 시 사용하는 경우가 아닐 때만 조회수 업데이트
+        if (!isPopularPosting) {
+            // 조회수 갱신
+            postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
+            todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_VIEW_CNT_SCORE);
+        }
 
         // 게시글 정보, 댓글 리스트, like status 등을 DTO 객체에 저장
         PostingDetailsResponse postingDetailsResponse = PostingDetailsResponse.toDTO(posting, commentList);
@@ -222,11 +225,11 @@ public class PostingService {
         // 좋아요를 가장 많이 받은 게시글이 2개 이상일 때
         if (mostLikePostingList.size() > 1) {
             int randomNum = Utils.getRandomNum(mostLikePostingList.size());
-            return getPosting(accessToken, mostLikePostingList.get(randomNum).getPostingId());
+            return getPosting(accessToken, mostLikePostingList.get(randomNum).getPostingId(), true);
         }
         
         // 좋아요를 가장 많이 받은 게시글이 1개일 때
-        return getPosting(accessToken, mostLikePostingList.get(0).getPostingId());
+        return getPosting(accessToken, mostLikePostingList.get(0).getPostingId(), true);
     }
 
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
