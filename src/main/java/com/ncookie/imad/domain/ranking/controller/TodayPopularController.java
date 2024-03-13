@@ -12,6 +12,7 @@ import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,13 +53,13 @@ public class TodayPopularController {
 
     @Description("인기 게시글 조회")
     @GetMapping("/posting")
-    public ApiResponse<PostingDetailsResponse> getPopularPosting() {
-        PostingDetailsResponse todayPopularPosting = todayPopularPostingService.getTodayPopularPosting();
+    public ApiResponse<PostingDetailsResponse> getPopularPosting(@RequestHeader("Authorization") String accessToken) {
+        PostingDetailsResponse todayPopularPosting = todayPopularPostingService.getTodayPopularPosting(accessToken);
 
         // 현재 인기 게시글 데이터가 없는 상태이므로 좋아요가 가장 많은 게시글 데이터 반환
         if (todayPopularPosting == null) {
             log.info("인기 리뷰 데이터가 없으므로 좋아요가 가장 많은 리뷰를 조회합니다...");
-            PostingDetailsResponse mostLikePosting = postingService.getMostLikePosting();
+            PostingDetailsResponse mostLikePosting = postingService.getMostLikePosting(accessToken);
 
             // 리뷰 좋아요 데이터도 없는 경우
             if (mostLikePosting == null) {

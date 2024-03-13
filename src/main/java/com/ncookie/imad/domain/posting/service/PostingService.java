@@ -212,18 +212,21 @@ public class PostingService {
         return postingDetailsResponseList;
     }
 
-    public PostingDetailsResponse getMostLikePosting() {
+    public PostingDetailsResponse getMostLikePosting(String accessToken) {
         List<Posting> mostLikePostingList = postingRepository.findMostLikePosting();
 
         if (mostLikePostingList.isEmpty()) {
             return null;
         }
 
+        // 좋아요를 가장 많이 받은 게시글이 2개 이상일 때
         if (mostLikePostingList.size() > 1) {
             int randomNum = Utils.getRandomNum(mostLikePostingList.size());
-            return PostingDetailsResponse.toDTO(mostLikePostingList.get(randomNum), null);
+            return getPosting(accessToken, mostLikePostingList.get(randomNum).getPostingId());
         }
-        return PostingDetailsResponse.toDTO(mostLikePostingList.get(0), null);
+        
+        // 좋아요를 가장 많이 받은 게시글이 1개일 때
+        return getPosting(accessToken, mostLikePostingList.get(0).getPostingId());
     }
 
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
