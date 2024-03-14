@@ -6,6 +6,8 @@ import com.ncookie.imad.domain.user.entity.AuthProvider;
 import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
+import com.ncookie.imad.global.dto.response.ResponseCode;
+import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.global.jwt.service.JwtService;
 import com.ncookie.imad.global.oauth2.property.AppleProperties;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
@@ -66,7 +68,24 @@ public class AppleService {
         return loginUrl;
     }
 
-    public UserAccount login(String code) {
+    // 안드로이드 앱 / 리액트 웹 서비스 전용 애플 로그인
+    public UserAccount loginWithRest(String code) {
+        UserAccount user;
+        try {
+            user = login(generateAuthToken(code));
+        } catch (IOException e) {
+            throw new BadRequestException(ResponseCode.OAUTH2_APPLE_TOKEN_INVALID);
+        }
+
+        return user;
+    }
+
+    // iOS 앱 전용 애플 로그인. JWT 토큰을 애플 측에서 받아 다이렉트로 보내줌
+    public UserAccount loginWithToken(String jwt) {
+        return login(jwt);
+    }
+
+    public UserAccount login(String jwt) {
         String userId;
         String email;
         String accessToken;
@@ -75,7 +94,7 @@ public class AppleService {
 
         try {
             JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObj = (JSONObject) jsonParser.parse(generateAuthToken(code));
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(jwt);
 
             accessToken = String.valueOf(jsonObj.get("access_token"));
 
@@ -115,10 +134,8 @@ public class AppleService {
 
             return user;
 
-        } catch (ParseException | JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse json data");
-        } catch (IOException | java.text.ParseException e) {
-            throw new RuntimeException(e);
+        } catch (ParseException | JsonProcessingException | java.text.ParseException e) {
+            throw new BadRequestException(ResponseCode.OAUTH2_APPLE_TOKEN_INVALID);
         }
     }
 

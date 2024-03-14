@@ -10,10 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -34,7 +31,7 @@ public class AppleController {
     public ApiResponse<?> callback(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String redirectUri = request.getParameter("state");
 
-        UserAccount user = appleService.login(request.getParameter("code"));
+        UserAccount user = appleService.loginWithRest(request.getParameter("code"));
         boolean isValidRedirectUri = (redirectUri != null && !redirectUri.isEmpty());
 
         // 로그인 성공
@@ -58,6 +55,17 @@ public class AppleController {
             } else {
                 return ApiResponse.createError(ResponseCode.LOGIN_FAILURE);
             }
+        }
+    }
+
+    @PostMapping("/api/callback/apple/token")
+    public ApiResponse<?> loginWithIdentityToken(@RequestBody String jwt) {
+        UserAccount user = appleService.loginWithToken(jwt);
+
+        if (user != null) {
+            return ApiResponse.createSuccess(ResponseCode.LOGIN_SUCCESS, UserInfoResponse.toDTO(user));
+        } else {
+            return ApiResponse.createError(ResponseCode.LOGIN_FAILURE);
         }
     }
 }
