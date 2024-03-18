@@ -72,7 +72,7 @@ public class AppleService {
     public UserAccount loginWithRest(String code) {
         UserAccount user;
         try {
-            user = login(generateAuthToken(code));
+            user = login(generateAuthToken(code, true));
         } catch (IOException e) {
             throw new BadRequestException(ResponseCode.OAUTH2_APPLE_TOKEN_INVALID);
         }
@@ -166,15 +166,21 @@ public class AppleService {
                 .build().toUriString();
     }
 
-    public String generateAuthToken(String code) throws IOException {
+    public String generateAuthToken(String code, boolean isiOSApp) throws IOException {
         if (code == null) throw new IllegalArgumentException("Failed get authorization code");
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", appleProperties.getClientId());
         params.add("client_secret", createClientSecretKey());
         params.add("code", code);
         params.add("redirect_uri", appleProperties.getRedirectUrl());
+
+        // 애플 로그인 시 사용하는 clinet id는 app id(iOS 네이티브 앱 버전)와 service id(웹 서비스 버전)을 각각 사용함
+        if (isiOSApp) {
+            params.add("client_id", appleProperties.getIOSClientId());
+        } else {
+            params.add("client_id", appleProperties.getClientId());
+        }
 
         RestTemplate restTemplate = new RestTemplate();
 
