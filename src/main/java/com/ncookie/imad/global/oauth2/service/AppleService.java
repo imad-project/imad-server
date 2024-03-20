@@ -169,13 +169,13 @@ public class AppleService {
         return appleLoginClient.getToken(AppleToken.Request.of(
                 code,
                 clientId,
-                createClientSecretKey(),
+                createClientSecretKey(clientId),
                 "authorization_code",
                 null
         ));
     }
 
-    public String createClientSecretKey() {
+    public String createClientSecretKey(String clientId) {
         // headerParams 적재
         Map<String, Object> headerParamsMap = new HashMap<>();
         headerParamsMap.put("kid", appleProperties.getLoginKey());
@@ -190,7 +190,7 @@ public class AppleService {
                     .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(new Date(System.currentTimeMillis() + 1000 * 30)) // 만료 시간 (30초)
                     .setAudience(APPLE_AUTH_URL)
-                    .setSubject(appleProperties.getClientId())
+                    .setSubject(clientId)
                     .signWith(SignatureAlgorithm.ES256, getPrivateKey())
                     .compact();
         } catch (IOException e) {

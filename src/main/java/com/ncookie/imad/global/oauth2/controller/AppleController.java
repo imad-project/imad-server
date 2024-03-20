@@ -67,10 +67,12 @@ public class AppleController {
     }
 
     @PostMapping("/api/callback/apple/token")
-    public ApiResponse<?> loginWithIdentityToken(@RequestBody AppleLoginResponse appleLoginResponse) {
+    public ApiResponse<?> loginWithIdentityToken(HttpServletResponse response,
+                                                 @RequestBody AppleLoginResponse appleLoginResponse) {
         UserAccount user = appleService.loginWithToken(appleLoginResponse);
 
         if (user != null) {
+            appleService.loginSuccess(user, response);
             return ApiResponse.createSuccess(ResponseCode.LOGIN_SUCCESS, UserInfoResponse.toDTO(user));
         } else {
             return ApiResponse.createError(ResponseCode.LOGIN_FAILURE);
