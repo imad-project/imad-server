@@ -34,6 +34,8 @@ public enum ResponseCode {
     USER_DELETE_SUCCESS(204, "회원 탈퇴가 정상적으로 처리되었습니다."),
 
     LOGIN_FAILURE(400, "로그인 정보를 다시 확인해주세요."),
+    OAUTH2_APPLE_TOKEN_INVALID(400, "유효하지 않은 토큰입니다."),
+    OAUTH2_APPLE_ID_TOKEN_INVALID(400, "유효하지 않은 ID 토큰입니다."),
     SIGNUP_EMAIL_DUPLICATED(400, "이미 존재하는 이메일입니다."),
     NICKNAME_DUPLICATED(400, "이미 사용 중인 닉네임입니다."),
     USER_NOT_FOUND(404,  "해당 계정을 찾을 수 없습니다."),

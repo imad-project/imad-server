@@ -11,6 +11,7 @@ public class AppleProperties {
     private String teamId;
     private String loginKey;
     private String clientId;
+    private String iOSClientId;
     private String redirectUrl;
     private String keyPath;
 }
