@@ -6,9 +6,9 @@ import com.ncookie.imad.global.oauth2.service.RevokeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,8 +16,9 @@ public class RevokeController {
     private final RevokeService revokeService;
 
     @DeleteMapping("/api/oauth2/revoke/apple")
-    public ApiResponse<?> revokeAppleAccount(@RequestHeader("Authorization") String accessToken) throws IOException {
-        revokeService.deleteAppleAccount(accessToken);
+    public ApiResponse<?> revokeAppleAccount(@RequestHeader("Authorization") String accessToken,
+                                             @RequestParam(value = "ios") boolean isIOS) {
+        revokeService.deleteAppleAccount(accessToken, isIOS);
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_DELETE_SUCCESS);
     }
 

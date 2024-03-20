@@ -138,6 +138,7 @@ public class SecurityConfig {
                         "/api/user/validation/**",
                         "/api/callback/**",
                         "/api/test/**",
+                        "/api/oauth2/**",
                         "/aws",
                         "/login/**",        // 소셜 로그인 redirect url
                         "/oauth2/login/apple",

@@ -13,10 +13,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static com.ncookie.imad.global.Utils.*;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,12 +34,13 @@ public class RevokeService {
     private String naverClientSecret;
 
 
-    public void deleteAppleAccount(String accessToken) throws IOException {
+    public void deleteAppleAccount(String accessToken, boolean isIOS) {
         UserAccount userAccount = extractUserFromAccessToken(accessToken);
         deleteUserAccount(userAccount);
 
-        String data = "client_id=" + appleService.getAppleClientId() +
-                "&client_secret=" + appleService.createClientSecretKey() +
+        String clientId = isIOS ? appleService.getIOSAppleClientId() : appleService.getAppleClientId();
+        String data = "client_id=" + clientId +
+                "&client_secret=" + appleService.createClientSecretKey(clientId) +
                 "&token=" + userAccount.getOauth2AccessToken() +
                 "&token_type_hint=access_token";
 
