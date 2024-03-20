@@ -202,6 +202,10 @@ public class AppleService {
         return appleProperties.getClientId();
     }
 
+    public String getIOSAppleClientId() {
+        return appleProperties.getIOSClientId();
+    }
+
     private PrivateKey getPrivateKey() throws IOException {
         ClassPathResource resource = new ClassPathResource(appleProperties.getKeyPath());
         String privateKey = new String(resource.getInputStream().readAllBytes());
