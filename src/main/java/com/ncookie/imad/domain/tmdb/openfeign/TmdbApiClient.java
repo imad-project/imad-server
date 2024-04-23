@@ -1,4 +1,4 @@
-package com.ncookie.imad.global.openfeign;
+package com.ncookie.imad.domain.tmdb.openfeign;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

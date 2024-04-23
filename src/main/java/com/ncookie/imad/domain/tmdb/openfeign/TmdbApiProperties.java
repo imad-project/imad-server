@@ -1,4 +1,4 @@
-package com.ncookie.imad.global.openfeign;
+package com.ncookie.imad.domain.tmdb.openfeign;
 
 import lombok.Getter;
 import lombok.Setter;

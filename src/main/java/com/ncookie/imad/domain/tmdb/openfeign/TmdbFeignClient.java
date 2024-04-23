@@ -1,4 +1,4 @@
-package com.ncookie.imad.global.openfeign;
+package com.ncookie.imad.domain.tmdb.openfeign;
 
 import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
