@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverMovie;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverTv;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import feign.FeignException;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 
 
 // TMDB API를 사용하기 위한 메소드들을 모아놓은 클래스
@@ -115,9 +118,46 @@ public class TmdbApiClient {
         return certification.isEmpty() ? "NONE" : certification;
     }
 
+    public TmdbDiscoverTv discoverTvWithPreferredGenre() {
+        TmdbDiscoverTv tmdbDiscoverTv = feignClient.discoverTvWithPreferredGenre(
+                apiProperties.getApiKey(),
+                false,
+                false,
+                language,
+                "popularity.desc",
+                1,
+                listStringToVerticalBarSeparatedString(List.of(16L, 10762L))
+        );
+
+        return null;
+    }
+
+    public TmdbDiscoverMovie discoverMovieWithPreferredGenre() {
+        TmdbDiscoverMovie tmdbDiscoverMovie = feignClient.discoverMovieWithPreferredGenre(
+                apiProperties.getApiKey(),
+                false,
+                false,
+                language,
+                "popularity.desc",
+                1,
+                listStringToVerticalBarSeparatedString(List.of(16L, 14L))
+        );
+
+        return null;
+    }
+
 
     // append_to_response에 들어갈 값을 List<String>에서 추출함
     private String listStringToCommaSeparatedString(List<String> list) {
         return String.join(",", list);
+    }
+
+    // 장르 기반 작품 검색 시 장르 구분자로 사용
+    private String listStringToVerticalBarSeparatedString(List<Long> list) {
+        StringJoiner joiner = new StringJoiner("|");
+        for (Long genre : list) {
+            joiner.add(String.valueOf(genre));
+        }
+        return joiner.toString();
     }
 }

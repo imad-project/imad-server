@@ -16,7 +16,11 @@ import org.springframework.stereotype.Service;
 public class ContentsRecommendationService {
     private final TmdbApiClient apiClient;
 
-
     // 1. 추천 종류별로 작품을 받아와 전달
     // 2. 사용자가 추가로 원하는 종류의 추천 작품 추가 전달
+
+    public void getPreferredGenreBasedRecommendation() {
+        apiClient.discoverTvWithPreferredGenre();
+        apiClient.discoverMovieWithPreferredGenre();
+    }
 }

@@ -2,6 +2,8 @@ package com.ncookie.imad.domain.tmdb.openfeign;
 
 import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverMovie;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverTv;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -75,5 +77,29 @@ public interface TmdbFeignClient {
     String getMovieCertification(
             @RequestHeader(value = "Authorization") String apiKey,
             @PathVariable(value = "id") Long id
+    );
+
+    @GetMapping("/discover/tv")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverTv discoverTvWithPreferredGenre(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "include_adult") boolean includeAdult,
+            @RequestParam(value = "include_null_first_air_dates") boolean includeNullFirstAirDates,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "sort_by") String sortBy,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "with_genres") String genres
+    );
+
+    @GetMapping("/discover/movie")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverMovie discoverMovieWithPreferredGenre(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "include_adult") boolean includeAdult,
+            @RequestParam(value = "include_null_first_air_dates") boolean includeNullFirstAirDates,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "sort_by") String sortBy,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "with_genres") String genres
     );
 }

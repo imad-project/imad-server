@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/recommend")
 public class RecommendController {
     private final ContentsRecommendationService recommendationService;
-    
+
+
     @Description("선호 장르 기반 추천")
     @GetMapping("/genre")
     public ApiResponse<?> recommendBasedPreferredGenre() {
-
+        recommendationService.getPreferredGenreBasedRecommendation();
         return null;
     }
 }
