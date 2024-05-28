@@ -15,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 
 // TMDB API를 사용하기 위한 메소드들을 모아놓은 클래스
@@ -118,32 +115,32 @@ public class TmdbApiClient {
         return certification.isEmpty() ? "NONE" : certification;
     }
 
-    public TmdbDiscoverTv discoverTvWithPreferredGenre() {
+    public TmdbDiscoverTv discoverTvWithPreferredGenre(int pageNumber, Set<Long> genres) {
         TmdbDiscoverTv tmdbDiscoverTv = feignClient.discoverTvWithPreferredGenre(
                 apiProperties.getApiKey(),
                 false,
                 false,
                 language,
                 "popularity.desc",
-                1,
-                listStringToVerticalBarSeparatedString(List.of(16L, 10762L))
+                pageNumber,
+                listStringToVerticalBarSeparatedString(genres)
         );
 
-        return null;
+        return tmdbDiscoverTv;
     }
 
-    public TmdbDiscoverMovie discoverMovieWithPreferredGenre() {
+    public TmdbDiscoverMovie discoverMovieWithPreferredGenre(int pageNumber, Set<Long> genres) {
         TmdbDiscoverMovie tmdbDiscoverMovie = feignClient.discoverMovieWithPreferredGenre(
                 apiProperties.getApiKey(),
                 false,
                 false,
                 language,
                 "popularity.desc",
-                1,
-                listStringToVerticalBarSeparatedString(List.of(16L, 14L))
+                pageNumber,
+                listStringToVerticalBarSeparatedString(genres)
         );
 
-        return null;
+        return tmdbDiscoverMovie;
     }
 
 
@@ -153,7 +150,7 @@ public class TmdbApiClient {
     }
 
     // 장르 기반 작품 검색 시 장르 구분자로 사용
-    private String listStringToVerticalBarSeparatedString(List<Long> list) {
+    private String listStringToVerticalBarSeparatedString(Set<Long> list) {
         StringJoiner joiner = new StringJoiner("|");
         for (Long genre : list) {
             joiner.add(String.valueOf(genre));

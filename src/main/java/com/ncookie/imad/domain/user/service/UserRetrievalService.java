@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static com.ncookie.imad.global.Utils.extractToken;
 
@@ -45,7 +46,17 @@ public class UserRetrievalService {
             }
         } else {
             log.warn("[이메일 정보 추출 실패] : JWT 토큰이 유효하지 않음");
-            return null;
+            throw new BadRequestException(ResponseCode.TOKEN_INVALID);
         }
+    }
+
+    public Set<Long> getPreferredTvGenres(String accessToken) {
+        UserAccount userFromAccessToken = getUserFromAccessToken(accessToken);
+        return userFromAccessToken.getPreferredTvGenres();
+    }
+
+    public Set<Long> getPreferredMovieGenres(String accessToken) {
+        UserAccount userFromAccessToken = getUserFromAccessToken(accessToken);
+        return userFromAccessToken.getPreferredMovieGenres();
     }
 }
