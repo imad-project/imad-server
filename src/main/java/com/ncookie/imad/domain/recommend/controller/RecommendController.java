@@ -21,6 +21,7 @@ public class RecommendController {
     @GetMapping("/genre")
     public ApiResponse<ContentsRecommendationResponse> recommendBasedPreferredGenre(@RequestHeader("Authorization") String accessToken,
                                                                                     @RequestParam("page") int pageNumber) {
+        recommendationService.getImadRecommendation(accessToken, pageNumber);
         return ApiResponse.createSuccess(
                 ResponseCode.RECOMMEND_GET_SUCCESS,
                 recommendationService.getPreferredGenreBasedRecommendation(accessToken, pageNumber));

@@ -39,4 +39,16 @@ public class ContentsRecommendationService {
                 .preferredGenreRecommendationMovie(tmdbDiscoverMovie)
                 .build();
     }
+
+    public void getImadRecommendation(String accessToken, int pageNumber) {
+        TmdbDiscoverTv tmdbDiscoverTv = apiClient.fetchTmdbPopularTv(pageNumber);
+        TmdbDiscoverTv tmdbDiscoverTv1 = apiClient.fetchTmdbTopRatedTv(pageNumber);
+        TmdbDiscoverTv tmdbDiscoverTv2 = apiClient.fetchTmdbTrendingTv();
+
+        TmdbDiscoverMovie tmdbDiscoverMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
+        TmdbDiscoverMovie tmdbDiscoverMovie1 = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+        TmdbDiscoverMovie tmdbDiscoverMovie2 = apiClient.fetchTmdbTrendingMovie();
+
+        return;
+    }
 }

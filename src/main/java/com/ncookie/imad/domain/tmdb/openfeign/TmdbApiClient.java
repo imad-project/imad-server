@@ -26,7 +26,7 @@ public class TmdbApiClient {
     private final TmdbFeignClient feignClient;
     private final TmdbApiProperties apiProperties;
 
-    private final String language = "ko-kr";
+    private final String LANGUAGE_STRING = "ko-kr";
     private final List<String> appendResponseForDetails = new ArrayList<>(Arrays.asList("credits", "images", "videos"));
 
 
@@ -34,9 +34,9 @@ public class TmdbApiClient {
     // TMDB API에서 page는 1부터 시작함
     public ContentsSearchResponse searchByQuery(String query, String type, int page) {
         return switch (type) {
-            case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, false, language, page);
-            case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, false, language, page);
-            case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, false, language, page);
+            case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, false, LANGUAGE_STRING, page);
+            case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, false, LANGUAGE_STRING, page);
+            case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, false, LANGUAGE_STRING, page);
             default -> throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
         };
     }
@@ -49,13 +49,13 @@ public class TmdbApiClient {
                 return feignClient.getTvDetailsById(
                         apiProperties.getApiKey(),
                         id,
-                        language,
+                        LANGUAGE_STRING,
                         listStringToCommaSeparatedString(appendResponseForDetails));
             } else if (type.equals(ContentsType.MOVIE)) {
                 return feignClient.getMovieDetailsById(
                         apiProperties.getApiKey(),
                         id,
-                        language,
+                        LANGUAGE_STRING,
                         listStringToCommaSeparatedString(appendResponseForDetails));
             } else {
                 throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
@@ -120,7 +120,7 @@ public class TmdbApiClient {
                 apiProperties.getApiKey(),
                 false,
                 false,
-                language,
+                LANGUAGE_STRING,
                 "popularity.desc",
                 pageNumber,
                 listStringToVerticalBarSeparatedString(genres)
@@ -134,13 +134,61 @@ public class TmdbApiClient {
                 apiProperties.getApiKey(),
                 false,
                 false,
-                language,
+                LANGUAGE_STRING,
                 "popularity.desc",
                 pageNumber,
                 listStringToVerticalBarSeparatedString(genres)
         );
 
         return tmdbDiscoverMovie;
+    }
+
+    // TODO: TMDB의 Trend, Popular, Top Rated와 같이 갱신이 빈번하지 않은 데이터의 경우
+    // 기본적으로 로컬에 데이터를 저장해뒀다가 주기적으로 업데이트한다.
+    public TmdbDiscoverTv fetchTmdbPopularTv(int pageNumber) {
+        return feignClient.getPopularTVs(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    public TmdbDiscoverMovie fetchTmdbPopularMovie(int pageNumber) {
+        return feignClient.getPopularMovies(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    public TmdbDiscoverTv fetchTmdbTopRatedTv(int pageNumber) {
+        return feignClient.getTopRatedTVs(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    public TmdbDiscoverMovie fetchTmdbTopRatedMovie(int pageNumber) {
+        return feignClient.getTopRatedMovies(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    public TmdbDiscoverTv fetchTmdbTrendingTv() {
+        return feignClient.getTrendingTVs(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING
+        );
+    }
+
+    public TmdbDiscoverMovie fetchTmdbTrendingMovie() {
+        return feignClient.getTrendingMovies(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING
+        );
     }
 
 
