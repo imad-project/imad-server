@@ -116,7 +116,7 @@ public class TmdbApiClient {
     }
 
     public TmdbDiscoverTv discoverTvWithPreferredGenre(int pageNumber, Set<Long> genres) {
-        TmdbDiscoverTv tmdbDiscoverTv = feignClient.discoverTvWithPreferredGenre(
+        return feignClient.discoverTvWithPreferredGenre(
                 apiProperties.getApiKey(),
                 false,
                 false,
@@ -125,12 +125,10 @@ public class TmdbApiClient {
                 pageNumber,
                 listStringToVerticalBarSeparatedString(genres)
         );
-
-        return tmdbDiscoverTv;
     }
 
     public TmdbDiscoverMovie discoverMovieWithPreferredGenre(int pageNumber, Set<Long> genres) {
-        TmdbDiscoverMovie tmdbDiscoverMovie = feignClient.discoverMovieWithPreferredGenre(
+        return feignClient.discoverMovieWithPreferredGenre(
                 apiProperties.getApiKey(),
                 false,
                 false,
@@ -139,8 +137,6 @@ public class TmdbApiClient {
                 pageNumber,
                 listStringToVerticalBarSeparatedString(genres)
         );
-
-        return tmdbDiscoverMovie;
     }
 
     // TODO: TMDB의 Trend, Popular, Top Rated와 같이 갱신이 빈번하지 않은 데이터의 경우
@@ -177,17 +173,19 @@ public class TmdbApiClient {
         );
     }
 
-    public TmdbDiscoverTv fetchTmdbTrendingTv() {
+    public TmdbDiscoverTv fetchTmdbTrendingTv(int pageNumber) {
         return feignClient.getTrendingTVs(
                 apiProperties.getApiKey(),
-                LANGUAGE_STRING
+                LANGUAGE_STRING,
+                pageNumber
         );
     }
 
-    public TmdbDiscoverMovie fetchTmdbTrendingMovie() {
+    public TmdbDiscoverMovie fetchTmdbTrendingMovie(int pageNumber) {
         return feignClient.getTrendingMovies(
                 apiProperties.getApiKey(),
-                LANGUAGE_STRING
+                LANGUAGE_STRING,
+                pageNumber
         );
     }
 

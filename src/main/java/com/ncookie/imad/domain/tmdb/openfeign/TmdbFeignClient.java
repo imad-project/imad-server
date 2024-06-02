@@ -139,13 +139,15 @@ public interface TmdbFeignClient {
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     TmdbDiscoverTv getTrendingTVs(
             @RequestHeader(value = "Authorization") String apiKey,
-            @RequestParam(value = "language") String language
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
     );
 
     @GetMapping("/trending/movie/week")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     TmdbDiscoverMovie getTrendingMovies(
             @RequestHeader(value = "Authorization") String apiKey,
-            @RequestParam(value = "language") String language
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
     );
 }

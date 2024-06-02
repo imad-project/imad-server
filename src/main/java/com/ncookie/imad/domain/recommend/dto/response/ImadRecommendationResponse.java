@@ -13,10 +13,11 @@ import lombok.Data;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@Description("작품 추천 데이터 - 전체")
-public class ContentsRecommendationResponse {
-    // 선호 장르 기반 추천 데이터
-    private TmdbDiscoverTv preferredGenreRecommendationTv;
-    private TmdbDiscoverMovie preferredGenreRecommendationMovie;
-}
+@Description("작품 추천 데이터 - 아이매드 자체 추천")
+public class ImadRecommendationResponse {
+    private TmdbDiscoverTv popularRecommendationTv;
+    private TmdbDiscoverMovie popularRecommendationMovie;
 
+    private TmdbDiscoverTv topRatedRecommendationTv;
+    private TmdbDiscoverMovie topRatedRecommendationMovie;
+}
