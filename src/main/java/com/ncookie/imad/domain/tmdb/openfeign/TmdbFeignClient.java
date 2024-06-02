@@ -102,4 +102,50 @@ public interface TmdbFeignClient {
             @RequestParam(value = "page") int page,
             @RequestParam(value = "with_genres") String genres
     );
+
+    @GetMapping("/tv/popular")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverTv getPopularTVs(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
+
+    @GetMapping("/movie/popular")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverMovie getPopularMovies(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
+
+    @GetMapping("/tv/top_rated")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverTv getTopRatedTVs(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
+
+    @GetMapping("/movie/top_rated")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverMovie getTopRatedMovies(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
+
+    @GetMapping("/trending/tv")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverTv getTrendingTVs(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "language") String language
+    );
+
+    @GetMapping("/trending/movie")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverMovie getTrendingMovies(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @RequestParam(value = "language") String language
+    );
 }
