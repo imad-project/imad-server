@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.useractivity.entity;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.posting.entity.Posting;
+import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.entity.BaseTimeEntity;
@@ -33,6 +34,12 @@ public class UserActivity extends BaseTimeEntity {
     @JoinColumn(name = "contents_id", nullable = false)
     @ToString.Exclude
     private Contents contents;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "bookmark_id")
+    @ToString.Exclude
+    private ContentsBookmark contentsBookmark;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
