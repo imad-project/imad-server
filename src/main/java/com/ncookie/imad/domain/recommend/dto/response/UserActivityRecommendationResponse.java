@@ -13,28 +13,12 @@ import lombok.Data;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@Description("작품 추천 데이터 - 전체")
-public class AllRecommendationResponse {
-    // 선호 장르 기반 추천
-    private TmdbDiscoverTv preferredGenreRecommendationTv;
-    private TmdbDiscoverMovie preferredGenreRecommendationMovie;
-    
-    // 서비스 활동 기반 추천
+@Description("작품 추천 데이터 - 서비스 활동 기반 추천")
+public class UserActivityRecommendationResponse {
+    // 유저의 활동 기록이 없으면 추천 데이터가 null일 수 있다.
+    // 이 때에는 관련 메세지를 유저에게 보여주도록 하자
     private TmdbDiscoverTv userActivityRecommendationTv;
     private TmdbDiscoverMovie userActivityRecommendationMovie;
     private TmdbDiscoverTv userActivityRecommendationTvAnimation;
     private TmdbDiscoverMovie userActivityRecommendationMovieAnimation;
-
-    // 인기 작품 추천
-    private TmdbDiscoverTv popularRecommendationTv;
-    private TmdbDiscoverMovie popularRecommendationMovie;
-
-    // 상위 평점 작품 추천
-    private TmdbDiscoverTv topRatedRecommendationTv;
-    private TmdbDiscoverMovie topRatedRecommendationMovie;
-
-    // 트렌드 작품 추천
-    private TmdbDiscoverTv trendRecommendationTv;
-    private TmdbDiscoverMovie trendRecommendationMovie;
 }
-
