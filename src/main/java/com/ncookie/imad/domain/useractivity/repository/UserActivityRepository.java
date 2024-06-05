@@ -1,6 +1,5 @@
 package com.ncookie.imad.domain.useractivity.repository;
 
-import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.review.entity.Review;
