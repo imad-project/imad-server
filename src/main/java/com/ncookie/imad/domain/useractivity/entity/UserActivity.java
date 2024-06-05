@@ -1,6 +1,8 @@
 package com.ncookie.imad.domain.useractivity.entity;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.like.entity.PostingLike;
+import com.ncookie.imad.domain.like.entity.ReviewLike;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.review.entity.Review;
@@ -42,14 +44,28 @@ public class UserActivity extends BaseTimeEntity {
     private ContentsBookmark contentsBookmark;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "review_id")
     @ToString.Exclude
     private Review review;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "review_like_id")
+    @ToString.Exclude
+    private ReviewLike reviewLike;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "posting_id")
     @ToString.Exclude
     private Posting posting;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "posting_like_id")
+    @ToString.Exclude
+    private PostingLike postingLike;
 
     // 활동 타입
     @Enumerated(EnumType.STRING)

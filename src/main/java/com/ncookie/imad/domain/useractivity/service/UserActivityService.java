@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.useractivity.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
+import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.useractivity.entity.ActivityType;
 import com.ncookie.imad.domain.useractivity.entity.UserActivity;
@@ -35,9 +36,48 @@ public class UserActivityService {
     }
     
     public void removeContentsBookmark(ContentsBookmark contentsBookmark) {
-        Optional<UserActivity> optionalUserActivity = userActivityRepository.findByContentsBookmark(contentsBookmark);
-
-        optionalUserActivity.ifPresent(userActivityRepository::delete);
+        userActivityRepository.findByContentsBookmark(contentsBookmark)
+                .ifPresent(userActivityRepository::delete);
+        
         log.info("활동 기록: 북마크 삭제");
+    }
+
+    public void addWritingReview(UserAccount user, Contents contents, Review review) {
+        userActivityRepository.save(
+                UserActivity.builder()
+                        .userAccount(user)
+                        .contents(contents)
+                        .review(review)
+                        .activityType(ActivityType.WRITING_REVIEW)
+                        .build()
+        );
+        log.info("활동 기록: 리뷰 작성");
+    }
+
+    public void removeWritingReview(UserAccount user, Review review) {
+        userActivityRepository.findByUserAccountAndReviewAndActivityType(
+                user, review, ActivityType.WRITING_REVIEW
+        ).ifPresent(userActivityRepository::delete);
+
+        log.info("활동 기록: 리뷰 삭제");
+    }
+
+    public void addReviewLike(UserAccount user, Contents contents, Review review) {
+        userActivityRepository.save(
+                UserActivity.builder()
+                        .userAccount(user)
+                        .contents(contents)
+                        .review(review)
+                        .activityType(ActivityType.LIKE_REVIEW)
+                        .build()
+        );
+        log.info("활동 기록: 리뷰 좋아요");
+    }
+
+    public void removeReviewLike(UserAccount user, Review review) {
+        userActivityRepository.findByUserAccountAndReviewAndActivityType(user, review, ActivityType.LIKE_REVIEW)
+                .ifPresent(userActivityRepository::delete);
+
+        log.info("활동 기록: 리뷰 좋아요 삭제");
     }
 }
