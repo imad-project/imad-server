@@ -27,9 +27,7 @@ public class ContentsRecommendationService {
     private final TmdbApiClient apiClient;
 
 
-    // 1. 추천 종류별로 작품을 받아와 전달
-    // 2. 사용자가 추가로 원하는 종류의 추천 작품 추가 전달
-
+    // 작품 추천 종합 버전 (메인 페이지용)
     public AllRecommendationResponse getAllRecommendations(String accessToken, int pageNumber) {
         GenreRecommendationResponse preferredGenreBasedRecommendation = getPreferredGenreBasedRecommendation(accessToken, pageNumber);
         UserActivityRecommendationResponse userActivityRecommendationResponse = getUserActivityRecommendation(accessToken, pageNumber);
@@ -55,6 +53,7 @@ public class ContentsRecommendationService {
                 .build();
     }
 
+    // 장르 기반 추천 (TMDB API - discover 사용)
     public GenreRecommendationResponse getPreferredGenreBasedRecommendation(String accessToken, int pageNumber) {
         TmdbDiscoverTv tmdbDiscoverTv = apiClient.discoverTvWithPreferredGenre(
                 pageNumber,
@@ -69,6 +68,7 @@ public class ContentsRecommendationService {
                 .build();
     }
 
+    // 서비스 활동 기반 추천 (TMDB API - Similar 사용)
     public UserActivityRecommendationResponse getUserActivityRecommendation(String accessToken, int pageNumber) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
@@ -104,6 +104,7 @@ public class ContentsRecommendationService {
         return recommendationResponse;
     }
 
+    // IMAD 자체 추천 (TMDB API - Popular, Top Rated 사용)
     public ImadRecommendationResponse getImadRecommendation(int pageNumber) {
         TmdbDiscoverTv popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
         TmdbDiscoverTv topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
@@ -119,6 +120,7 @@ public class ContentsRecommendationService {
                 .build();
     }
 
+    // 트렌드 추천 (TMDB API - Trend 사용)
     public TrendRecommendationResponse getTrendRecommendation(int pageNumber) {
         TmdbDiscoverTv tmdbDiscoverTv = apiClient.fetchTmdbTrendingTv(pageNumber);
         TmdbDiscoverMovie tmdbDiscoverMovie = apiClient.fetchTmdbTrendingMovie(pageNumber);
