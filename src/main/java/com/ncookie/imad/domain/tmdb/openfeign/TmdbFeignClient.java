@@ -103,6 +103,24 @@ public interface TmdbFeignClient {
             @RequestParam(value = "with_genres") String genres
     );
 
+    @GetMapping("/tv/{id}/similar")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverTv getSimilarTVs(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @PathVariable(value = "id") Long id,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
+
+    @GetMapping("/movie/{id}/similar")
+    @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
+    TmdbDiscoverMovie getSimilarMovies(
+            @RequestHeader(value = "Authorization") String apiKey,
+            @PathVariable(value = "id") Long id,
+            @RequestParam(value = "language") String language,
+            @RequestParam(value = "page") int page
+    );
+
     @GetMapping("/tv/popular")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     TmdbDiscoverTv getPopularTVs(

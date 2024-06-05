@@ -139,6 +139,24 @@ public class TmdbApiClient {
         );
     }
 
+    public TmdbDiscoverTv fetchTmdbSimilarTv(Long tvId, int pageNumber) {
+        return feignClient.getSimilarTVs(
+                apiProperties.getApiKey(),
+                tvId,
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    public TmdbDiscoverMovie fetchTmdbSimilarMovie(Long movieId, int pageNumber) {
+        return feignClient.getSimilarMovies(
+                apiProperties.getApiKey(),
+                movieId,
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
     // TODO: TMDB의 Trend, Popular, Top Rated와 같이 갱신이 빈번하지 않은 데이터의 경우
     // 기본적으로 로컬에 데이터를 저장해뒀다가 주기적으로 업데이트한다.
     public TmdbDiscoverTv fetchTmdbPopularTv(int pageNumber) {
