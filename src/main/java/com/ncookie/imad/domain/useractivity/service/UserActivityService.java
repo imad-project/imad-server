@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.useractivity.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
+import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.profile.entity.ContentsBookmark;
 import com.ncookie.imad.domain.review.entity.Review;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -75,9 +76,50 @@ public class UserActivityService {
     }
 
     public void removeReviewLike(UserAccount user, Review review) {
-        userActivityRepository.findByUserAccountAndReviewAndActivityType(user, review, ActivityType.LIKE_REVIEW)
+        userActivityRepository.findByUserAccountAndReviewAndActivityType(
+                user, review, ActivityType.LIKE_REVIEW)
                 .ifPresent(userActivityRepository::delete);
 
         log.info("활동 기록: 리뷰 좋아요 삭제");
+    }
+    
+    public void addWritingPosting(UserAccount user, Contents contents, Posting posting) {
+        userActivityRepository.save(
+                UserActivity.builder()
+                        .userAccount(user)
+                        .contents(contents)
+                        .posting(posting)
+                        .activityType(ActivityType.WRITING_POSTING)
+                        .build()
+        );
+        log.info("활동 기록: 게시글 작성");
+    }
+
+    public void removeWritingPosting(UserAccount user, Posting posting) {
+        userActivityRepository.findByUserAccountAndPostingAndActivityType(
+                user, posting, ActivityType.WRITING_POSTING
+        ).ifPresent(userActivityRepository::delete);
+
+        log.info("활동 기록: 게시글 삭제");
+    }
+
+    public void addPostingLike(UserAccount user, Contents contents, Posting posting) {
+        userActivityRepository.save(
+                UserActivity.builder()
+                        .userAccount(user)
+                        .contents(contents)
+                        .posting(posting)
+                        .activityType(ActivityType.LIKE_POSTING)
+                        .build()
+        );
+        log.info("활동 기록: 게시글 좋아요");
+    }
+
+    public void removePostingLike(UserAccount user, Posting posting) {
+        userActivityRepository.findByUserAccountAndPostingAndActivityType(
+                user, posting, ActivityType.LIKE_POSTING)
+                .ifPresent(userActivityRepository::delete);
+
+        log.info("활동 기록: 게시글 좋아요 삭제");
     }
 }
