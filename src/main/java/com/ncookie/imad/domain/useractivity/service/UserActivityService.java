@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Slf4j
 @Transactional
@@ -22,6 +24,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Description("유저 활동을 기록")
 public class UserActivityService {
     private final UserActivityRepository userActivityRepository;
+
+    public List<UserActivity> getUserActivityListWithTv(UserAccount user) {
+        return userActivityRepository.findAllByUserAccountWithTv(user);
+    }
+
+    public List<UserActivity> getUserActivityListWithMovie(UserAccount user) {
+        return userActivityRepository.findAllByUserAccountWithMovie(user);
+    }
+
+    public List<UserActivity> getUserActivityListWithAnimation(UserAccount user) {
+        return userActivityRepository.findAllByUserAccountWithAnimation(user);
+    }
 
     public void addContentsBookmark(UserAccount user, Contents contents, ContentsBookmark bookmark) {
         userActivityRepository.save(
