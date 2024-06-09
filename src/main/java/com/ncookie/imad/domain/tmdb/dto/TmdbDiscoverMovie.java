@@ -18,4 +18,8 @@ public class TmdbDiscoverMovie {
     private Long totalResults;
 
     private List<TmdbDiscoverMovieDetails> results;
+
+    // 서비스 활동 기반 추천에서만 사용하는 데이터
+    // 추천 시 Similar API에 요청했던 TMDB ID를 저장함
+    private Long tmdbId;
 }

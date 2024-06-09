@@ -80,6 +80,13 @@ public class ContentsRecommendationService {
         TmdbDiscoverTv recommendedTv = tv != null ? apiClient.fetchTmdbSimilarTv(tv.getTmdbId(), pageNumber) : null;
         TmdbDiscoverMovie recommendedMovie = movie != null ? apiClient.fetchTmdbSimilarMovie(movie.getTmdbId(), pageNumber) : null;
 
+        if (tv != null) {
+            recommendedTv.setTmdbId(tv.getTmdbId());
+        }
+        if (movie != null) {
+            recommendedMovie.setTmdbId(movie.getTmdbId());
+        }
+
         UserActivityRecommendationResponse recommendationResponse = UserActivityRecommendationResponse.builder()
                 .userActivityRecommendationTv(recommendedTv)
                 .userActivityRecommendationMovie(recommendedMovie)
@@ -92,13 +99,15 @@ public class ContentsRecommendationService {
 
         // 애니메이션은 TV와 Movie 모두 될 수 있으므로 따로 처리
         if (animation.getTmdbType().equals(ContentsType.TV)) {
-            recommendationResponse.setUserActivityRecommendationTvAnimation(
-                    apiClient.fetchTmdbSimilarTv(animation.getTmdbId(), pageNumber)
-            );
+            TmdbDiscoverTv tvAnimation = apiClient.fetchTmdbSimilarTv(animation.getTmdbId(), pageNumber);
+
+            tvAnimation.setTmdbId(animation.getTmdbId());
+            recommendationResponse.setUserActivityRecommendationTvAnimation(tvAnimation);
         } else if (animation.getTmdbType().equals(ContentsType.MOVIE)) {
-            recommendationResponse.setUserActivityRecommendationMovieAnimation(
-                    apiClient.fetchTmdbSimilarMovie(animation.getTmdbId(), pageNumber)
-            );
+            TmdbDiscoverMovie movieAnimation = apiClient.fetchTmdbSimilarMovie(animation.getTmdbId(), pageNumber);
+
+            movieAnimation.setTmdbId(animation.getTmdbId());
+            recommendationResponse.setUserActivityRecommendationMovieAnimation(movieAnimation);
         }
 
         return recommendationResponse;
