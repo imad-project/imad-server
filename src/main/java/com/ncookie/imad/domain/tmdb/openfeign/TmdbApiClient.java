@@ -13,6 +13,7 @@ import com.ncookie.imad.global.exception.BadRequestException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -157,8 +158,7 @@ public class TmdbApiClient {
         );
     }
 
-    // TODO: TMDB의 Trend, Popular, Top Rated와 같이 갱신이 빈번하지 않은 데이터의 경우
-    // 기본적으로 로컬에 데이터를 저장해뒀다가 주기적으로 업데이트한다.
+    @Cacheable(cacheNames = "fetchTmdbPopularTv")
     public TmdbDiscoverTv fetchTmdbPopularTv(int pageNumber) {
         return feignClient.getPopularTVs(
                 apiProperties.getApiKey(),
@@ -167,6 +167,7 @@ public class TmdbApiClient {
         );
     }
 
+    @Cacheable(cacheNames = "fetchTmdbPopularMovie")
     public TmdbDiscoverMovie fetchTmdbPopularMovie(int pageNumber) {
         return feignClient.getPopularMovies(
                 apiProperties.getApiKey(),
@@ -175,6 +176,7 @@ public class TmdbApiClient {
         );
     }
 
+    @Cacheable(cacheNames = "fetchTmdbTopRatedTv")
     public TmdbDiscoverTv fetchTmdbTopRatedTv(int pageNumber) {
         return feignClient.getTopRatedTVs(
                 apiProperties.getApiKey(),
@@ -183,6 +185,7 @@ public class TmdbApiClient {
         );
     }
 
+    @Cacheable(cacheNames = "fetchTmdbTopRatedMovie")
     public TmdbDiscoverMovie fetchTmdbTopRatedMovie(int pageNumber) {
         return feignClient.getTopRatedMovies(
                 apiProperties.getApiKey(),
@@ -191,6 +194,7 @@ public class TmdbApiClient {
         );
     }
 
+    @Cacheable(cacheNames = "fetchTmdbTrendingTv")
     public TmdbDiscoverTv fetchTmdbTrendingTv(int pageNumber) {
         return feignClient.getTrendingTVs(
                 apiProperties.getApiKey(),
@@ -199,6 +203,7 @@ public class TmdbApiClient {
         );
     }
 
+    @Cacheable(cacheNames = "fetchTmdbTrendingMovie")
     public TmdbDiscoverMovie fetchTmdbTrendingMovie(int pageNumber) {
         return feignClient.getTrendingMovies(
                 apiProperties.getApiKey(),
