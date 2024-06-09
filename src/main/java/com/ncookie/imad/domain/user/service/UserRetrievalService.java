@@ -32,6 +32,11 @@ public class UserRetrievalService {
     public UserAccount getUserFromAccessToken(String accessToken) {
         log.info("[Access Token 사용하여 UserAccount entity 조회]");
 
+        if (accessToken.equals("GUEST")) {
+            log.info("게스트 전용 헤더 확인");
+            return null;
+        }
+
         log.info("액세스 토큰에서 이메일 정보를 추출");
         Optional<String> optionalEmail = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken));
 
@@ -50,13 +55,11 @@ public class UserRetrievalService {
         }
     }
 
-    public Set<Long> getPreferredTvGenres(String accessToken) {
-        UserAccount userFromAccessToken = getUserFromAccessToken(accessToken);
-        return userFromAccessToken.getPreferredTvGenres();
+    public Set<Long> getPreferredTvGenres(UserAccount user) {
+        return user.getPreferredTvGenres();
     }
 
-    public Set<Long> getPreferredMovieGenres(String accessToken) {
-        UserAccount userFromAccessToken = getUserFromAccessToken(accessToken);
-        return userFromAccessToken.getPreferredMovieGenres();
+    public Set<Long> getPreferredMovieGenres(UserAccount user) {
+        return user.getPreferredMovieGenres();
     }
 }

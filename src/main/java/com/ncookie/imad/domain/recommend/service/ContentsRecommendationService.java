@@ -58,12 +58,19 @@ public class ContentsRecommendationService {
 
     // 장르 기반 추천 (TMDB API - discover 사용)
     public GenreRecommendationResponse getPreferredGenreBasedRecommendation(String accessToken, int pageNumber) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        // 게스트 요청일 경우 추천 데이터를 반환하지 않음
+        if (user == null) {
+            return GenreRecommendationResponse.builder().build();
+        }
+
         TmdbDiscoverTv tmdbDiscoverTv = apiClient.discoverTvWithPreferredGenre(
                 pageNumber,
-                userRetrievalService.getPreferredTvGenres(accessToken));
+                userRetrievalService.getPreferredTvGenres(user));
         TmdbDiscoverMovie tmdbDiscoverMovie = apiClient.discoverMovieWithPreferredGenre(
                 pageNumber,
-                userRetrievalService.getPreferredMovieGenres(accessToken));
+                userRetrievalService.getPreferredMovieGenres(user));
 
         return GenreRecommendationResponse.builder()
                 .preferredGenreRecommendationTv(tmdbDiscoverTv)
@@ -75,6 +82,10 @@ public class ContentsRecommendationService {
     // 일괄 요청 시 사용됨
     public UserActivityRecommendationResponse getUserActivityRecommendation(String accessToken, int pageNumber) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        if (user == null) {
+            return UserActivityRecommendationResponse.builder().build();
+        }
 
         // 유저 활동 기록에서 TV, Movie, Animation 별로 추출
         Contents tv = userActivityBasedRecommendationService.selectWeightedRandomContents(user, ContentsType.TV);
