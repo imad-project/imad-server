@@ -35,13 +35,13 @@ public class RecommendController {
                 recommendationService.getPreferredGenreBasedRecommendation(accessToken, pageNumber));
     }
 
-    @Description("유저 활동 기반 추천")
+    @Description("서비스 활동 기반 추천")
     @GetMapping("/activity")
-    public ApiResponse<UserActivityRecommendationResponse> getUserActivityRecommendations(@RequestHeader("Authorization") String accessToken,
-                                                                                          @RequestParam("page") int pageNumber) {
+    public ApiResponse<UserActivityRecommendationResponse> getUserActivityRecommendations(@RequestParam("page") int pageNumber,
+                                                                                          @RequestParam("contents_id") Long contentsId) {
         return ApiResponse.createSuccess(
                 ResponseCode.RECOMMEND_GET_SUCCESS,
-                recommendationService.getUserActivityRecommendation(accessToken, pageNumber)
+                recommendationService.getUserActivityAdditionalRecommendation(pageNumber, contentsId)
         );
     }
 

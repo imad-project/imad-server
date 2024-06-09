@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.recommend.service;
 
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
+import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
 import com.ncookie.imad.domain.recommend.dto.response.*;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverMovie;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverTv;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Service;
 @Description("다른 작품 추천 관련 Service들로부터 작품들을 받아와 유저에게 반환하는 서비스")
 public class ContentsRecommendationService {
     private final UserRetrievalService userRetrievalService;
+    private final ContentsRetrievalService contentsRetrievalService;
+
     private final UserActivityBasedRecommendationService userActivityBasedRecommendationService;
 
     private final TmdbApiClient apiClient;
@@ -69,6 +72,7 @@ public class ContentsRecommendationService {
     }
 
     // 서비스 활동 기반 추천 (TMDB API - Similar 사용)
+    // 일괄 요청 시 사용됨
     public UserActivityRecommendationResponse getUserActivityRecommendation(String accessToken, int pageNumber) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
@@ -81,10 +85,10 @@ public class ContentsRecommendationService {
         TmdbDiscoverMovie recommendedMovie = movie != null ? apiClient.fetchTmdbSimilarMovie(movie.getTmdbId(), pageNumber) : null;
 
         if (tv != null) {
-            recommendedTv.setTmdbId(tv.getTmdbId());
+            recommendedTv.setContentsId(tv.getContentsId());
         }
         if (movie != null) {
-            recommendedMovie.setTmdbId(movie.getTmdbId());
+            recommendedMovie.setContentsId(movie.getContentsId());
         }
 
         UserActivityRecommendationResponse recommendationResponse = UserActivityRecommendationResponse.builder()
@@ -101,16 +105,47 @@ public class ContentsRecommendationService {
         if (animation.getTmdbType().equals(ContentsType.TV)) {
             TmdbDiscoverTv tvAnimation = apiClient.fetchTmdbSimilarTv(animation.getTmdbId(), pageNumber);
 
-            tvAnimation.setTmdbId(animation.getTmdbId());
+            tvAnimation.setContentsId(animation.getContentsId());
             recommendationResponse.setUserActivityRecommendationTvAnimation(tvAnimation);
         } else if (animation.getTmdbType().equals(ContentsType.MOVIE)) {
             TmdbDiscoverMovie movieAnimation = apiClient.fetchTmdbSimilarMovie(animation.getTmdbId(), pageNumber);
 
-            movieAnimation.setTmdbId(animation.getTmdbId());
+            movieAnimation.setContentsId(animation.getContentsId());
             recommendationResponse.setUserActivityRecommendationMovieAnimation(movieAnimation);
         }
 
         return recommendationResponse;
+    }
+
+    // 추천 데이터 개별 요청 시 사용
+    public UserActivityRecommendationResponse getUserActivityAdditionalRecommendation(int pageNumber, Long contentsId) {
+        Contents contents = contentsRetrievalService.getContentsById(contentsId);
+
+        UserActivityRecommendationResponse build = UserActivityRecommendationResponse.builder().build();
+
+        TmdbDiscoverTv tv = null;
+        TmdbDiscoverMovie movie = null;
+
+        if (contents.getTmdbType().equals(ContentsType.TV)) {
+            tv = apiClient.fetchTmdbSimilarTv(contents.getTmdbId(), pageNumber);
+        } else if (contents.getTmdbType().equals(ContentsType.MOVIE)) {
+            movie = apiClient.fetchTmdbSimilarMovie(contents.getTmdbId(), pageNumber);
+        }
+
+        // 작품 타입(TV, Movie, Animation)에 따라 DTO 클래스에 할당
+        if (contents.getContentsType().equals(ContentsType.TV)) {
+            build.setUserActivityRecommendationTv(tv);
+        } else if (contents.getContentsType().equals(ContentsType.MOVIE)) {
+            build.setUserActivityRecommendationMovie(movie);
+        } else if (contents.getContentsType().equals(ContentsType.ANIMATION)) {
+            if (contents.getTmdbType().equals(ContentsType.TV)) {
+                build.setUserActivityRecommendationTvAnimation(tv);
+            } else if (contents.getTmdbType().equals(ContentsType.MOVIE)) {
+                build.setUserActivityRecommendationMovieAnimation(movie);
+            }
+        }
+
+        return build;
     }
 
     // IMAD 자체 추천 (TMDB API - Popular, Top Rated 사용)
