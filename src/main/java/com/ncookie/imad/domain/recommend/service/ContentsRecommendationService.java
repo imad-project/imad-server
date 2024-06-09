@@ -28,11 +28,11 @@ public class ContentsRecommendationService {
 
 
     // 작품 추천 종합 버전 (메인 페이지용)
-    public AllRecommendationResponse getAllRecommendations(String accessToken, int pageNumber) {
-        GenreRecommendationResponse preferredGenreBasedRecommendation = getPreferredGenreBasedRecommendation(accessToken, pageNumber);
-        UserActivityRecommendationResponse userActivityRecommendationResponse = getUserActivityRecommendation(accessToken, pageNumber);
-        ImadRecommendationResponse imadRecommendation = getImadRecommendation(pageNumber);
-        TrendRecommendationResponse trendRecommendation = getTrendRecommendation(pageNumber);
+    public AllRecommendationResponse getAllRecommendations(String accessToken) {
+        GenreRecommendationResponse preferredGenreBasedRecommendation = getPreferredGenreBasedRecommendation(accessToken, 1);
+        UserActivityRecommendationResponse userActivityRecommendationResponse = getUserActivityRecommendation(accessToken, 1);
+        ImadRecommendationResponse imadRecommendation = getImadRecommendation(1);
+        TrendRecommendationResponse trendRecommendation = getTrendRecommendation(1);
 
         return AllRecommendationResponse.builder()
                 .preferredGenreRecommendationTv(preferredGenreBasedRecommendation.getPreferredGenreRecommendationTv())

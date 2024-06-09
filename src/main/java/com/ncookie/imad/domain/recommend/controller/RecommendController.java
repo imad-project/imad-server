@@ -19,11 +19,10 @@ public class RecommendController {
 
     @Description("작품 추천 종합 버전")
     @GetMapping("/all")
-    public ApiResponse<AllRecommendationResponse> getAllRecommendations(@RequestHeader("Authorization") String accessToken,
-                                                                        @RequestParam("page") int pageNumber) {
+    public ApiResponse<AllRecommendationResponse> getAllRecommendations(@RequestHeader("Authorization") String accessToken) {
         return ApiResponse.createSuccess(
                 ResponseCode.RECOMMEND_GET_SUCCESS,
-                recommendationService.getAllRecommendations(accessToken, pageNumber)
+                recommendationService.getAllRecommendations(accessToken)
         );
     }
 
