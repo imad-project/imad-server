@@ -153,7 +153,7 @@ public interface TmdbFeignClient {
             @RequestParam(value = "page") int page
     );
 
-    @GetMapping("/trending/tv/week")
+    @GetMapping("/trending/tv/day")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     TmdbDiscoverTv getTrendingTVs(
             @RequestHeader(value = "Authorization") String apiKey,
@@ -161,7 +161,7 @@ public interface TmdbFeignClient {
             @RequestParam(value = "page") int page
     );
 
-    @GetMapping("/trending/movie/week")
+    @GetMapping("/trending/movie/day")
     @Headers("Accept: " + MediaType.APPLICATION_JSON_VALUE)
     TmdbDiscoverMovie getTrendingMovies(
             @RequestHeader(value = "Authorization") String apiKey,
