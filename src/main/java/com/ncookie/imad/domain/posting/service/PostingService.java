@@ -14,6 +14,7 @@ import com.ncookie.imad.domain.profile.service.ScrapService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularScoreService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.domain.useractivity.service.UserActivityService;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -48,6 +49,7 @@ public class PostingService {
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
     private final TodayPopularScoreService todayPopularScoreService;
+    private final UserActivityService userActivityService;
 
 
     public PostingDetailsResponse getPosting(String accessToken, Long postingId, boolean isPopularPosting) {
@@ -253,6 +255,9 @@ public class PostingService {
         contentsRankingScoreUpdateService.addRankingScore(contents, POSTING_RANKING_SCORE);
         log.info("[게시글 작성] 랭킹 점수 반영 완료");
 
+        // 유저 활동 기록
+        userActivityService.addWritingPosting(user, contents, posting);
+
         return PostingIdResponse.builder()
                 .postingId(posting.getPostingId())
                 .build();
@@ -283,7 +288,10 @@ public class PostingService {
         if (posting.getUser().getId().equals(user.getId())) {
             contentsRankingScoreUpdateService.subtractRankingScore(posting.getContents(), POSTING_RANKING_SCORE);
             log.info("[게시글 삭제] 랭킹 점수 반영 완료");
-            
+
+            // 유저 활동 기록
+            userActivityService.removeWritingPosting(user, posting);
+
             postingRepository.delete(posting);
         } else {
             throw new BadRequestException(ResponseCode.POSTING_NO_PERMISSION);
@@ -312,6 +320,7 @@ public class PostingService {
             int previousLikeStatus = postingLike.getLikeStatus();
             if (previousLikeStatus == 1 && (likeStatus == 0 || likeStatus == -1)) {
                 todayPopularScoreService.subtractPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_LIKE_SCORE);
+                userActivityService.removePostingLike(user, posting);
             }
 
             // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
@@ -331,6 +340,7 @@ public class PostingService {
         // 게시글 인기 점수 추가
         if (likeStatus == 1) {
             todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_LIKE_SCORE);
+            userActivityService.addPostingLike(user, posting.getContents(), posting);
         }
 
         // like, dislike count 갱신

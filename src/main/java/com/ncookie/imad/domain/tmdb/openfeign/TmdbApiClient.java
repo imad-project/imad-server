@@ -1,4 +1,4 @@
-package com.ncookie.imad.global.openfeign;
+package com.ncookie.imad.domain.tmdb.openfeign;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,16 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncookie.imad.domain.contents.dto.ContentsSearchResponse;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverMovie;
+import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverTv;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 // TMDB API를 사용하기 위한 메소드들을 모아놓은 클래스
@@ -26,7 +27,7 @@ public class TmdbApiClient {
     private final TmdbFeignClient feignClient;
     private final TmdbApiProperties apiProperties;
 
-    private final String language = "ko-kr";
+    private final String LANGUAGE_STRING = "ko-kr";
     private final List<String> appendResponseForDetails = new ArrayList<>(Arrays.asList("credits", "images", "videos"));
 
 
@@ -34,9 +35,9 @@ public class TmdbApiClient {
     // TMDB API에서 page는 1부터 시작함
     public ContentsSearchResponse searchByQuery(String query, String type, int page) {
         return switch (type) {
-            case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, false, language, page);
-            case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, false, language, page);
-            case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, false, language, page);
+            case "multi" -> feignClient.searchMultiByQuery(apiProperties.getApiKey(), query, false, LANGUAGE_STRING, page);
+            case "tv" -> feignClient.searchTvByQuery(apiProperties.getApiKey(), query, false, LANGUAGE_STRING, page);
+            case "movie" -> feignClient.searchMovieByQuery(apiProperties.getApiKey(), query, false, LANGUAGE_STRING, page);
             default -> throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
         };
     }
@@ -49,13 +50,13 @@ public class TmdbApiClient {
                 return feignClient.getTvDetailsById(
                         apiProperties.getApiKey(),
                         id,
-                        language,
+                        LANGUAGE_STRING,
                         listStringToCommaSeparatedString(appendResponseForDetails));
             } else if (type.equals(ContentsType.MOVIE)) {
                 return feignClient.getMovieDetailsById(
                         apiProperties.getApiKey(),
                         id,
-                        language,
+                        LANGUAGE_STRING,
                         listStringToCommaSeparatedString(appendResponseForDetails));
             } else {
                 throw new BadRequestException(ResponseCode.CONTENTS_SEARCH_WRONG_TYPE);
@@ -115,9 +116,114 @@ public class TmdbApiClient {
         return certification.isEmpty() ? "NONE" : certification;
     }
 
+    public TmdbDiscoverTv discoverTvWithPreferredGenre(int pageNumber, Set<Long> genres) {
+        return feignClient.discoverTvWithPreferredGenre(
+                apiProperties.getApiKey(),
+                false,
+                false,
+                LANGUAGE_STRING,
+                "popularity.desc",
+                pageNumber,
+                listStringToVerticalBarSeparatedString(genres)
+        );
+    }
+
+    public TmdbDiscoverMovie discoverMovieWithPreferredGenre(int pageNumber, Set<Long> genres) {
+        return feignClient.discoverMovieWithPreferredGenre(
+                apiProperties.getApiKey(),
+                false,
+                false,
+                LANGUAGE_STRING,
+                "popularity.desc",
+                pageNumber,
+                listStringToVerticalBarSeparatedString(genres)
+        );
+    }
+
+    public TmdbDiscoverTv fetchTmdbSimilarTv(Long tvId, int pageNumber) {
+        return feignClient.getSimilarTVs(
+                apiProperties.getApiKey(),
+                tvId,
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    public TmdbDiscoverMovie fetchTmdbSimilarMovie(Long movieId, int pageNumber) {
+        return feignClient.getSimilarMovies(
+                apiProperties.getApiKey(),
+                movieId,
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    @Cacheable(cacheNames = "fetchTmdbPopularTv")
+    public TmdbDiscoverTv fetchTmdbPopularTv(int pageNumber) {
+        return feignClient.getPopularTVs(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    @Cacheable(cacheNames = "fetchTmdbPopularMovie")
+    public TmdbDiscoverMovie fetchTmdbPopularMovie(int pageNumber) {
+        return feignClient.getPopularMovies(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    @Cacheable(cacheNames = "fetchTmdbTopRatedTv")
+    public TmdbDiscoverTv fetchTmdbTopRatedTv(int pageNumber) {
+        return feignClient.getTopRatedTVs(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    @Cacheable(cacheNames = "fetchTmdbTopRatedMovie")
+    public TmdbDiscoverMovie fetchTmdbTopRatedMovie(int pageNumber) {
+        return feignClient.getTopRatedMovies(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    @Cacheable(cacheNames = "fetchTmdbTrendingTv")
+    public TmdbDiscoverTv fetchTmdbTrendingTv(int pageNumber) {
+        return feignClient.getTrendingTVs(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
+    @Cacheable(cacheNames = "fetchTmdbTrendingMovie")
+    public TmdbDiscoverMovie fetchTmdbTrendingMovie(int pageNumber) {
+        return feignClient.getTrendingMovies(
+                apiProperties.getApiKey(),
+                LANGUAGE_STRING,
+                pageNumber
+        );
+    }
+
 
     // append_to_response에 들어갈 값을 List<String>에서 추출함
     private String listStringToCommaSeparatedString(List<String> list) {
         return String.join(",", list);
+    }
+
+    // 장르 기반 작품 검색 시 장르 구분자로 사용
+    private String listStringToVerticalBarSeparatedString(Set<Long> list) {
+        StringJoiner joiner = new StringJoiner("|");
+        for (Long genre : list) {
+            joiner.add(String.valueOf(genre));
+        }
+        return joiner.toString();
     }
 }

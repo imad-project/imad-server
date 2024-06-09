@@ -1,4 +1,4 @@
-package com.ncookie.imad.global.openfeign;
+package com.ncookie.imad.global.oauth2.openfeign;
 
 import com.ncookie.imad.global.oauth2.dto.ApplePublicKeys;
 import com.ncookie.imad.global.oauth2.dto.AppleToken;

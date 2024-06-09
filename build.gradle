@@ -38,10 +38,14 @@ dependencies {
 
 	// 보안
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 	// 외부 API 통신 라이브러리
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	
+	// TMDB API 요청 캐싱
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'com.github.ben-manes.caffeine:caffeine'
 
 	// DB
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

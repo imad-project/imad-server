@@ -14,6 +14,7 @@ import com.ncookie.imad.domain.review.repository.ReviewRepository;
 import com.ncookie.imad.domain.like.entity.ReviewLike;
 import com.ncookie.imad.domain.like.service.ReviewLikeService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.domain.useractivity.service.UserActivityService;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -45,8 +46,10 @@ public class ReviewService {
 
     private final ReviewLikeService reviewLikeService;
 
+    // 기록용
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
     private final TodayPopularScoreService todayPopularScoreService;
+    private final UserActivityService userActivityService;
 
     public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
@@ -181,6 +184,8 @@ public class ReviewService {
 
         calculateAndSaveAverageScore(review);
 
+        userActivityService.addWritingReview(user, contents, review);
+
         contentsRankingScoreUpdateService.addRankingScore(contents, REVIEW_RANKING_SCORE);
         log.info("[리뷰 작성] 랭킹 점수 반영 완료");
 
@@ -224,8 +229,10 @@ public class ReviewService {
             // 해당 리뷰를 작성한 유저만 삭제할 수 있음
             if (Objects.equals(review.getUserAccount().getId(), user.getId())) {
                 reviewRepository.delete(review);
+                userActivityService.removeWritingReview(user, review);
                 calculateAndSaveAverageScore(review);
-                
+
+
                 contentsRankingScoreUpdateService.subtractRankingScore(review.getContents(), REVIEW_RANKING_SCORE);
                 log.info("[리뷰 삭제] 랭킹 점수 반영 완료");
             } else {
@@ -261,6 +268,7 @@ public class ReviewService {
                 int previousLikeStatus = reviewLike.getLikeStatus();
                 if (previousLikeStatus == 1 && (likeStatus == 0 || likeStatus == -1)) {
                     todayPopularScoreService.subtractPopularScore(review, TodayPopularScoreService.POPULAR_REVIEW_LIKE_SCORE);
+                    userActivityService.removeReviewLike(user, review);
                 }
 
                 // like_status가 1이면 좋아요, -1이면 싫어요, 0이면 둘 중 하나를 취소한 상태이므로 테이블에서 데이터 삭제
@@ -280,6 +288,7 @@ public class ReviewService {
             // 리뷰 인기 점수 추가
             if (likeStatus == 1) {
                 todayPopularScoreService.addPopularScore(review, TodayPopularScoreService.POPULAR_REVIEW_LIKE_SCORE);
+                userActivityService.addReviewLike(user, review.getContents(), review);
             }
 
             // like, dislike count 갱신

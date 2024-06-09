@@ -49,7 +49,7 @@ public class ReviewLikeService implements LikeService<Review, ReviewLike> {
         if (likeStatus == 0) {
             return reviewLikeRepository.findAllByUserAccount(user, pageable);
         } else {
-            return reviewLikeRepository.findAllByUserAccountAndLikeStatus(user, pageable, likeStatus);
+            return reviewLikeRepository.findAllByUserAccountAndLikeStatus(pageable, user, likeStatus);
         }
     }
 }

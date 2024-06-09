@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.ncookie.imad.domain.user.entity.AuthProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class SignUpRequest {
     private String email;
