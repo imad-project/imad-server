@@ -11,7 +11,7 @@ import com.ncookie.imad.domain.contents.repository.TvProgramDataRepository;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDetails;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
-import com.ncookie.imad.global.openfeign.TmdbApiClient;
+import com.ncookie.imad.domain.tmdb.openfeign.TmdbApiClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

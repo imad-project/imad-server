@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static com.ncookie.imad.global.Utils.extractToken;
 
@@ -31,6 +32,11 @@ public class UserRetrievalService {
     public UserAccount getUserFromAccessToken(String accessToken) {
         log.info("[Access Token 사용하여 UserAccount entity 조회]");
 
+        if (accessToken.equals("GUEST")) {
+            log.info("게스트 전용 헤더 확인");
+            return null;
+        }
+
         log.info("액세스 토큰에서 이메일 정보를 추출");
         Optional<String> optionalEmail = jwtService.extractClaimFromJWT(JwtService.CLAIM_EMAIL, extractToken(accessToken));
 
@@ -45,7 +51,15 @@ public class UserRetrievalService {
             }
         } else {
             log.warn("[이메일 정보 추출 실패] : JWT 토큰이 유효하지 않음");
-            return null;
+            throw new BadRequestException(ResponseCode.TOKEN_INVALID);
         }
+    }
+
+    public Set<Long> getPreferredTvGenres(UserAccount user) {
+        return user.getPreferredTvGenres();
+    }
+
+    public Set<Long> getPreferredMovieGenres(UserAccount user) {
+        return user.getPreferredMovieGenres();
     }
 }

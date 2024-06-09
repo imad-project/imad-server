@@ -8,7 +8,7 @@ import com.ncookie.imad.global.exception.BadRequestException;
 import com.ncookie.imad.global.oauth2.dto.ApplePublicKey;
 import com.ncookie.imad.global.oauth2.dto.ApplePublicKeys;
 import com.ncookie.imad.global.oauth2.property.AppleProperties;
-import com.ncookie.imad.global.openfeign.AppleLoginClient;
+import com.ncookie.imad.global.oauth2.openfeign.AppleLoginClient;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;

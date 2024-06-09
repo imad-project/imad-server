@@ -20,14 +20,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsReviewByUserAccountAndContents(UserAccount user, Contents contents);
 
     @Query("SELECT AVG(score) FROM Review WHERE contents = :contents")
-    Float calculateAverageScoreForContents(Contents contents);
+    Float calculateAverageScoreForContents(@Param("contents") Contents contents);
 
     @Query("SELECT COUNT(*) FROM Review WHERE contents = :contents")
-    Integer countReviewForContents(Contents contents);
+    Integer countReviewForContents(@Param("contents") Contents contents);
 
     // 프로필 조회용
     @Query("SELECT COUNT(*) FROM Review WHERE userAccount = :user")
-    int countWrittenReviewByUser(UserAccount user);
+    int countWrittenReviewByUser(@Param("user") UserAccount user);
 
     // 좋아요 개수 업데이트
     @Modifying

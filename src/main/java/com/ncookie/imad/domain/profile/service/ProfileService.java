@@ -15,6 +15,7 @@ import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
+import com.ncookie.imad.domain.useractivity.service.UserActivityService;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import com.ncookie.imad.global.exception.BadRequestException;
@@ -47,8 +48,10 @@ public class ProfileService {
     private final BookmarkService bookmarkService;
     private final ScrapService scrapService;
 
+    // 기록용
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
     private final TodayPopularScoreService todayPopularScoreService;
+    private final UserActivityService userActivityService;
 
 
     // 프로필 요약 정보
@@ -95,14 +98,17 @@ public class ProfileService {
         Contents contents = contentsService.getContentsEntityById(contentsId);
 
         if (!bookmarkService.existsByUserAccountAndContents(user, contents)) {
-            bookmarkService.save(
+            ContentsBookmark bookmark = bookmarkService.save(
                     ContentsBookmark.builder()
                             .userAccount(user)
                             .contents(contents)
                             .build()
             );
             log.info("북마크 등록 완료");
-            
+
+            // 유저 활동 기록
+            userActivityService.addContentsBookmark(user, contents, bookmark);
+
             contentsRankingScoreUpdateService.addRankingScore(contents, BOOKMARK_RANKING_SCORE);
             log.info("[작품 북마크 추가] 랭킹 점수 반영 완료");
             
@@ -126,6 +132,8 @@ public class ProfileService {
         ContentsBookmark bookmark = bookmarkService.findByIdAndUserAccount(bookmarkId, user);
         contentsRankingScoreUpdateService.subtractRankingScore(bookmark.getContents(), BOOKMARK_RANKING_SCORE);
         log.info("[작품 북마크 삭제] 랭킹 점수 반영 완료");
+
+        userActivityService.removeContentsBookmark(bookmark);
 
         bookmarkService.deleteByIdAndUserAccount(bookmarkId, user);
         log.info("북마크 삭제 완료");

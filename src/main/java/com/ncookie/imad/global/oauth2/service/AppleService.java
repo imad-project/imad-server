@@ -13,7 +13,7 @@ import com.ncookie.imad.global.oauth2.dto.AppleLoginResponse;
 import com.ncookie.imad.global.oauth2.dto.AppleToken;
 import com.ncookie.imad.global.oauth2.property.AppleProperties;
 import com.ncookie.imad.global.oauth2.utils.AppleJwtUtils;
-import com.ncookie.imad.global.openfeign.AppleLoginClient;
+import com.ncookie.imad.global.oauth2.openfeign.AppleLoginClient;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
