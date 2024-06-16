@@ -12,16 +12,17 @@ Table User {
 
   user_nickname varchar
   gender varchar
-  age_range integer
+  birth_year integer
+  age_range integer [note: "유저로부터 출생연도를 입력받고 연령대를 계산한다."]
   profile_image varchar
 
   preferred_tv_genres integer [note: "유저 TV 선호 장르. 실제로는 별도의 테이블로 구현됨"]
   preferred_movie_genres integer
 
-  role varchar
-  auth_provider varchar
+  role varchar [note: "회원가입 후 추가 정보를 입력하면 'USER', 그렇지 않으면 'GUEST'"]
+  auth_provider varchar [note: "자체 회원가입 시 'IMAD', 그 외에는 소셜 서비스 이름"]
+  social_id varchar [note: "소셜 로그인 시 발급받는 해당 소셜에서의 고유 ID"]
 
-  social_id varchar
   oauth2_access_token varchar
   refresh_token varchar
 }
@@ -45,13 +46,13 @@ Table Contents {
   status varchar
   overview varchar
   poster_path varchar
-   certifications varchar [note: "시청 등급"]
+  certifications varchar [note: "시청 등급"]
 
   production_countries varchar
   contents_genres varchar [note: "작품의 장르 리스트. 별도의 테이블로 구현됨"]
 
   review_cnt integer [note: "작품 리뷰 수"]
-  article_cnt integer [note: "작품 게시글 수"]
+  posting_cnt integer [note: "작품 게시글 수"]
   imad_score float [note: "IMAD 자체 평점"]
 }
 
