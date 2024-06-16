@@ -324,6 +324,32 @@ Table TodayPopularPosting {
 }
 
 /*
+ * 추천 관련 테이블
+ * ===============================================
+ */
+
+// 서비스 활동 기반 추천 기능을 위해 사용되는 테이블
+// IMAD에서 유저의 여러 활동들을 기록한다.
+// 많은 테이블과의 관계가 연결되어 있기에 가독성을 위해 UML 상에서 따로 Ref를 표시하지는 않는다.
+// 대신 필드 속성에 해당 entity를 명시했다.
+Table UserActivity {
+  id integer [primary key, not null]
+
+  user_id UserAccount [not null]
+
+  contents_id Contents [not null]
+  contents_bookmark_id ContentsBookmark [not null]
+
+  review_id Review
+  review_like_id ReviewLike
+
+  posting_id Posting
+  posting_like_id PostingLike
+
+  activity_type enum [not null, note: "유저 활동 종류"]
+}
+
+/*
  * 참조 관계
  * ===============================================
  */
