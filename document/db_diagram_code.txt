@@ -12,16 +12,17 @@ Table User {
 
   user_nickname varchar
   gender varchar
-  age_range integer
+  birth_year integer
+  age_range integer [note: "유저로부터 출생연도를 입력받고 연령대를 계산한다."]
   profile_image varchar
 
   preferred_tv_genres integer [note: "유저 TV 선호 장르. 실제로는 별도의 테이블로 구현됨"]
   preferred_movie_genres integer
 
-  role varchar
-  auth_provider varchar
+  role varchar [note: "회원가입 후 추가 정보를 입력하면 'USER', 그렇지 않으면 'GUEST'"]
+  auth_provider varchar [note: "자체 회원가입 시 'IMAD', 그 외에는 소셜 서비스 이름"]
+  social_id varchar [note: "소셜 로그인 시 발급받는 해당 소셜에서의 고유 ID"]
 
-  social_id varchar
   oauth2_access_token varchar
   refresh_token varchar
 }
@@ -45,13 +46,13 @@ Table Contents {
   status varchar
   overview varchar
   poster_path varchar
-   certifications varchar [note: "시청 등급"]
+  certifications varchar [note: "시청 등급"]
 
   production_countries varchar
   contents_genres varchar [note: "작품의 장르 리스트. 별도의 테이블로 구현됨"]
 
   review_cnt integer [note: "작품 리뷰 수"]
-  article_cnt integer [note: "작품 게시글 수"]
+  posting_cnt integer [note: "작품 게시글 수"]
   imad_score float [note: "IMAD 자체 평점"]
 }
 
@@ -268,42 +269,85 @@ Table PostingLike {
  * 랭킹 관련 테이블
  * ===============================================
  */
-Table AllTimeScore {
-  all_time_score_id integer [primary key]
+
+// 작품의 랭킹 점수를 저장하는 테이블. 자정마다 초기화된다.
+// 이 테이블의 데이터를 기반으로 랭킹 데이터가 갱신된다.
+Table ContentsDailyRankingScore {
+  id integer [primary key]
 
   contents_id integer
 
   ranking_score integer
 }
 
-Table AllTimeRanking {
-  all_time_ranking_id integer [primary key]
+Table RankingBaseEntity {
+  id integer [primary key]
 
   contents_id integer
 
-  all_time_rank integer
-  rank_changed integer
+  ranking integer [note: "현재 랭킹 순위"]
+  ranking_changed integer [note: "이전 랭킹 데이터와의 순위 차이. 순위권에 새로 진입한 작품인 경우 NULL 값이 들어간다."]
+  ranking_score integer [note: "랭킹 점수"]
 }
 
-Table WeeklyScore {
-  weekly_score_id integer [primary key]
-
-  contents_id integer
-
-  ranking_score integer
-  ref_date date
+// 아래 3개 테이블은 RankingBaseEntity를 상속하여 필드를 그대로 사용한다.
+// 각자 주간/월간/전체 랭킹 데이터를 저장하고 있다.
+Table RankingWeekly {
+  id integer [primary key]
+}
+Table RankingMonthly {
+  id integer [primary key]
+}
+Table RankingAllTime {
+  id integer [primary key]
 }
 
-Table WeeklyRanking {
-  weekly_ranking_id integer [primary key]
+/*
+ * 오늘의 리뷰/게시글 테이블
+ * ===============================================
+ * 좋아요, 조회, 댓글 등의 활동이 발생할 때마다 해당 리뷰/게시글의 인기 점수를 갱신한다.
+ * 이들을 종합해 자정마다 오늘의 리뷰/게시글을 뽑는다.
+ */
 
-  contents_id integer
+Table TodayPopularReview {
+  id integer [primary key]
 
-  weekly_rank integer
-  rank_changed integer
+  review_id integer
+  popular_score integer [note: "인기 리뷰 점수"]
 }
 
+Table TodayPopularPosting {
+  id integer [primary key]
 
+  posting_id integer
+  popular_score integer [note: "인기 게시글 점수"]
+}
+
+/*
+ * 추천 관련 테이블
+ * ===============================================
+ */
+
+// 서비스 활동 기반 추천 기능을 위해 사용되는 테이블
+// IMAD에서 유저의 여러 활동들을 기록한다.
+// 많은 테이블과의 관계가 연결되어 있기에 가독성을 위해 UML 상에서 따로 Ref를 표시하지는 않는다.
+// 대신 필드 속성에 해당 entity를 명시했다.
+Table UserActivity {
+  id integer [primary key, not null]
+
+  user_id UserAccount [not null]
+
+  contents_id Contents [not null]
+  contents_bookmark_id ContentsBookmark [not null]
+
+  review_id Review
+  review_like_id ReviewLike
+
+  posting_id Posting
+  posting_like_id PostingLike
+
+  activity_type enum [not null, note: "유저 활동 종류"]
+}
 
 /*
  * 참조 관계
@@ -339,13 +383,12 @@ Ref: Posting.posting_id < Comment.posting_id
 
 
 // Contetns : Score / Ranking
-Ref: Contents.contents_id < AllTimeScore.contents_id
+Ref: Contents.contents_id < ContentsDailyRankingScore.contents_id
+Ref: Contents.contents_id < RankingBaseEntity.contents_id
 
-Ref: Contents.contents_id < AllTimeRanking.contents_id
-
-Ref: Contents.contents_id < WeeklyScore.contents_id
-
-Ref: Contents.contents_id < WeeklyRanking.contents_id
+// Review/Posting : TodayPopular
+Ref: Review.review_id < TodayPopularReview.review_id
+Ref: Posting.posting_id < TodayPopularPosting.posting_id
 
 
 // Like : Review / Posting

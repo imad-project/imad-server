@@ -12,5 +12,7 @@ import lombok.Data;
 public class TmdbDiscoverTvDetails {
     private Long id;                // TMDB ID
     private String name;            // 제목
+
     private String posterPath;      // 포스터 경로
+    private String backdropPath;    // 배경 포스터 경로
 }
