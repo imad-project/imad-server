@@ -27,10 +27,12 @@ public class TmdbDetails {
 
     private String overview;                        // 작품 개요
     private String tagline;                         // 작품의 핵심이 되는 포인트나 제목에 대한 부연설명
+
     private String posterPath;                      // 포스터
+    private String backdropPath;                    // 배경 포스터
+
     private String originalLanguage;                // 원어
     private String certification;                   // 영상물 등급
-
     private String status;                          // 제작 중, 개봉함, 방영함 등의 값을 가짐
 
     private Set<Integer> genres;                    // 장르 리스트
