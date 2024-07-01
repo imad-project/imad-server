@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true)
@@ -12,6 +14,8 @@ import lombok.Data;
 public class TmdbDiscoverMovieDetails {
     private Long id;                // TMDB ID
     private String title;           // 제목
+
+    private List<Long> genreIds;    // 장르
 
     private String posterPath;      // 포스터 경로
     private String backdropPath;    // 배경 포스터 경로
