@@ -45,6 +45,8 @@ public class Contents {
     @Setter
     private String posterPath;
     @Setter
+    private String backdropPath;
+    @Setter
     private String status;
 
     // 여러 개의 데이터를 넣기 위해서 @ElementCollection 어노테이션 생성

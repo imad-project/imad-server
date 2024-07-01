@@ -150,6 +150,7 @@ public class TmdbService {
                     .overview(tvProgramData.getOverview())
                     .tagline(tvProgramData.getTagline())
                     .posterPath(tvProgramData.getPosterPath())
+                    .backdropPath(tvProgramData.getBackdropPath())
                     .originalLanguage(tvProgramData.getOriginalLanguage())
                     .certification(tvProgramData.getCertification())
                     .status(tvProgramData.getStatus())
@@ -189,6 +190,7 @@ public class TmdbService {
                     .overview(movieData.getOverview())
                     .tagline(movieData.getTagline())
                     .posterPath(movieData.getPosterPath())
+                    .backdropPath(movieData.getBackdropPath())
                     .originalLanguage(movieData.getOriginalLanguage())
                     .certification(movieData.getCertification())
                     .status(movieData.getStatus())
@@ -285,6 +287,7 @@ public class TmdbService {
                                 .overview(tmdbDetails.getOverview())
                                 .tagline(tmdbDetails.getTagline())
                                 .posterPath(tmdbDetails.getPosterPath())
+                                .backdropPath(tmdbDetails.getBackdropPath())
                                 .productionCountries(tmdbDetails.getProductionCountries())
                                 .status(tmdbDetails.getStatus())
 
@@ -339,6 +342,7 @@ public class TmdbService {
                                 .overview(tmdbDetails.getOverview())
                                 .tagline(tmdbDetails.getTagline())
                                 .posterPath(tmdbDetails.getPosterPath())
+                                .backdropPath(tmdbDetails.getBackdropPath())
                                 .status(tmdbDetails.getStatus())
 
                                 .productionCountries(tmdbDetails.getProductionCountries())
