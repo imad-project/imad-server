@@ -123,20 +123,26 @@ public class RankingScheduler {
     public void updateRankingScore(RankingPeriod rankingPeriod, int PERIOD) {
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
 
+        // 주간 또는 월간 랭킹을 정산할지에 따라 몇 일분의 일일 랭킹 점수 데이터를 읽어올지 결정한다.
         String periodString = rankingPeriod.getValue();
         List<String> recentDates = getRecentDates(PERIOD);
 
+        // 오늘 날짜의 key를 만들기 위해 사용
         String todayDate = getLastDate(0);
-        String yesterdayDate = getLastDate(1);
+
+        // 전체 랭킹의 경우 오늘 갱신된 daily 데이터와 가장 최근의 alltime 데이터를 합산해야 한다.
+        // 때문에 가장 최근 날짜의 alltime 데이터를 읽어와야 한다.
+        String recentAllTimeRanking = getRecentAllTimeRankingKey();
 
         // 랭킹 점수 합산 데이터 생성
         String destKey = periodString + "_score_" + todayDate;
 
         if (PERIOD == PERIOD_ALLTIME) {
-            // 총합 랭킹 점수 데이터를 합산 및 저장함
+            // 전체 랭킹 점수 데이터를 합산 및 저장함
+            // 오늘 갱신한 일일 랭킹 점수 + 가장 최근에 갱신한 전체 랭킹 점수
             zSetOperations.unionAndStore(
-                    destKey,
-                    dailyRankingScoreString + yesterdayDate,
+                    recentAllTimeRanking,
+                    dailyRankingScoreString + getLastDate(1),
                     destKey);
         } else {
             // 장르별 랭킹 점수 데이터를 합산 및 저장함
@@ -222,5 +228,20 @@ public class RankingScheduler {
         
         log.info(String.format("[%s] 랭킹 점수 정산 완료", periodString));
         return rankingList;
+    }
+
+    private String getRecentAllTimeRankingKey() {
+        // 패턴으로 키 검색
+        Set<String> keys = redisTemplate.keys("alltime_score_*");
+
+        // 키가 비어있지 않은 경우
+        if (keys != null && !keys.isEmpty()) {
+            // 키를 정렬하여 가장 최신 날짜의 키를 반환
+            // 내림차순으로 정렬
+            return keys.stream().max(Comparator.naturalOrder())
+                    .orElse(null);
+        }
+
+        return "alltime_score_";
     }
 }
