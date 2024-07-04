@@ -46,6 +46,7 @@ Table Contents {
   status varchar
   overview varchar
   poster_path varchar
+  backdrop_path varchar
   certifications varchar [note: "시청 등급"]
 
   production_countries varchar
