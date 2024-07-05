@@ -6,11 +6,14 @@ import com.ncookie.imad.domain.profile.dto.response.ProfileSummaryInfoResponse;
 import com.ncookie.imad.domain.profile.dto.response.ScrapListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
+import com.ncookie.imad.global.aws.AwsS3Service;
+import com.ncookie.imad.global.aws.FileFolder;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -156,5 +159,18 @@ public class ProfileController {
                 ResponseCode.PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS,
                 profileService.getLikedReviewList(accessToken, pageNumber - 1, likeStatus)
         );
+    }
+
+    /*
+     * =================================================
+     * 프로필 이미지 관련
+     * =================================================
+     */
+    private final AwsS3Service awsS3Service;
+    @Description("프로필 이미지 등록")
+    @PostMapping("/image")
+    public ApiResponse<?> updatePostingImage(@RequestParam("file") MultipartFile file) {
+        String s = awsS3Service.uploadFile(file, FileFolder.PROFILE_IMAGES);
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS);
     }
 }
