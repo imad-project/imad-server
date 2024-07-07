@@ -27,7 +27,7 @@ public class PostingListElement {
     // 유저 정보
     private Long userId;                    // 유저 id
     private String userNickname;            // 닉네임
-    private int userProfileImage;           // 프로필 이미지
+    private String userProfileImage;           // 프로필 이미지
 
     // 게시글 정보
     private String title;                   // 제목

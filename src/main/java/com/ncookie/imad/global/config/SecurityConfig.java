@@ -1,6 +1,7 @@
 package com.ncookie.imad.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncookie.imad.domain.user.service.ProfileImageService;
 import com.ncookie.imad.domain.user.repository.UserAccountRepository;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -64,6 +65,9 @@ public class SecurityConfig {
     // 로그인을 위한 유저 repository
     private final UserAccountRepository userRepository;
     private final UserRetrievalService userRetrievalService;
+
+    // 로그인 성공 시 사용하기 위한 서비스
+    private final ProfileImageService profileImageService;
 
     // JWT 관련
     private final JwtService jwtService;
@@ -222,7 +226,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, jwtProperties, userRetrievalService);
+        return new LoginSuccessHandler(jwtService, jwtProperties, userRetrievalService, profileImageService);
     }
 
     /**
