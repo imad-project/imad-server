@@ -14,7 +14,6 @@ import java.util.Set;
 public class UserUpdateRequest {
     private Gender gender;
     private int birthYear;
-    private String profileImage;
     private String nickname;
 
     private Set<Long> preferredTvGenres;

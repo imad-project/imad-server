@@ -102,7 +102,6 @@ public class UserAccountService {
         user.setBirthYear(userUpdateRequest.getBirthYear());
         user.setAgeRange(ageRange);
         user.setGender(userUpdateRequest.getGender());
-        user.setProfileImage(userUpdateRequest.getProfileImage());
 
         user.setPreferredTvGenres(userUpdateRequest.getPreferredTvGenres());
         user.setPreferredMovieGenres(userUpdateRequest.getPreferredMovieGenres());
