@@ -30,6 +30,7 @@ public enum ResponseCode {
     USER_INFO_GET_SUCCESS(200, "정상적으로 회원 정보를 조회했습니다."),
     USER_INFO_VALIDATION(200, "정상적으로 중복 검사를 수행했습니다."),
     USER_INFO_UPDATE_SUCCESS(200, "정상적으로 회원 정보를 수정했습니다."),
+    USER_PROFILE_IMAGE_MODIFY_SUCCESS(200, "정상적으로 프로필 이미지를 수정했습니다."),
     USER_MODIFY_PASSWORD_SUCCESS(200, "정상적으로 비밀번호를 수정했습니다."),
     USER_DELETE_SUCCESS(204, "회원 탈퇴가 정상적으로 처리되었습니다."),
 

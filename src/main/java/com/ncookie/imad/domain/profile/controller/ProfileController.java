@@ -160,17 +160,4 @@ public class ProfileController {
                 profileService.getLikedReviewList(accessToken, pageNumber - 1, likeStatus)
         );
     }
-
-    /*
-     * =================================================
-     * 프로필 이미지 관련
-     * =================================================
-     */
-    private final AwsS3Service awsS3Service;
-    @Description("프로필 이미지 등록")
-    @PostMapping("/image")
-    public ApiResponse<?> updatePostingImage(@RequestParam("file") MultipartFile file) {
-        String s = awsS3Service.uploadFile(file, FileFolder.PROFILE_IMAGES);
-        return ApiResponse.createSuccessWithNoContent(ResponseCode.PROFILE_GET_LIKED_REVIEW_LIST_SUCCESS);
-    }
 }
