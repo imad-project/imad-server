@@ -1,5 +1,6 @@
 package com.ncookie.imad.global.oauth2.handler;
 
+import com.ncookie.imad.domain.user.service.ProfileImageService;
 import jakarta.servlet.http.Cookie;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.UserAccount;
@@ -33,6 +34,7 @@ import static com.ncookie.imad.global.oauth2.HttpCookieOAuth2AuthorizationReques
 @Component
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final UserRetrievalService userRetrievalService;
+    private final ProfileImageService profileImageService;
 
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
@@ -67,6 +69,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         } else {
             // 로그인 시 response에 유저 정보 첨부
             UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+            // 프로필 이미지 URL 설정
+            String profileImageUrl = profileImageService.getProfileImageUrl(user.getProfileImage());
+            user.setProfileImage(profileImageUrl);
+
             UserInfoResponse userInfoResponse = UserInfoResponse.toDTO(user);
 
             log.info("모바일 애플리케이션의 소셜 로그인 요청 : 유저 정보를 첨부하여 응답합니다.");

@@ -1,5 +1,6 @@
 package com.ncookie.imad.global.login.handler;
 
+import com.ncookie.imad.domain.user.service.ProfileImageService;
 import com.ncookie.imad.domain.user.dto.response.UserInfoResponse;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
@@ -27,6 +28,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtProperties jwtProperties;
 
     private final UserRetrievalService userRetrievalService;
+    private final ProfileImageService profileImageService;
 
 
     @Override
@@ -39,9 +41,16 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         // 로그인 시 response에 유저 정보 첨부
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        // 프로필 이미지 URL 설정
+        String profileImageUrl = profileImageService.getProfileImageUrl(user.getProfileImage());
+        user.setProfileImage(profileImageUrl);
+
+        // entity -> DTO 변환
         UserInfoResponse userInfoResponse = UserInfoResponse.toDTO(user);
 
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
+        // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
+        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
         jwtService.updateRefreshToken(user.getEmail(), refreshToken);
 
         try {

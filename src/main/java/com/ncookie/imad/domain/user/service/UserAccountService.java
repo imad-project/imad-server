@@ -31,6 +31,7 @@ import java.util.*;
 public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
+    private final ProfileImageService profileImageService;
 
     private final UserRetrievalService userRetrievalService;
     private final JwtService jwtService;
@@ -73,6 +74,10 @@ public class UserAccountService {
     @Description("회원정보 조회")
     public UserInfoResponse getUserInfo(String accessToken) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        // 프로필 이미지 URL 설정
+        String profileImageUrl = profileImageService.getProfileImageUrl(user.getProfileImage());
+        user.setProfileImage(profileImageUrl);
 
         log.info("유저 정보 조회 완료");
         return UserInfoResponse.toDTO(user);
