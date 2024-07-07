@@ -6,11 +6,14 @@ import com.ncookie.imad.domain.profile.dto.response.ProfileSummaryInfoResponse;
 import com.ncookie.imad.domain.profile.dto.response.ScrapListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
+import com.ncookie.imad.global.aws.AwsS3Service;
+import com.ncookie.imad.global.aws.FileFolder;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 

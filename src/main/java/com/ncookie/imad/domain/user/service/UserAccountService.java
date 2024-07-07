@@ -15,6 +15,7 @@ import com.ncookie.imad.global.jwt.service.JwtService;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,9 @@ import java.util.*;
 public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
+
+    @Lazy
+    private final ProfileImageService profileImageService;
 
     private final UserRetrievalService userRetrievalService;
     private final JwtService jwtService;
@@ -74,8 +78,11 @@ public class UserAccountService {
     public UserInfoResponse getUserInfo(String accessToken) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
+
         log.info("유저 정보 조회 완료");
-        return UserInfoResponse.toDTO(user);
+        UserInfoResponse dto = UserInfoResponse.toDTO(user);
+        dto.setProfileImage(profileImageService.getProfileImageUrl(dto.getProfileImage()));
+        return dto;
     }
 
     @Description("회원 정보 수정")
@@ -97,7 +104,6 @@ public class UserAccountService {
         user.setBirthYear(userUpdateRequest.getBirthYear());
         user.setAgeRange(ageRange);
         user.setGender(userUpdateRequest.getGender());
-        user.setProfileImage(userUpdateRequest.getProfileImage());
 
         user.setPreferredTvGenres(userUpdateRequest.getPreferredTvGenres());
         user.setPreferredMovieGenres(userUpdateRequest.getPreferredMovieGenres());

@@ -24,7 +24,7 @@ public class CommentDetailsResponse {
     // 유저 정보
     private Long userId;                    // 유저 ID
     private String userNickname;            // 닉네임
-    private int userProfileImage;           // 프로필 이미지
+    private String userProfileImage;           // 프로필 이미지
 
     // 댓글 정보
     private Long parentId;                  // 댓글 부모 ID. 이 댓글이 최상위라면 null 값이 들어감
