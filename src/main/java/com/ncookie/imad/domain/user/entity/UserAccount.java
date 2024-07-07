@@ -32,7 +32,7 @@ public class UserAccount extends BaseTimeEntity {
     @Setter private Gender gender;              // 성별, 0 : 남자, 1 : 여자
     @Setter private int birthYear;              // 연령대
     @Setter private int ageRange;               // 출생연도
-    @Setter private int profileImage;     // 프로필 이미지(URL)
+    @Setter private String profileImage;           // 프로필 이미지(URL)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
