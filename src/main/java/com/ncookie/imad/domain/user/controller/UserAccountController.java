@@ -85,8 +85,6 @@ public class UserAccountController {
         return ApiResponse.createSuccessWithNoContent(ResponseCode.USER_MODIFY_PASSWORD_SUCCESS);
     }
 
-    private final RedisTemplate<String, String> redisTemplate;
-
     @Description("이메일 중복 검사")
     @PostMapping("/api/user/validation/email")
     public ApiResponse<UserInfoDuplicationResponse> validateUserAccountEmail(@RequestBody UserInfoDuplicationRequest email) {
