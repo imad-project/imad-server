@@ -63,7 +63,7 @@ public class AwsS3Service {
     }
 
     // 파일 삭제
-    public void deleteFile(String fileName) {
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+    public void deleteFile(FileFolder fileFolder, String fileName) {
+        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileFolder.getValue() + fileName));
     }
 }

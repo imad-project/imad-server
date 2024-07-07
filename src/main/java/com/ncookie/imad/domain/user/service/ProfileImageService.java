@@ -27,9 +27,12 @@ public class ProfileImageService {
     public UserModifyProfileImageResponse modifyCustomProfileImage(String accessToken, MultipartFile profileImage) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        // 기존 프로필 이미지 삭제
-        awsS3Service.deleteFile(user.getProfileImage());
-        
+        // 기존에 사용하던 프로필 이미지가 커스텀 이미지라면 S3에서 삭제
+        String previousImage = user.getProfileImage();
+        if (!previousImage.startsWith("default_profile_image_")) {
+            awsS3Service.deleteFile(FileFolder.PROFILE_IMAGES, previousImage);
+        }
+
         // 프로필 이미지 S3 업데이트
         String fileName = awsS3Service.uploadFile(profileImage, FileFolder.PROFILE_IMAGES);
 
@@ -47,7 +50,7 @@ public class ProfileImageService {
         // 기존에 사용하던 프로필 이미지가 커스텀 이미지라면 S3에서 삭제
         String previousImage = user.getProfileImage();
         if (!previousImage.startsWith("default_profile_image_")) {
-            awsS3Service.deleteFile(previousImage);
+            awsS3Service.deleteFile(FileFolder.PROFILE_IMAGES, previousImage);
         }
         
         // DB 업데이트
