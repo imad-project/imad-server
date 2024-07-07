@@ -41,7 +41,8 @@ public class UserAccountController {
     @Description("회원정보 조회")
     @GetMapping("/api/user")
     public ApiResponse<UserInfoResponse> getUserAccountInfo(@RequestHeader("Authorization") String accessToken) {
-        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS, userAccountService.getUserInfo(accessToken));
+        return ApiResponse.createSuccess(ResponseCode.USER_INFO_GET_SUCCESS,
+                userAccountService.getUserInfo(accessToken));
     }
 
     @Description("회원정보 수정")

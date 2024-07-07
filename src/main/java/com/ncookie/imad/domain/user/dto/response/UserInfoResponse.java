@@ -8,6 +8,7 @@ import com.ncookie.imad.domain.user.entity.Role;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
@@ -26,6 +27,8 @@ public class UserInfoResponse {
     // 연령대
     private int birthYear;
     private int ageRange;
+
+    @Setter
     private String profileImage;
 
     // 유저의 추가정보 입력여부를 구분하기 위한 플래그 변수

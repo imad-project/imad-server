@@ -21,7 +21,7 @@ public class ProfileImageService {
 
     // 프로필 이미지 파일 URL 반환
     public String getProfileImageUrl(String fileName) {
-        return awsS3Service.getFileUrl(fileName);
+        return awsS3Service.getFileUrl(FileFolder.PROFILE_IMAGES.getValue() + fileName);
     }
 
     public UserModifyProfileImageResponse modifyCustomProfileImage(String accessToken, MultipartFile profileImage) {
@@ -34,10 +34,11 @@ public class ProfileImageService {
         String fileName = awsS3Service.uploadFile(profileImage, FileFolder.PROFILE_IMAGES);
 
         // DB 업데이트
-        user.setProfileImage(fileName);
+        String fileNameWithoutDir = fileName.split("/")[1];     // 디렉터리 이름 중복 방지
+        user.setProfileImage(fileNameWithoutDir);
         userAccountRepository.save(user);
 
-        return UserModifyProfileImageResponse.of(awsS3Service.getFileUrl(fileName));
+        return UserModifyProfileImageResponse.of(getProfileImageUrl(fileNameWithoutDir));
     }
 
     public UserModifyProfileImageResponse modifyDefaultProfileImage(String accessToken, String defaultProfileImage) {
@@ -53,6 +54,6 @@ public class ProfileImageService {
         user.setProfileImage(defaultProfileImage);
         userAccountRepository.save(user);
 
-        return UserModifyProfileImageResponse.of(awsS3Service.getFileUrl(defaultProfileImage));
+        return UserModifyProfileImageResponse.of(getProfileImageUrl(defaultProfileImage));
     }
 }

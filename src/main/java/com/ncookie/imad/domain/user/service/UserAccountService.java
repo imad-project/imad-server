@@ -78,12 +78,11 @@ public class UserAccountService {
     public UserInfoResponse getUserInfo(String accessToken) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        // 프로필 이미지 URL 설정
-        String profileImageUrl = profileImageService.getProfileImageUrl(user.getProfileImage());
-        user.setProfileImage(profileImageUrl);
 
         log.info("유저 정보 조회 완료");
-        return UserInfoResponse.toDTO(user);
+        UserInfoResponse dto = UserInfoResponse.toDTO(user);
+        dto.setProfileImage(profileImageService.getProfileImageUrl(dto.getProfileImage()));
+        return dto;
     }
 
     @Description("회원 정보 수정")
