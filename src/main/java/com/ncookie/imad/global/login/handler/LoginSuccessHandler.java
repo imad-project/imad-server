@@ -28,7 +28,6 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtProperties jwtProperties;
 
     private final UserRetrievalService userRetrievalService;
-    private final ProfileImageService profileImageService;
 
 
     @Override
@@ -43,7 +42,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         // 프로필 이미지 URL 설정
-        String profileImageUrl = profileImageService.getProfileImageUrl(user.getProfileImage());
+        String profileImageUrl = user.getProfileImage();
         user.setProfileImage(profileImageUrl);
 
         // entity -> DTO 변환

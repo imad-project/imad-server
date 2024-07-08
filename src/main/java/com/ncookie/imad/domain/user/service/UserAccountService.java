@@ -82,7 +82,7 @@ public class UserAccountService {
 
         log.info("유저 정보 조회 완료");
         UserInfoResponse dto = UserInfoResponse.toDTO(user);
-        dto.setProfileImage(profileImageService.getProfileImageUrl(dto.getProfileImage()));
+        dto.setProfileImage(dto.getProfileImage());
         return dto;
     }
 

@@ -71,7 +71,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
             // 프로필 이미지 URL 설정
-            String profileImageUrl = profileImageService.getProfileImageUrl(user.getProfileImage());
+            String profileImageUrl = user.getProfileImage();
             user.setProfileImage(profileImageUrl);
 
             UserInfoResponse userInfoResponse = UserInfoResponse.toDTO(user);

@@ -66,9 +66,6 @@ public class SecurityConfig {
     private final UserAccountRepository userRepository;
     private final UserRetrievalService userRetrievalService;
 
-    // 로그인 성공 시 사용하기 위한 서비스
-    private final ProfileImageService profileImageService;
-
     // JWT 관련
     private final JwtService jwtService;
     private final JwtExceptionFilter jwtExceptionFilter;
@@ -226,7 +223,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, jwtProperties, userRetrievalService, profileImageService);
+        return new LoginSuccessHandler(jwtService, jwtProperties, userRetrievalService);
     }
 
     /**

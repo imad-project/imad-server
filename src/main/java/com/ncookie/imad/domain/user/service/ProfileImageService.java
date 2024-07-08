@@ -41,7 +41,7 @@ public class ProfileImageService {
         user.setProfileImage(fileNameWithoutDir);
         userAccountRepository.save(user);
 
-        return UserModifyProfileImageResponse.of(getProfileImageUrl(fileNameWithoutDir));
+        return UserModifyProfileImageResponse.of(fileNameWithoutDir);
     }
 
     public UserModifyProfileImageResponse modifyDefaultProfileImage(String accessToken, String defaultProfileImage) {
@@ -57,6 +57,6 @@ public class ProfileImageService {
         user.setProfileImage(defaultProfileImage);
         userAccountRepository.save(user);
 
-        return UserModifyProfileImageResponse.of(getProfileImageUrl(defaultProfileImage));
+        return UserModifyProfileImageResponse.of(defaultProfileImage);
     }
 }
