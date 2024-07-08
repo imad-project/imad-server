@@ -52,6 +52,7 @@ public class UserAccountService {
                 .email(signUpRequest.getEmail())
                 .password(signUpRequest.getPassword())
                 .authProvider(signUpRequest.getAuthProvider())
+                .profileImage("default_profile_image_1.png")
                 .role(Role.GUEST)
                 .build();
 
