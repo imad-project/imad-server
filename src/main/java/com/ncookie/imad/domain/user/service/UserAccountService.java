@@ -52,6 +52,7 @@ public class UserAccountService {
                 .email(signUpRequest.getEmail())
                 .password(signUpRequest.getPassword())
                 .authProvider(signUpRequest.getAuthProvider())
+                .profileImage("default_profile_image_1.png")
                 .role(Role.GUEST)
                 .build();
 
@@ -78,11 +79,8 @@ public class UserAccountService {
     public UserInfoResponse getUserInfo(String accessToken) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-
         log.info("유저 정보 조회 완료");
-        UserInfoResponse dto = UserInfoResponse.toDTO(user);
-        dto.setProfileImage(profileImageService.getProfileImageUrl(dto.getProfileImage()));
-        return dto;
+        return UserInfoResponse.toDTO(user);
     }
 
     @Description("회원 정보 수정")

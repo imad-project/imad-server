@@ -66,9 +66,6 @@ public class SecurityConfig {
     private final UserAccountRepository userRepository;
     private final UserRetrievalService userRetrievalService;
 
-    // 로그인 성공 시 사용하기 위한 서비스
-    private final ProfileImageService profileImageService;
-
     // JWT 관련
     private final JwtService jwtService;
     private final JwtExceptionFilter jwtExceptionFilter;
@@ -156,6 +153,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/ranking/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/popular/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/recommend/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/resource/**").permitAll()
 
                 // 모니터링 관련 데이터에 접근 가능한건 내 로컬 컴퓨터만
                 .requestMatchers("/actuator/**").access(hasIpAddress(myLocalIpAddress))
@@ -226,7 +224,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, jwtProperties, userRetrievalService, profileImageService);
+        return new LoginSuccessHandler(jwtService, jwtProperties, userRetrievalService);
     }
 
     /**
