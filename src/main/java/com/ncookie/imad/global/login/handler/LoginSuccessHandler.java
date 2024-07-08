@@ -41,10 +41,6 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         // 로그인 시 response에 유저 정보 첨부
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        // 프로필 이미지 URL 설정
-        String profileImageUrl = user.getProfileImage();
-        user.setProfileImage(profileImageUrl);
-
         // entity -> DTO 변환
         UserInfoResponse userInfoResponse = UserInfoResponse.toDTO(user);
 
