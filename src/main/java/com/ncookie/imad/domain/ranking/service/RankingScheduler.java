@@ -73,8 +73,7 @@ public class RankingScheduler {
         redisTemplate.expire(redisKey, expirationDays, TimeUnit.DAYS);
 
         // 작품 일일 랭킹 점수 DB 초기화
-        // TODO:
-//        contentsDailyScoreRankingRepository.deleteAllInBatch();
+        contentsDailyScoreRankingRepository.deleteAllInBatch();
         log.info("일일 작품 랭킹 점수 DB 초기화 완료");
     }
 
