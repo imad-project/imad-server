@@ -46,7 +46,7 @@ public class RankingSystemService {
                 Page<RankingWeekly> weeklyRanking = rankingRepositoryService.getWeeklyRanking(rankingPageRequest, contentsType);
                 rankingListResponse = RankingListResponse.toDTO(
                         weeklyRanking,
-                        convertRankingWeeklyPageToRankingDetailsResponse(weeklyRanking.stream().toList())
+                        convertRankingWeeklyPageToRankingDetailsResponse(weeklyRanking.stream().toList(), contentsType)
                 );
                 break;
             }
@@ -54,7 +54,7 @@ public class RankingSystemService {
                 Page<RankingMonthly> monthlyRanking = rankingRepositoryService.getMonthlyRanking(rankingPageRequest, contentsType);
                 rankingListResponse = RankingListResponse.toDTO(
                         monthlyRanking,
-                        convertRankingMonthlyPageToRankingDetailsResponse(monthlyRanking.stream().toList())
+                        convertRankingMonthlyPageToRankingDetailsResponse(monthlyRanking.stream().toList(), contentsType)
                 );
                 break;
             }
@@ -62,7 +62,7 @@ public class RankingSystemService {
                 Page<RankingAllTime> allTimeRanking = rankingRepositoryService.getAllTimeRanking(rankingPageRequest, contentsType);
                 rankingListResponse = RankingListResponse.toDTO(
                         allTimeRanking,
-                        convertRankingAllTimePageToRankingDetailsResponse(allTimeRanking.stream().toList())
+                        convertRankingAllTimePageToRankingDetailsResponse(allTimeRanking.stream().toList(), contentsType)
                 );
                 break;
             }
@@ -104,31 +104,30 @@ public class RankingSystemService {
         return PageRequest.of(pageNumber, Utils.PAGE_SIZE, sort);
     }
 
-    private List<RankingDetailsResponse> convertRankingWeeklyPageToRankingDetailsResponse(List<RankingWeekly> rankingList) {
+    private List<RankingDetailsResponse> convertRankingWeeklyPageToRankingDetailsResponse(List<RankingWeekly> rankingList, ContentsType contentsType) {
         List<RankingDetailsResponse> rankingDetailsResponseList = new ArrayList<>();
         for (RankingWeekly ranking : rankingList) {
-            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking));
+            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking, contentsType));
         }
 
         return rankingDetailsResponseList;
     }
 
-    private List<RankingDetailsResponse> convertRankingMonthlyPageToRankingDetailsResponse(List<RankingMonthly> rankingList) {
+    private List<RankingDetailsResponse> convertRankingMonthlyPageToRankingDetailsResponse(List<RankingMonthly> rankingList, ContentsType contentsType) {
         List<RankingDetailsResponse> rankingDetailsResponseList = new ArrayList<>();
         for (RankingMonthly ranking : rankingList) {
-            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking));
+            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking, contentsType));
         }
 
         return rankingDetailsResponseList;
     }
 
-    private List<RankingDetailsResponse> convertRankingAllTimePageToRankingDetailsResponse(List<RankingAllTime> rankingList) {
+    private List<RankingDetailsResponse> convertRankingAllTimePageToRankingDetailsResponse(List<RankingAllTime> rankingList, ContentsType contentsType) {
         List<RankingDetailsResponse> rankingDetailsResponseList = new ArrayList<>();
         for (RankingAllTime ranking : rankingList) {
-            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking));
+            rankingDetailsResponseList.add(RankingDetailsResponse.toDTO(ranking, contentsType));
         }
 
         return rankingDetailsResponseList;
     }
-
 }
