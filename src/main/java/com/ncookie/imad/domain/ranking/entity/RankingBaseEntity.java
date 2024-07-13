@@ -30,13 +30,19 @@ public abstract class RankingBaseEntity {
     // ALL, MOVIE, TV, ANIMATION 등이 있음
     private ContentsType contentsType;
 
-    // 현재 랭킹
-    private Long ranking;
+    // 랭킹 순위
+    private Long ranking;           // 전체 작품 중 랭킹 순위
+    private Long rankingTv;         // TV 작품 중 랭킹 순위
+    private Long rankingMovie;      // MOVIE 작품 중 랭킹 순위
+    private Long rankingAnimation;  // ANIMATION 작품 중 랭킹 순위
+
 
     // 어제자 데이터와의 랭킹 차이. 어제자 랭킹에 없는 작품인 경우 NULL값이 들어감
     private Long rankingChanged;
+    private Long rankingChangedTv;
+    private Long rankingChangedMovie;
+    private Long rankingChangedAnimation;
 
     // 랭킹 점수
     private Long rankingScore;
 }
-
