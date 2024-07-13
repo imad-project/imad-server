@@ -31,8 +31,31 @@ public class RankingDetailsResponse {
     private Long rankingChanged;
 
 
-    public static RankingDetailsResponse toDTO(RankingBaseEntity rankingBaseEntity) {
+    public static RankingDetailsResponse toDTO(RankingBaseEntity rankingBaseEntity, ContentsType contentsType) {
         Contents contents = rankingBaseEntity.getContents();
+
+        Long ranking = 0L;
+        Long rankingChanged = 0L;
+
+        // 작품 타입에 따라 랭킹 데이터 반환
+        switch (contentsType) {
+            case ALL -> {
+                ranking = rankingBaseEntity.getRanking();
+                rankingChanged = rankingBaseEntity.getRankingChanged();
+            }
+            case TV -> {
+                ranking = rankingBaseEntity.getRankingTv();
+                rankingChanged = rankingBaseEntity.getRankingChangedTv();
+            }
+            case MOVIE -> {
+                ranking = rankingBaseEntity.getRankingMovie();
+                rankingChanged = rankingBaseEntity.getRankingChangedMovie();
+            }
+            case ANIMATION -> {
+                ranking = rankingBaseEntity.getRankingAnimation();
+                rankingChanged = rankingBaseEntity.getRankingChangedAnimation();
+            }
+        }
 
         return RankingDetailsResponse.builder()
                 .contentsId(contents.getContentsId())
@@ -42,8 +65,8 @@ public class RankingDetailsResponse {
                 .title(contents.getTranslatedTitle())
                 .posterPath(contents.getPosterPath())
 
-                .ranking(rankingBaseEntity.getRanking())
-                .rankingChanged(rankingBaseEntity.getRankingChanged())
+                .ranking(ranking)
+                .rankingChanged(rankingChanged)
 
                 .build();
     }

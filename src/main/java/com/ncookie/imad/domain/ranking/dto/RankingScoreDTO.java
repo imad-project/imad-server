@@ -17,6 +17,14 @@ public class RankingScoreDTO {
     private ContentsType contentsType;
 
     private Long rank;
+    private Long rankTv;
+    private Long rankMovie;
+    private Long rankAnimation;
+
     private Long rankChanged;
+    private Long rankChangedTv;
+    private Long rankChangedMovie;
+    private Long rankChangedAnimation;
+
     private Long rankingScore;
 }
