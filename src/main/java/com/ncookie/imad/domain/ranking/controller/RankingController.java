@@ -2,6 +2,7 @@ package com.ncookie.imad.domain.ranking.controller;
 
 import com.ncookie.imad.domain.ranking.data.RankingPeriod;
 import com.ncookie.imad.domain.ranking.dto.response.RankingListResponse;
+import com.ncookie.imad.domain.ranking.service.RankingScheduler;
 import com.ncookie.imad.domain.ranking.service.RankingSystemService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -18,6 +19,14 @@ import org.springframework.web.bind.annotation.*;
 public class RankingController {
     private final RankingSystemService rankingSystemService;
 
+    private final RankingScheduler rankingScheduler;
+    @GetMapping("/test")
+    public ApiResponse<?> rankingTest() {
+        rankingScheduler.saveContentsDailyRankingScore();
+        rankingScheduler.updateRankingData();
+
+        return ApiResponse.createSuccessWithNoContent(ResponseCode.RANKING_GET_SUCCESS);
+    }
 
     @Description("주간 랭킹 조회")
     @GetMapping("/weekly")

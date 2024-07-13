@@ -1,6 +1,8 @@
 package com.ncookie.imad.domain.ranking.service;
 
+import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
+import com.ncookie.imad.domain.ranking.data.RankingPeriod;
 import com.ncookie.imad.domain.ranking.entity.RankingAllTime;
 import com.ncookie.imad.domain.ranking.entity.RankingMonthly;
 import com.ncookie.imad.domain.ranking.entity.RankingWeekly;
@@ -81,6 +83,59 @@ public class RankingRepositoryService {
             return rankingAllTimeRepository.findAll(pageable);
         } else {
             return rankingAllTimeRepository.findAllByContentsType(pageable, contentsType);
+        }
+    }
+
+    // ==============================================
+    // 작품 타입별 랭킹 변화 트래킹용
+    // ==============================================
+    // 기존에 저장되어 있던 랭킹 데이터에서 이전 랭킹 순위 참조
+    public Long getRankingNumberByContents(Contents contents, RankingPeriod rankingPeriod) {
+        try {
+            return switch (rankingPeriod) {
+                case WEEKLY -> rankingWeeklyRepository.findByContents(contents).getRanking();
+                case MONTHLY -> rankingMonthlyRepository.findByContents(contents).getRanking();
+                case ALL_TIME -> rankingAllTimeRepository.findByContents(contents).getRanking();
+            };
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // 반환값이 null인 경우 : 작품이 랭킹에 신규 진입했을 때(Exception 발생)
+    public Long getRankingNumberByTvContents(Contents contents, RankingPeriod rankingPeriod) {
+        try {
+            return switch (rankingPeriod) {
+                case WEEKLY -> rankingWeeklyRepository.findByContents(contents).getRankingTv();
+                case MONTHLY -> rankingMonthlyRepository.findByContents(contents).getRankingTv();
+                case ALL_TIME -> rankingAllTimeRepository.findByContents(contents).getRankingTv();
+            };
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Long getRankingNumberByMovieContents(Contents contents, RankingPeriod rankingPeriod) {
+        try {
+            return switch (rankingPeriod) {
+                case WEEKLY -> rankingWeeklyRepository.findByContents(contents).getRankingMovie();
+                case MONTHLY -> rankingMonthlyRepository.findByContents(contents).getRankingMovie();
+                case ALL_TIME -> rankingAllTimeRepository.findByContents(contents).getRankingMovie();
+            };
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Long getRankingNumberByAnimationContents(Contents contents, RankingPeriod rankingPeriod) {
+        try {
+            return switch (rankingPeriod) {
+                case WEEKLY -> rankingWeeklyRepository.findByContents(contents).getRankingAnimation();
+                case MONTHLY -> rankingMonthlyRepository.findByContents(contents).getRankingAnimation();
+                case ALL_TIME -> rankingAllTimeRepository.findByContents(contents).getRankingAnimation();
+            };
+        } catch (Exception e) {
+            return null;
         }
     }
 }
