@@ -22,8 +22,8 @@ public class RankingWeekly extends RankingBaseEntity {
 
                 .ranking(dto.getRank())
                 .rankingTv(dto.getRankTv())
-                .rankingMovie(dto.getRankTv())
-                .rankingAnimation(dto.getRankTv())
+                .rankingMovie(dto.getRankMovie())
+                .rankingAnimation(dto.getRankAnimation())
 
                 .rankingChanged(dto.getRankChanged())
                 .rankingChangedTv(dto.getRankChangedTv())
