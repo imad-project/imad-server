@@ -3,6 +3,7 @@ package com.ncookie.imad.domain.user.entity;
 import com.ncookie.imad.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
@@ -32,7 +33,9 @@ public class UserAccount extends BaseTimeEntity {
     @Setter private Gender gender;              // 성별, 0 : 남자, 1 : 여자
     @Setter private int birthYear;              // 연령대
     @Setter private int ageRange;               // 출생연도
-    @Setter private String profileImage;           // 프로필 이미지(URL)
+    @Setter
+    @ColumnDefault("default_profile_image_1.png")
+    private String profileImage;           // 프로필 이미지(URL)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
