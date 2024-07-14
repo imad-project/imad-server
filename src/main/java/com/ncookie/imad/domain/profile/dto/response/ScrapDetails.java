@@ -32,7 +32,7 @@ public class ScrapDetails {
     private LocalDateTime createdDate;
 
     public static ScrapDetails toDTO(PostingScrap scrap) {
-        UserAccount userAccount = scrap.getUserAccount();
+        UserAccount userAccount = scrap.getPosting().getUser();
         Contents contents = scrap.getPosting().getContents();
 
         return ScrapDetails.builder()

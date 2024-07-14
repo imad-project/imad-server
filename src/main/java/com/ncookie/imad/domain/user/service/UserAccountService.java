@@ -15,7 +15,6 @@ import com.ncookie.imad.global.jwt.service.JwtService;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +32,6 @@ public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
 
-    @Lazy
-    private final ProfileImageService profileImageService;
-
     private final UserRetrievalService userRetrievalService;
     private final JwtService jwtService;
 
@@ -52,7 +48,6 @@ public class UserAccountService {
                 .email(signUpRequest.getEmail())
                 .password(signUpRequest.getPassword())
                 .authProvider(signUpRequest.getAuthProvider())
-                .profileImage("default_profile_image_1.png")
                 .role(Role.GUEST)
                 .build();
 
