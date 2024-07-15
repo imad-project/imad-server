@@ -29,7 +29,7 @@ public class ProfileImageService {
 
         // 기존에 사용하던 프로필 이미지가 커스텀 이미지라면 S3에서 삭제
         String previousImage = user.getProfileImage();
-        if (!previousImage.startsWith("default_profile_image_")) {
+        if (previousImage != null && !previousImage.startsWith("default_profile_image_")) {
             awsS3Service.deleteFile(FileFolder.PROFILE_IMAGES, previousImage);
         }
 
@@ -49,7 +49,7 @@ public class ProfileImageService {
 
         // 기존에 사용하던 프로필 이미지가 커스텀 이미지라면 S3에서 삭제
         String previousImage = user.getProfileImage();
-        if (!previousImage.startsWith("default_profile_image_")) {
+        if (previousImage != null && !previousImage.startsWith("default_profile_image_")) {
             awsS3Service.deleteFile(FileFolder.PROFILE_IMAGES, previousImage);
         }
         
