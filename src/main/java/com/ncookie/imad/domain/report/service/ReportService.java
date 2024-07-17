@@ -1,7 +1,10 @@
 package com.ncookie.imad.domain.report.service;
 
+import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
+import com.ncookie.imad.domain.posting.service.CommentRetrievalService;
 import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
+import com.ncookie.imad.domain.report.entity.CommentReport;
 import com.ncookie.imad.domain.report.entity.PostingReport;
 import com.ncookie.imad.domain.report.entity.ReviewReport;
 import com.ncookie.imad.domain.report.entity.UserReport;
@@ -31,6 +34,7 @@ public class ReportService {
     private final UserRetrievalService userRetrievalService;
     private final ReviewRetrievalService reviewRetrievalService;
     private final PostingRetrievalService postingRetrievalService;
+    private final CommentRetrievalService commentRetrievalService;
 
     private final UserReportRepository userReportRepository;
     private final ReviewReportRepository reviewReportRepository;
@@ -99,6 +103,26 @@ public class ReportService {
                 PostingReport.builder()
                         .reporter(reporter)
                         .reportedPosting(reportedPosting)
+                        .reportType(ReportType.valueOf(reportTypeString))
+                        .reportDesc(reportDesc)
+                        .build()
+        );
+    }
+
+    public void reportComment(String accessToken, Long reportedCommentId, String reportTypeString, String reportDesc) {
+        UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        Comment reportedComment = commentRetrievalService.getCommentById(reportedCommentId);
+        if (reportedComment == null) {
+            throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
+        }
+
+        validateSelfReport(reporter, reportedComment.getUserAccount().getId());
+
+        commentReportRepository.save(
+                CommentReport.builder()
+                        .reporter(reporter)
+                        .reportedComment(reportedComment)
                         .reportType(ReportType.valueOf(reportTypeString))
                         .reportDesc(reportDesc)
                         .build()
