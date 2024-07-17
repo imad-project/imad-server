@@ -1,6 +1,8 @@
 package com.ncookie.imad.domain.report.service;
 
+import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
+import com.ncookie.imad.domain.report.entity.PostingReport;
 import com.ncookie.imad.domain.report.entity.ReviewReport;
 import com.ncookie.imad.domain.report.entity.UserReport;
 import com.ncookie.imad.domain.report.repository.CommentReportRepository;
@@ -77,6 +79,26 @@ public class ReportService {
                 ReviewReport.builder()
                         .reporter(reporter)
                         .reportedReview(reportedReview)
+                        .reportType(ReportType.valueOf(reportTypeString))
+                        .reportDesc(reportDesc)
+                        .build()
+        );
+    }
+
+    public void reportPosting(String accessToken, Long reportedPostingId, String reportTypeString, String reportDesc) {
+        UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        Posting reportedPosting = postingRetrievalService.getPostingEntityById(reportedPostingId);
+        if (reportedPosting == null) {
+            throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
+        }
+
+        validateSelfReport(reporter, reportedPosting.getUser().getId());
+
+        postingReportRepository.save(
+                PostingReport.builder()
+                        .reporter(reporter)
+                        .reportedPosting(reportedPosting)
                         .reportType(ReportType.valueOf(reportTypeString))
                         .reportDesc(reportDesc)
                         .build()
