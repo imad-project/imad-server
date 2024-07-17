@@ -136,6 +136,7 @@ public enum ResponseCode {
     REPORT_CANNOT_SELF_REPORT(400, "자신이 작성한 컨텐츠나 계정은 신고할 수 없습니다."),
     REPORT_NOT_FOUND_USER(404, "신고하려는 유저 계정이 존재하지 않습니다."),
     REPORT_NOT_FOUND_CONTENTS(404, "신고하려는 컨텐츠가 존재하지 않습니다."),
+    REPORT_ALREADY_REPORTED(400, "이미 신고된 계정 또는 컨텐츠입니다."),
 
     // Utils
     WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다.");

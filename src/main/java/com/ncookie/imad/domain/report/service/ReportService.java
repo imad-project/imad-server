@@ -52,11 +52,17 @@ public class ReportService {
 
     public void reportUser(String accessToken, Long reportedUserId, String reportTypeString, String reportDesc) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
-        validateSelfReport(reporter, reportedUserId);
 
         UserAccount reportedUser = userRetrievalService.getUserById(reportedUserId);
         if (reportedUser == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_USER);
+        }
+
+        validateSelfReport(reporter, reportedUserId);
+
+        // 유저 중복 신고 검사
+        if (userReportRepository.findByReporterAndReportedUser(reporter, reportedUser).isEmpty()) {
+            throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
         }
 
         userReportRepository.save(
@@ -79,6 +85,11 @@ public class ReportService {
 
         validateSelfReport(reporter, reportedReview.getUserAccount().getId());
 
+        // 리뷰 중복 신고 검사
+        if (reviewReportRepository.findByReporterAndReportedReview(reporter, reportedReview).isEmpty()) {
+            throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
+        }
+
         reviewReportRepository.save(
                 ReviewReport.builder()
                         .reporter(reporter)
@@ -99,6 +110,10 @@ public class ReportService {
 
         validateSelfReport(reporter, reportedPosting.getUser().getId());
 
+        if (postingReportRepository.findByReporterAndReportedPosting(reporter, reportedPosting).isEmpty()) {
+            throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
+        }
+
         postingReportRepository.save(
                 PostingReport.builder()
                         .reporter(reporter)
@@ -118,6 +133,10 @@ public class ReportService {
         }
 
         validateSelfReport(reporter, reportedComment.getUserAccount().getId());
+
+        if (commentReportRepository.findByReporterAndReportedComment(reporter, reportedComment).isEmpty()) {
+            throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
+        }
 
         commentReportRepository.save(
                 CommentReport.builder()
