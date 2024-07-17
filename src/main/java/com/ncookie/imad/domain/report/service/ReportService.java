@@ -1,11 +1,15 @@
 package com.ncookie.imad.domain.report.service;
 
+import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
+import com.ncookie.imad.domain.report.entity.ReviewReport;
 import com.ncookie.imad.domain.report.entity.UserReport;
 import com.ncookie.imad.domain.report.repository.CommentReportRepository;
 import com.ncookie.imad.domain.report.repository.PostingReportRepository;
 import com.ncookie.imad.domain.report.repository.ReviewReportRepository;
 import com.ncookie.imad.domain.report.repository.UserReportRepository;
 import com.ncookie.imad.domain.report.type.ReportType;
+import com.ncookie.imad.domain.review.entity.Review;
+import com.ncookie.imad.domain.review.service.ReviewRetrievalService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.dto.response.ResponseCode;
@@ -23,6 +27,8 @@ import java.util.Objects;
 @Service
 public class ReportService {
     private final UserRetrievalService userRetrievalService;
+    private final ReviewRetrievalService reviewRetrievalService;
+    private final PostingRetrievalService postingRetrievalService;
 
     private final UserReportRepository userReportRepository;
     private final ReviewReportRepository reviewReportRepository;
@@ -44,7 +50,7 @@ public class ReportService {
 
         UserAccount reportedUser = userRetrievalService.getUserById(reportedUserId);
         if (reportedUser == null) {
-            throw new BadRequestException(ResponseCode.USER_NOT_FOUND);
+            throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_USER);
         }
 
         userReportRepository.save(
@@ -54,6 +60,26 @@ public class ReportService {
                     .reportType(ReportType.valueOf(reportTypeString))
                     .reportDesc(reportDesc)
                     .build()
+        );
+    }
+
+    public void reportReview(String accessToken, Long reportedReviewId, String reportTypeString, String reportDesc) {
+        UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        Review reportedReview = reviewRetrievalService.findByReviewId(reportedReviewId);
+        if (reportedReview == null) {
+            throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
+        }
+
+        validateSelfReport(reporter, reportedReview.getUserAccount().getId());
+
+        reviewReportRepository.save(
+                ReviewReport.builder()
+                        .reporter(reporter)
+                        .reportedReview(reportedReview)
+                        .reportType(ReportType.valueOf(reportTypeString))
+                        .reportDesc(reportDesc)
+                        .build()
         );
     }
 

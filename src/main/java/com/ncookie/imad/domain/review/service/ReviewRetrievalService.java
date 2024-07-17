@@ -22,4 +22,8 @@ public class ReviewRetrievalService {
     public Review findByContentsAndUser(Contents contents, UserAccount user) {
         return reviewRepository.findByContentsAndUserAccount(contents, user);
     }
+
+    public Review findByReviewId(Long reviewId) {
+        return reviewRepository.findById(reviewId).orElse(null);
+    }
 }
