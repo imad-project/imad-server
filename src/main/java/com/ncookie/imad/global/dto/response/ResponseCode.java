@@ -131,6 +131,9 @@ public enum ResponseCode {
 
     // 추천
     RECOMMEND_GET_SUCCESS(200, "정상적으로 작품 추천 데이터를 조회했습니다."),
+
+    // 신고
+    REPORT_CANNOT_SELF_REPORT(400, "자신이 작성한 컨텐츠나 계정은 신고할 수 없습니다."),
     
     // Utils
     WRONG_SORT_STRING(400, "옳바르지 않은 정렬 기준입니다.");
