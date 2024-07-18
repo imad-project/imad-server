@@ -22,13 +22,13 @@ public class PostingReport extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "reporter_id")
     @ToString.Exclude
     private UserAccount reporter;   // 신고한 유저
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "reported_posting_id")
     @ToString.Exclude
     private Posting reportedPosting;   // 신고 당한 유저
 
