@@ -54,15 +54,15 @@ public class ReportService {
     public void reportUser(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        UserAccount reportedUser = userRetrievalService.getUserById(reportRequest.reportedId());
+        UserAccount reportedUser = userRetrievalService.getUserById(reportRequest.getReportedId());
         if (reportedUser == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_USER);
         }
 
-        validateSelfReport(reporter, reportRequest.reportedId());
+        validateSelfReport(reporter, reportRequest.getReportedId());
 
         // 유저 중복 신고 검사
-        if (userReportRepository.findByReporterAndReportedUser(reporter, reportedUser).isEmpty()) {
+        if (userReportRepository.findByReporterAndReportedUser(reporter, reportedUser).isPresent()) {
             throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
         }
 
@@ -70,8 +70,8 @@ public class ReportService {
             UserReport.builder()
                     .reporter(reporter)
                     .reportedUser(reportedUser)
-                    .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
-                    .reportDesc(reportRequest.reportDesc())
+                    .reportType(ReportType.valueOf(reportRequest.getReportTypeString()))
+                    .reportDesc(reportRequest.getReportDesc())
                     .build()
         );
     }
@@ -79,7 +79,7 @@ public class ReportService {
     public void reportReview(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        Review reportedReview = reviewRetrievalService.findByReviewId(reportRequest.reportedId());
+        Review reportedReview = reviewRetrievalService.findByReviewId(reportRequest.getReportedId());
         if (reportedReview == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
         }
@@ -87,7 +87,7 @@ public class ReportService {
         validateSelfReport(reporter, reportedReview.getUserAccount().getId());
 
         // 리뷰 중복 신고 검사
-        if (reviewReportRepository.findByReporterAndReportedReview(reporter, reportedReview).isEmpty()) {
+        if (reviewReportRepository.findByReporterAndReportedReview(reporter, reportedReview).isPresent()) {
             throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
         }
 
@@ -95,8 +95,8 @@ public class ReportService {
                 ReviewReport.builder()
                         .reporter(reporter)
                         .reportedReview(reportedReview)
-                        .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
-                        .reportDesc(reportRequest.reportDesc())
+                        .reportType(ReportType.valueOf(reportRequest.getReportTypeString()))
+                        .reportDesc(reportRequest.getReportDesc())
                         .build()
         );
     }
@@ -104,14 +104,14 @@ public class ReportService {
     public void reportPosting(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        Posting reportedPosting = postingRetrievalService.getPostingEntityById(reportRequest.reportedId());
+        Posting reportedPosting = postingRetrievalService.getPostingEntityById(reportRequest.getReportedId());
         if (reportedPosting == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
         }
 
         validateSelfReport(reporter, reportedPosting.getUser().getId());
 
-        if (postingReportRepository.findByReporterAndReportedPosting(reporter, reportedPosting).isEmpty()) {
+        if (postingReportRepository.findByReporterAndReportedPosting(reporter, reportedPosting).isPresent()) {
             throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
         }
 
@@ -119,8 +119,8 @@ public class ReportService {
                 PostingReport.builder()
                         .reporter(reporter)
                         .reportedPosting(reportedPosting)
-                        .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
-                        .reportDesc(reportRequest.reportDesc())
+                        .reportType(ReportType.valueOf(reportRequest.getReportTypeString()))
+                        .reportDesc(reportRequest.getReportDesc())
                         .build()
         );
     }
@@ -128,14 +128,14 @@ public class ReportService {
     public void reportComment(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        Comment reportedComment = commentRetrievalService.getCommentById(reportRequest.reportedId());
+        Comment reportedComment = commentRetrievalService.getCommentById(reportRequest.getReportedId());
         if (reportedComment == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
         }
 
         validateSelfReport(reporter, reportedComment.getUserAccount().getId());
 
-        if (commentReportRepository.findByReporterAndReportedComment(reporter, reportedComment).isEmpty()) {
+        if (commentReportRepository.findByReporterAndReportedComment(reporter, reportedComment).isPresent()) {
             throw new BadRequestException(ResponseCode.REPORT_ALREADY_REPORTED);
         }
 
@@ -143,8 +143,8 @@ public class ReportService {
                 CommentReport.builder()
                         .reporter(reporter)
                         .reportedComment(reportedComment)
-                        .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
-                        .reportDesc(reportRequest.reportDesc())
+                        .reportType(ReportType.valueOf(reportRequest.getReportTypeString()))
+                        .reportDesc(reportRequest.getReportDesc())
                         .build()
         );
     }
