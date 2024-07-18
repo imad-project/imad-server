@@ -149,6 +149,11 @@ public class ReportService {
         );
     }
 
+    // 리뷰 신고 여부 확인
+    public boolean isReviewReported(UserAccount reporter, Review review) {
+        return reviewReportRepository.existsByReporterAndReportedReview(reporter, review);
+    }
+
     // 셀프 신고 확인
     private void validateSelfReport(UserAccount reporter, Long reportedUserId) {
         if (Objects.equals(reporter.getId(), reportedUserId)) {

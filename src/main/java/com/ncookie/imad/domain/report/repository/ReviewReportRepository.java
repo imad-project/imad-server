@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface ReviewReportRepository extends JpaRepository<ReviewReport, Long> {
     Optional<ReviewReport> findByReporterAndReportedReview(UserAccount reporter, Review reportedReview);
+    boolean existsByReporterAndReportedReview(UserAccount reporter, Review reportedReview);
 }

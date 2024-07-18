@@ -4,6 +4,7 @@ import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularScoreService;
+import com.ncookie.imad.domain.report.service.ReportService;
 import com.ncookie.imad.domain.review.dto.request.AddReviewRequest;
 import com.ncookie.imad.domain.review.dto.request.ModifyReviewRequest;
 import com.ncookie.imad.domain.review.dto.response.AddReviewResponse;
@@ -45,6 +46,7 @@ public class ReviewService {
     private final ContentsService contentsService;
 
     private final ReviewLikeService reviewLikeService;
+    private final ReportService reportService;
 
     // 기록용
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
@@ -110,6 +112,7 @@ public class ReviewService {
                 Utils.getDefaultPageable(pageNumber),
                 likeStatus);
 
+        // 좋아요한 리뷰들의 리스트 생성
         List<Review> reviewList = new ArrayList<>();
         for (ReviewLike reviewLike : reviewLikePage.getContent().stream().toList()) {
             reviewList.add(reviewLike.getReview());
@@ -143,12 +146,18 @@ public class ReviewService {
         // Review 클래스를 ReviewDetailsResponse 데이터 형식에 맞게 매핑
         List<ReviewDetailsResponse> reviewDetailsResponseList = new ArrayList<>();
         for (Review review : reviewList) {
+            // 좋아요/싫어요 여부
             ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
+
+            // 신고 여부
+            boolean isReported = reportService.isReviewReported(user, review);
 
             // DTO 클래스 변환 및 like status 설정
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
             reviewDetailsResponse.setLikeStatus(likeStatus);
+            reviewDetailsResponse.setReported(isReported);
+
             reviewDetailsResponseList.add(reviewDetailsResponse);
         }
 
