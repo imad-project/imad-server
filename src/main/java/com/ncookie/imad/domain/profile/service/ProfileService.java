@@ -54,10 +54,19 @@ public class ProfileService {
     private final UserActivityService userActivityService;
 
 
-    // 프로필 요약 정보
-    public ProfileSummaryInfoResponse getProfileSummaryInfo(String accessToken) {
+    public ProfileSummaryInfoResponse getMyProfileSummary(String accessToken) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
-        BookmarkListResponse contentsBookmarkList = getContentsBookmarkList(accessToken, 0);
+        return getProfileSummaryInfo(user);
+    }
+
+    public ProfileSummaryInfoResponse getOthersProfileSummary(Long userId) {
+        UserAccount user = userRetrievalService.getUserById(userId);
+        return getProfileSummaryInfo(user);
+    }
+
+    // 프로필 요약 정보
+    public ProfileSummaryInfoResponse getProfileSummaryInfo(UserAccount user) {
+        BookmarkListResponse contentsBookmarkList = getContentsBookmarkList(user, 0);
 
         return ProfileSummaryInfoResponse.builder()
                 .userId(user.getId())
@@ -78,9 +87,14 @@ public class ProfileService {
      * 북마크 관련
      * =================================================
      */
-    public BookmarkListResponse getContentsBookmarkList(String accessToken, int pageNumber) {
+    public BookmarkListResponse getContentsBookmarkListByController(String accessToken, int pageNumber) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+        return getContentsBookmarkList(user, pageNumber);
+    }
+
+    public BookmarkListResponse getContentsBookmarkList(UserAccount user, int pageNumber) {
         Page<ContentsBookmark> contentsBookmarkPage = bookmarkService.findAllByUserAccount(
-                userRetrievalService.getUserFromAccessToken(accessToken),
+                user,
                 PageRequest.of(pageNumber, Utils.PAGE_SIZE)
         );
 
