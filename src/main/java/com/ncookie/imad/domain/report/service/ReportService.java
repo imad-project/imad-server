@@ -154,6 +154,10 @@ public class ReportService {
         return reviewReportRepository.existsByReporterAndReportedReview(reporter, review);
     }
 
+    public boolean isPostingReported(UserAccount reporter, Posting posting) {
+        return postingReportRepository.existsByReporterAndReportedPosting(reporter, posting);
+    }
+
     // 셀프 신고 확인
     private void validateSelfReport(UserAccount reporter, Long reportedUserId) {
         if (Objects.equals(reporter.getId(), reportedUserId)) {
