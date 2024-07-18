@@ -133,6 +133,8 @@ public enum ResponseCode {
     RECOMMEND_GET_SUCCESS(200, "정상적으로 작품 추천 데이터를 조회했습니다."),
 
     // 신고
+    REPORT_REQUEST_SUCCESS(201, "정상적으로 신고 접수가 완료되었습니다."),
+
     REPORT_CANNOT_SELF_REPORT(400, "자신이 작성한 컨텐츠나 계정은 신고할 수 없습니다."),
     REPORT_NOT_FOUND_USER(404, "신고하려는 유저 계정이 존재하지 않습니다."),
     REPORT_NOT_FOUND_CONTENTS(404, "신고하려는 컨텐츠가 존재하지 않습니다."),
