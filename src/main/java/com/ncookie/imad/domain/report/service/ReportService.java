@@ -4,6 +4,7 @@ import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.service.CommentRetrievalService;
 import com.ncookie.imad.domain.posting.service.PostingRetrievalService;
+import com.ncookie.imad.domain.report.dto.request.ReportRequest;
 import com.ncookie.imad.domain.report.entity.CommentReport;
 import com.ncookie.imad.domain.report.entity.PostingReport;
 import com.ncookie.imad.domain.report.entity.ReviewReport;
@@ -50,15 +51,15 @@ public class ReportService {
      * - 신고할 컨텐츠가 존재하는지 확인한다.
      */
 
-    public void reportUser(String accessToken, Long reportedUserId, String reportTypeString, String reportDesc) {
+    public void reportUser(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        UserAccount reportedUser = userRetrievalService.getUserById(reportedUserId);
+        UserAccount reportedUser = userRetrievalService.getUserById(reportRequest.reportedId());
         if (reportedUser == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_USER);
         }
 
-        validateSelfReport(reporter, reportedUserId);
+        validateSelfReport(reporter, reportRequest.reportedId());
 
         // 유저 중복 신고 검사
         if (userReportRepository.findByReporterAndReportedUser(reporter, reportedUser).isEmpty()) {
@@ -69,16 +70,16 @@ public class ReportService {
             UserReport.builder()
                     .reporter(reporter)
                     .reportedUser(reportedUser)
-                    .reportType(ReportType.valueOf(reportTypeString))
-                    .reportDesc(reportDesc)
+                    .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
+                    .reportDesc(reportRequest.reportDesc())
                     .build()
         );
     }
 
-    public void reportReview(String accessToken, Long reportedReviewId, String reportTypeString, String reportDesc) {
+    public void reportReview(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        Review reportedReview = reviewRetrievalService.findByReviewId(reportedReviewId);
+        Review reportedReview = reviewRetrievalService.findByReviewId(reportRequest.reportedId());
         if (reportedReview == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
         }
@@ -94,16 +95,16 @@ public class ReportService {
                 ReviewReport.builder()
                         .reporter(reporter)
                         .reportedReview(reportedReview)
-                        .reportType(ReportType.valueOf(reportTypeString))
-                        .reportDesc(reportDesc)
+                        .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
+                        .reportDesc(reportRequest.reportDesc())
                         .build()
         );
     }
 
-    public void reportPosting(String accessToken, Long reportedPostingId, String reportTypeString, String reportDesc) {
+    public void reportPosting(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        Posting reportedPosting = postingRetrievalService.getPostingEntityById(reportedPostingId);
+        Posting reportedPosting = postingRetrievalService.getPostingEntityById(reportRequest.reportedId());
         if (reportedPosting == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
         }
@@ -118,16 +119,16 @@ public class ReportService {
                 PostingReport.builder()
                         .reporter(reporter)
                         .reportedPosting(reportedPosting)
-                        .reportType(ReportType.valueOf(reportTypeString))
-                        .reportDesc(reportDesc)
+                        .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
+                        .reportDesc(reportRequest.reportDesc())
                         .build()
         );
     }
 
-    public void reportComment(String accessToken, Long reportedCommentId, String reportTypeString, String reportDesc) {
+    public void reportComment(String accessToken, ReportRequest reportRequest) {
         UserAccount reporter = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        Comment reportedComment = commentRetrievalService.getCommentById(reportedCommentId);
+        Comment reportedComment = commentRetrievalService.getCommentById(reportRequest.reportedId());
         if (reportedComment == null) {
             throw new BadRequestException(ResponseCode.REPORT_NOT_FOUND_CONTENTS);
         }
@@ -142,8 +143,8 @@ public class ReportService {
                 CommentReport.builder()
                         .reporter(reporter)
                         .reportedComment(reportedComment)
-                        .reportType(ReportType.valueOf(reportTypeString))
-                        .reportDesc(reportDesc)
+                        .reportType(ReportType.valueOf(reportRequest.reportTypeString()))
+                        .reportDesc(reportRequest.reportDesc())
                         .build()
         );
     }
