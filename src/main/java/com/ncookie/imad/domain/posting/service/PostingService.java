@@ -13,6 +13,7 @@ import com.ncookie.imad.domain.profile.entity.PostingScrap;
 import com.ncookie.imad.domain.profile.service.ScrapService;
 import com.ncookie.imad.domain.ranking.service.ContentsRankingScoreUpdateService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularScoreService;
+import com.ncookie.imad.domain.report.service.ReportService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.domain.useractivity.service.UserActivityService;
 import com.ncookie.imad.global.Utils;
@@ -46,6 +47,7 @@ public class PostingService {
     private final PostingLikeService postingLikeService;
     private final CommentService commentService;
     private final ScrapService scrapService;
+    private final ReportService reportService;
 
     private final ContentsRankingScoreUpdateService contentsRankingScoreUpdateService;
     private final TodayPopularScoreService todayPopularScoreService;
@@ -210,7 +212,12 @@ public class PostingService {
             // 스크랩 설정
             postingDetailsResponse.setScrapId(scrap != null ? scrap.getId() : null);
             postingDetailsResponse.setScrapStatus(scrap != null);
-            
+
+            // 신고 여부 조회 및 설정
+            boolean isReported = reportService.isPostingReported(user, posting)
+                    || reportService.isUserReported(user, posting.getUser());
+            postingDetailsResponse.setReported(isReported);
+
             postingDetailsResponseList.add(postingDetailsResponse);
         }
 
@@ -360,7 +367,7 @@ public class PostingService {
         }
     }
 
-    public PostingListResponse getPostingListByUser(UserAccount user, int pageNumber) {
+    public PostingListResponse getPostingListByWriter(UserAccount user, int pageNumber) {
         Page<Posting> postingPage = postingRepository.findAllByUser(user, Utils.getDefaultPageable(pageNumber));
 
         return PostingListResponse.toDTO(

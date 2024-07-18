@@ -30,6 +30,7 @@ public class CommentDetailsResponse {
     private Long parentId;                  // 댓글 부모 ID. 이 댓글이 최상위라면 null 값이 들어감
     private int childCnt;                   // 답글 개수
     private String content;                 // 댓글 내용
+
     /**
      * 댓글 삭제 여부
      * 해당 필드가 true이면 이 댓글은 삭제된 데이터이므로 content는 null이고 클라이언트에서 삭제되었음이 표시되어야 함
@@ -45,6 +46,8 @@ public class CommentDetailsResponse {
 
     private LocalDateTime createdAt;        // 댓글 작성 날짜
     private LocalDateTime modifiedAt;       // 댓글 수정 날짜
+
+    private boolean isReported;             // 댓글 신고 여부
 
 
     public static CommentDetailsResponse toDTO(Comment comment) {

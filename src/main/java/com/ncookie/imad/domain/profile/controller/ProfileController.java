@@ -6,14 +6,11 @@ import com.ncookie.imad.domain.profile.dto.response.ProfileSummaryInfoResponse;
 import com.ncookie.imad.domain.profile.dto.response.ScrapListResponse;
 import com.ncookie.imad.domain.profile.service.ProfileService;
 import com.ncookie.imad.domain.review.dto.response.ReviewListResponse;
-import com.ncookie.imad.global.aws.AwsS3Service;
-import com.ncookie.imad.global.aws.FileFolder;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -23,12 +20,23 @@ import java.util.Map;
 public class ProfileController {
     private final ProfileService profileService;
 
-    @Description("프로필 관련 요약 데이터")
+    @Description("자신의 프로필 관련 요약 데이터")
     @GetMapping("")
     public ApiResponse<ProfileSummaryInfoResponse> getProfileInfo(
             @RequestHeader("Authorization") String accessToken
     ) {
-        ProfileSummaryInfoResponse profileSummaryInfo = profileService.getProfileSummaryInfo(accessToken);
+        ProfileSummaryInfoResponse profileSummaryInfo = profileService.getMyProfileSummary(accessToken);
+        return ApiResponse.createSuccess(
+                ResponseCode.PROFILE_GET_INFO_SUCCESS,
+                profileSummaryInfo);
+    }
+
+    @Description("다른 사용자의 프로필 관련 요약 데이터")
+    @GetMapping("/other/{user_id}")
+    public ApiResponse<ProfileSummaryInfoResponse> getOtherProfileInfo(
+            @PathVariable(value = "user_id") Long userId
+    ) {
+        ProfileSummaryInfoResponse profileSummaryInfo = profileService.getOthersProfileSummary(userId);
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_INFO_SUCCESS,
                 profileSummaryInfo);
@@ -45,7 +53,7 @@ public class ProfileController {
             @RequestHeader("Authorization") String accessToken,
             @RequestParam("page") int pageNumber
     ) {
-        BookmarkListResponse contentsBookmarkList = profileService.getContentsBookmarkList(accessToken, pageNumber - 1);
+        BookmarkListResponse contentsBookmarkList = profileService.getContentsBookmarkListByController(accessToken, pageNumber - 1);
         return ApiResponse.createSuccess(ResponseCode.PROFILE_GET_INFO_SUCCESS, contentsBookmarkList);
     }
 
@@ -121,7 +129,7 @@ public class ProfileController {
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_WRITTEN_POSTING_LIST_SUCCESS,
-                profileService.getPostingList(accessToken, pageNumber - 1));
+                profileService.getWrittenPostingList(accessToken, pageNumber - 1));
     }
 
     @Description("작성한 리뷰 목록 조회")
@@ -132,7 +140,7 @@ public class ProfileController {
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS,
-                profileService.getReviewList(accessToken, pageNumber - 1)
+                profileService.getWrittenReviewList(accessToken, pageNumber - 1)
         );
     }
 

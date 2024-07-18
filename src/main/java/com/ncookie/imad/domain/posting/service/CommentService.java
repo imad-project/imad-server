@@ -11,6 +11,7 @@ import com.ncookie.imad.domain.posting.entity.Comment;
 import com.ncookie.imad.domain.posting.entity.Posting;
 import com.ncookie.imad.domain.posting.repository.CommentRepository;
 import com.ncookie.imad.domain.ranking.service.TodayPopularScoreService;
+import com.ncookie.imad.domain.report.service.ReportService;
 import com.ncookie.imad.domain.user.entity.UserAccount;
 import com.ncookie.imad.global.Utils;
 import com.ncookie.imad.domain.user.service.UserRetrievalService;
@@ -37,6 +38,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     private final CommentLikeService commentLikeService;
+    private final ReportService reportService;
 
     private final UserRetrievalService userRetrievalService;
     private final PostingRetrievalService postingRetrievalService;
@@ -68,10 +70,15 @@ public class CommentService {
         // 답글 개수
         int childCnt = commentRepository.countCommentByParent(comment);
 
+        // 댓글 신고 여부
+        boolean isReported = reportService.isCommentReported(user, comment)
+                || reportService.isUserReported(user, comment.getUserAccount());
+
         CommentDetailsResponse commentDetailsResponse = CommentDetailsResponse.toDTO(comment);
         commentDetailsResponse.setAuthor(isAuthor);
         commentDetailsResponse.setLikeStatus(likeStatus);
         commentDetailsResponse.setChildCnt(childCnt);
+        commentDetailsResponse.setReported(isReported);
 
         return commentDetailsResponse;
     }
