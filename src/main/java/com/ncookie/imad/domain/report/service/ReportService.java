@@ -154,8 +154,14 @@ public class ReportService {
         return reviewReportRepository.existsByReporterAndReportedReview(reporter, review);
     }
 
+    // 게시글 신고 여부 확인
     public boolean isPostingReported(UserAccount reporter, Posting posting) {
         return postingReportRepository.existsByReporterAndReportedPosting(reporter, posting);
+    }
+
+    // 댓글 신고 여부 확인
+    public boolean isCommentReported(UserAccount reporter, Comment comment) {
+        return commentReportRepository.existsByReporterAndReportedComment(reporter, comment);
     }
 
     // 셀프 신고 확인
