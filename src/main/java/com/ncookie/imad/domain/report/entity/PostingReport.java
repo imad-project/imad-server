@@ -14,6 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "report_posting")
 @Entity
 public class PostingReport extends BaseTimeEntity {
     @Id
