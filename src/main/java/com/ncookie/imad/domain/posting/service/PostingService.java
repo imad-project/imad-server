@@ -366,7 +366,7 @@ public class PostingService {
         }
     }
 
-    public PostingListResponse getPostingListByUser(UserAccount user, int pageNumber) {
+    public PostingListResponse getPostingListByWriter(UserAccount user, int pageNumber) {
         Page<Posting> postingPage = postingRepository.findAllByUser(user, Utils.getDefaultPageable(pageNumber));
 
         return PostingListResponse.toDTO(

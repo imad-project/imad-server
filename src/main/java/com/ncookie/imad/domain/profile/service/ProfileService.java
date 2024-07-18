@@ -220,10 +220,10 @@ public class ProfileService {
      * 작성/좋아요한 게시글
      * =================================================
      */
-    public PostingListResponse getPostingList(String accessToken, int pageNumber) {
+    public PostingListResponse getWrittenPostingList(String accessToken, int pageNumber) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        return postingService.getPostingListByUser(user, pageNumber);
+        return postingService.getPostingListByWriter(user, pageNumber);
     }
 
     public PostingListResponse getLikedPostingList(String accessToken, int pageNumber, int likeStatus) {
@@ -237,10 +237,10 @@ public class ProfileService {
      * 작성/좋아요한 리뷰
      * =================================================
      */
-    public ReviewListResponse getReviewList(String accessToken, int pageNumber) {
+    public ReviewListResponse getWrittenReviewList(String accessToken, int pageNumber) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
-        return reviewService.getReviewListByUser(user, pageNumber);
+        return reviewService.getReviewListByWriter(user, pageNumber);
     }
 
     public ReviewListResponse getLikedReviewList(String accessToken, int pageNumber, int likeStatus) {

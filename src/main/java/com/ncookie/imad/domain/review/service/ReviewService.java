@@ -95,7 +95,7 @@ public class ReviewService {
         );
     }
 
-    public ReviewListResponse getReviewListByUser(UserAccount user, int pageNumber) {
+    public ReviewListResponse getReviewListByWriter(UserAccount user, int pageNumber) {
         Page<Review> reviewPage = reviewRepository.findAllByUserAccount(user, Utils.getDefaultPageable(pageNumber));
 
         return ReviewListResponse.toDTO(

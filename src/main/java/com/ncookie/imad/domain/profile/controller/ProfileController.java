@@ -129,7 +129,7 @@ public class ProfileController {
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_WRITTEN_POSTING_LIST_SUCCESS,
-                profileService.getPostingList(accessToken, pageNumber - 1));
+                profileService.getWrittenPostingList(accessToken, pageNumber - 1));
     }
 
     @Description("작성한 리뷰 목록 조회")
@@ -140,7 +140,7 @@ public class ProfileController {
     ) {
         return ApiResponse.createSuccess(
                 ResponseCode.PROFILE_GET_WRITTEN_REVIEW_LIST_SUCCESS,
-                profileService.getReviewList(accessToken, pageNumber - 1)
+                profileService.getWrittenReviewList(accessToken, pageNumber - 1)
         );
     }
 
