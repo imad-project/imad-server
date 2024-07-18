@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface UserReportRepository extends JpaRepository<UserReport, Long> {
     Optional<UserReport> findByReporterAndReportedUser(UserAccount reporter, UserAccount reportedUser);
+    boolean existsByReporterAndReportedUser(UserAccount reporter, UserAccount reportedUser);
 }

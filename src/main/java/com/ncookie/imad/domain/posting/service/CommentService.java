@@ -71,7 +71,8 @@ public class CommentService {
         int childCnt = commentRepository.countCommentByParent(comment);
 
         // 댓글 신고 여부
-        boolean isReported = reportService.isCommentReported(user, comment);
+        boolean isReported = reportService.isCommentReported(user, comment)
+                || reportService.isUserReported(user, comment.getUserAccount());
 
         CommentDetailsResponse commentDetailsResponse = CommentDetailsResponse.toDTO(comment);
         commentDetailsResponse.setAuthor(isAuthor);

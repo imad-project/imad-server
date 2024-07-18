@@ -151,7 +151,8 @@ public class ReviewService {
             int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
 
             // 신고 여부
-            boolean isReported = reportService.isReviewReported(user, review);
+            boolean isReported = reportService.isReviewReported(user, review)
+                    || reportService.isUserReported(user, review.getUserAccount());
 
             // DTO 클래스 변환 및 like status 설정
             ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);

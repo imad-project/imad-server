@@ -149,6 +149,10 @@ public class ReportService {
         );
     }
 
+    public boolean isUserReported(UserAccount reporter, UserAccount reportedUser) {
+        return userReportRepository.existsByReporterAndReportedUser(reporter, reportedUser);
+    }
+
     // 리뷰 신고 여부 확인
     public boolean isReviewReported(UserAccount reporter, Review review) {
         return reviewReportRepository.existsByReporterAndReportedReview(reporter, review);

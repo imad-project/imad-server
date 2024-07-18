@@ -214,7 +214,8 @@ public class PostingService {
             postingDetailsResponse.setScrapStatus(scrap != null);
 
             // 신고 여부 조회 및 설정
-            boolean isReported = reportService.isPostingReported(user, posting);
+            boolean isReported = reportService.isPostingReported(user, posting)
+                    || reportService.isUserReported(user, posting.getUser());
             postingDetailsResponse.setReported(isReported);
 
             postingDetailsResponseList.add(postingDetailsResponse);
