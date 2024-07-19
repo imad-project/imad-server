@@ -49,6 +49,9 @@ public class PostingListElement {
     // 스크랩 정보
     private Long scrapId;
     private boolean scrapStatus;
+    
+    // 게시글 신고 여부
+    private boolean isReported;
 
 
     public static PostingListElement toDTO(Posting posting) {

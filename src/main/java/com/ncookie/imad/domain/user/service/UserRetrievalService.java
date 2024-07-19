@@ -55,6 +55,10 @@ public class UserRetrievalService {
         }
     }
 
+    public UserAccount getUserById(Long userId) {
+        return userAccountRepository.findById(userId).orElse(null);
+    }
+
     public Set<Long> getPreferredTvGenres(UserAccount user) {
         return user.getPreferredTvGenres();
     }

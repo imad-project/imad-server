@@ -45,6 +45,7 @@ public class ReviewDetailsResponse {
     private LocalDateTime modifiedAt;       // 리뷰 수정 날짜
 
     private int likeStatus;                 // 1이면 좋아요, -1이면 싫어요, 0이면 아무 상태도 아님
+    private boolean isReported;             // 요청한 사용자 기준 신고 여부
 
     public static ReviewDetailsResponse toDTO(Review review) {
         return ReviewDetailsResponse.builder()
