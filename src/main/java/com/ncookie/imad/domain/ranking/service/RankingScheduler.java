@@ -3,7 +3,6 @@ package com.ncookie.imad.domain.ranking.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
 import com.ncookie.imad.domain.ranking.data.RankingPeriod;
-import com.ncookie.imad.domain.ranking.dto.ContentsData;
 import com.ncookie.imad.domain.ranking.dto.RankingScoreDTO;
 import com.ncookie.imad.domain.ranking.entity.*;
 import com.ncookie.imad.domain.ranking.repository.ContentsDailyScoreRankingRepository;
@@ -64,8 +63,11 @@ public class RankingScheduler {
             Contents contents = dailyScore.getContents();
 
             // 일일 작품 랭킹 점수 Redis에 저장
-            rankingTuples.add(new DefaultTypedTuple<>(ContentsData.from(dailyScore.getContents()), (double) dailyScore.getRankingScore()));
-            log.info(String.format("[%s][%s] 일일 작품 랭킹 점수 저장 (Redis)", redisKey, contents.getTranslatedTitle()));
+            rankingTuples.add(new DefaultTypedTuple<>(contents.getContentsId(), (double) dailyScore.getRankingScore()));
+            log.info(String.format("[%s][(%d) %s] 일일 작품 랭킹 점수 저장 (Redis)",
+                    redisKey,
+                    contents.getContentsId(),
+                    contents.getTranslatedTitle()));
         }
 
         // 일일 랭킹 데이터의 만료기간 설정 (40일)
@@ -141,14 +143,14 @@ public class RankingScheduler {
         // 오늘 날짜의 key를 만들기 위해 사용
         String todayDate = getLastDate(0);
 
-        // 전체 랭킹의 경우 오늘 갱신된 daily 데이터와 가장 최근의 alltime 데이터를 합산해야 한다.
-        // 때문에 가장 최근 날짜의 alltime 데이터를 읽어와야 한다.
-        String recentAllTimeRanking = getRecentAllTimeRankingKey();
-
         // 랭킹 점수 합산 데이터 생성
         String destKey = periodString + "_score_" + todayDate;
 
         if (PERIOD == PERIOD_ALLTIME) {
+            // 전체 랭킹의 경우 오늘 갱신된 daily 데이터와 가장 최근의 alltime 데이터를 합산해야 한다.
+            // 때문에 가장 최근 날짜의 alltime 데이터를 읽어와야 한다.
+            String recentAllTimeRanking = getRecentAllTimeRankingKey();
+
             // 전체 랭킹 점수 데이터를 합산 및 저장함
             // 오늘 갱신한 일일 랭킹 점수 + 가장 최근에 갱신한 전체 랭킹 점수
             zSetOperations.unionAndStore(
@@ -201,14 +203,14 @@ public class RankingScheduler {
         }
 
         for (ZSetOperations.TypedTuple<Object> next : todayRankSet) {
-            ContentsData contentsData = (ContentsData) next.getValue();
+            Integer contentsId = (Integer) next.getValue();
 
-            if (contentsData == null) {
+            if (contentsId == null) {
                 log.error("랭킹 데이터에서 작품을 찾을 수 없음");
                 continue;
             }
 
-            final Contents contents = contentsRetrievalService.getContentsById(contentsData.getContentsId());
+            final Contents contents = contentsRetrievalService.getContentsById(Long.valueOf(contentsId));
             if (contents == null) {
                 log.warn("ID에 해당하는 작품을 찾을 수 없음");
                 continue;
