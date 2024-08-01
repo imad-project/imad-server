@@ -56,6 +56,9 @@ public class PostingDetailsResponse {
     private Long scrapId;
     private boolean scrapStatus;
 
+    // 신고 여부
+    private boolean isReported;
+
 
     public static PostingDetailsResponse toDTO(Posting posting, CommentListResponse commentList) {
         return PostingDetailsResponse.builder()

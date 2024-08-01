@@ -54,15 +54,19 @@ public class PostingService {
     private final UserActivityService userActivityService;
 
 
-    public PostingDetailsResponse getPosting(String accessToken, Long postingId, boolean isPopularPosting) {
+    public PostingDetailsResponse getPostingById(String accessToken, Long postingId, boolean isPopularPosting) {
         Posting posting = getPostingEntityById(postingId);
+        return getPosting(accessToken, posting, isPopularPosting);
+    }
+
+    public PostingDetailsResponse getPosting(String accessToken, Posting posting, boolean isPopularPosting) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         // 댓글 조회
         // 게시글 조회 시 댓글 조회는 항상 날짜 기준/오름차순으로 첫 페이지의 데이터만 조회함
         CommentListResponse commentList = commentService.getCommentListByPosting(
                 accessToken,
-                postingId,
+                posting.getPostingId(),
                 0,
                 null,
                 0,
@@ -89,7 +93,7 @@ public class PostingService {
         // 인기 게시글 조회 시 사용하는 경우가 아닐 때만 조회수 업데이트
         if (!isPopularPosting) {
             // 조회수 갱신
-            postingRepository.updateViewCount(postingId, posting.getViewCnt() + 1);
+            postingRepository.updateViewCount(posting.getPostingId(), posting.getViewCnt() + 1);
             todayPopularScoreService.addPopularPostingScore(posting, TodayPopularScoreService.POPULAR_POSTING_VIEW_CNT_SCORE);
         }
 
@@ -100,6 +104,11 @@ public class PostingService {
         postingDetailsResponse.setCommentCnt(commentCount);
         postingDetailsResponse.setScrapId(scrap != null ? scrap.getId() : null);
         postingDetailsResponse.setScrapStatus(scrap != null);
+
+        // 신고 여부 조회 및 설정
+        boolean isReported = reportService.isPostingReported(user, posting)
+                || reportService.isUserReported(user, posting.getUser());
+        postingDetailsResponse.setReported(isReported);
 
         return postingDetailsResponse;
     }
@@ -234,11 +243,11 @@ public class PostingService {
         // 좋아요를 가장 많이 받은 게시글이 2개 이상일 때
         if (mostLikePostingList.size() > 1) {
             int randomNum = Utils.getRandomNum(mostLikePostingList.size());
-            return getPosting(accessToken, mostLikePostingList.get(randomNum).getPostingId(), true);
+            return getPosting(accessToken, mostLikePostingList.get(randomNum), true);
         }
         
         // 좋아요를 가장 많이 받은 게시글이 1개일 때
-        return getPosting(accessToken, mostLikePostingList.get(0).getPostingId(), true);
+        return getPosting(accessToken, mostLikePostingList.get(0), true);
     }
 
     public PostingIdResponse addPosting(String accessToken, AddPostingRequest addPostingRequest) {
