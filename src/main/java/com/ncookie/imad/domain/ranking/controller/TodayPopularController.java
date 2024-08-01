@@ -5,7 +5,6 @@ import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularReviewService;
 import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
-import com.ncookie.imad.domain.review.service.ReviewService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
 import com.ncookie.imad.global.dto.response.ResponseCode;
 import jdk.jfr.Description;
@@ -39,21 +38,6 @@ public class TodayPopularController {
     @GetMapping("/posting")
     public ApiResponse<PostingDetailsResponse> getPopularPosting(@RequestHeader("Authorization") String accessToken) {
         PostingDetailsResponse todayPopularPosting = todayPopularPostingService.getTodayPopularPosting(accessToken);
-
-        // 현재 인기 게시글 데이터가 없는 상태이므로 좋아요가 가장 많은 게시글 데이터 반환
-        if (todayPopularPosting == null) {
-            log.info("인기 리뷰 데이터가 없으므로 좋아요가 가장 많은 리뷰를 조회합니다...");
-            PostingDetailsResponse mostLikePosting = postingService.getMostLikePosting(accessToken);
-
-            // 리뷰 좋아요 데이터도 없는 경우
-            if (mostLikePosting == null) {
-                log.info("리뷰의 좋아요 데이터도 존재하지 않으므로 이에 맞는 응답을 반환합니다.");
-                return ApiResponse.createSuccess(ResponseCode.POPULAR_POSTING_ALL_NULL, null);
-            }
-            return ApiResponse.createSuccess(ResponseCode.POPULAR_POSTING_NULL_AND_GET_POSTING, mostLikePosting);
-        }
-
-        // 오늘의 리뷰 데이터 반환
         return ApiResponse.createSuccess(ResponseCode.POPULAR_POSTING_GET_SUCCESS, todayPopularPosting);
     }
 }

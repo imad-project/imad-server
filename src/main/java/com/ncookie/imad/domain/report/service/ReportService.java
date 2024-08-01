@@ -171,6 +171,13 @@ public class ReportService {
         return postingReportRepository.existsByReporterAndReportedPosting(reporter, posting);
     }
 
+    public boolean isPostingReportedById(Long reporterId, Long postingId) {
+        UserAccount reporter = userRetrievalService.getUserById(reporterId);
+        Posting posting = postingRetrievalService.getPostingEntityById(postingId);
+
+        return isPostingReported(reporter, posting);
+    }
+
     // 댓글 신고 여부 확인
     public boolean isCommentReported(UserAccount reporter, Comment comment) {
         return commentReportRepository.existsByReporterAndReportedComment(reporter, comment);
