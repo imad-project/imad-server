@@ -53,32 +53,40 @@ public class ReviewService {
     private final TodayPopularScoreService todayPopularScoreService;
     private final UserActivityService userActivityService;
 
-    public ReviewDetailsResponse getReview(String accessToken, Long reviewId) {
+    public ReviewDetailsResponse getReviewById(String accessToken, Long reviewId) {
         Optional<Review> optional = reviewRepository.findById(reviewId);
-        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         if (optional.isPresent()) {
-            Review review = optional.get();
-
-            // 본인 작성 여부
-            boolean isAuthor;
-            if (user == null) {
-                isAuthor = false;
-            } else {
-                isAuthor = review.getUserAccount().getId().equals(user.getId());
-            }
-
-            ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
-            int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
-
-            ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
-            reviewDetailsResponse.setAuthor(isAuthor);
-            reviewDetailsResponse.setLikeStatus(likeStatus);
-
-            return reviewDetailsResponse;
+            return getReview(accessToken, optional.get());
         } else {
             throw new BadRequestException(ResponseCode.REVIEW_NOT_FOUND);
         }
+    }
+
+    public ReviewDetailsResponse getReview(String accessToken, Review review) {
+        UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+
+        // 본인 작성 여부
+        boolean isAuthor;
+        if (user == null) {
+            isAuthor = false;
+        } else {
+            isAuthor = review.getUserAccount().getId().equals(user.getId());
+        }
+
+        ReviewLike reviewLike = reviewLikeService.findByUserAccountAndE(user, review);
+        int likeStatus = reviewLike == null ? 0 : reviewLike.getLikeStatus();
+
+        ReviewDetailsResponse reviewDetailsResponse = ReviewDetailsResponse.toDTO(review);
+        reviewDetailsResponse.setAuthor(isAuthor);
+        reviewDetailsResponse.setLikeStatus(likeStatus);
+
+        // 신고 여부
+        boolean isReported = reportService.isReviewReported(user, review)
+                || reportService.isUserReported(user, review.getUserAccount());
+        reviewDetailsResponse.setReported(isReported);
+
+        return reviewDetailsResponse;
     }
 
     public ReviewListResponse getReviewList(String accessToken, Long contentsId, int pageNumber, String sortString, int order) {
@@ -124,7 +132,7 @@ public class ReviewService {
         );
     }
 
-    public ReviewDetailsResponse getMostLikeReview() {
+    public ReviewDetailsResponse getMostLikeReview(String accessToken) {
         List<Review> mostLikeReviewList = reviewRepository.findMostLikeReview();
 
         if (mostLikeReviewList.isEmpty()) {
@@ -133,9 +141,10 @@ public class ReviewService {
 
         if (mostLikeReviewList.size() > 1) {
             int randomNum = Utils.getRandomNum(mostLikeReviewList.size());
-            return ReviewDetailsResponse.toDTO(mostLikeReviewList.get(randomNum));
+            return getReview(accessToken, mostLikeReviewList.get(randomNum));
         }
-        return ReviewDetailsResponse.toDTO(mostLikeReviewList.get(0));
+
+        return getReview(accessToken, mostLikeReviewList.get(0));
     }
 
     public int getWrittenReviewCount(UserAccount user) {

@@ -21,7 +21,7 @@ public class ReviewController {
     @GetMapping("/{id}")
     public ApiResponse<ReviewDetailsResponse> reviewDetails(@RequestHeader("Authorization") String accessToken,
                                                             @PathVariable("id") Long id) {
-        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_DETAILS_SUCCESS, reviewService.getReview(accessToken, id));
+        return ApiResponse.createSuccess(ResponseCode.REVIEW_GET_DETAILS_SUCCESS, reviewService.getReviewById(accessToken, id));
     }
 
     @GetMapping("/list")
