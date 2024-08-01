@@ -28,7 +28,7 @@ public class TodayPopularReviewService {
 
         if (popularReviewList.isEmpty()) {
             // 인기 리뷰 데이터가 존재하지 않으면 좋아요를 가장 많이 받은 리뷰 반환
-            log.info("오늘의 리뷰 데이터가 존재하지 않아 ");
+            log.info("오늘의 리뷰 데이터가 존재하지 않아 좋아요가 가장 많은 리뷰를 반환합니다.");
             todayPopularReview = reviewService.getMostLikeReview(accessToken);
         } else if (popularReviewList.size() > 1) {
             // 인기 리뷰 점수가 가장 높은 리뷰가 2개 이상일 때 랜덤으로 반환
