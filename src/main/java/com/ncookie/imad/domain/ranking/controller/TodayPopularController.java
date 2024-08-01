@@ -25,29 +25,13 @@ public class TodayPopularController {
     private final TodayPopularReviewService todayPopularReviewService;
     private final TodayPopularPostingService todayPopularPostingService;
 
-    private final ReviewService reviewService;
     private final PostingService postingService;
 
 
     @Description("오늘의 리뷰 조회")
     @GetMapping("/review")
-    public ApiResponse<ReviewDetailsResponse> getPopularReview() {
-        ReviewDetailsResponse todayPopularReview = todayPopularReviewService.getTodayPopularReview();
-
-        // 현재 인기 리뷰 데이터가 없는 상태이므로 좋아요가 가장 많은 리뷰 데이터 반환
-        if (todayPopularReview == null) {
-            log.info("인기 리뷰 데이터가 없으므로 좋아요가 가장 많은 리뷰를 조회합니다...");
-            ReviewDetailsResponse popularReview = reviewService.getMostLikeReview();
-
-            // 리뷰 좋아요 데이터도 없는 경우
-            if (popularReview == null) {
-                log.info("리뷰의 좋아요 데이터도 존재하지 않으므로 이에 맞는 응답을 반환합니다.");
-                return ApiResponse.createSuccess(ResponseCode.POPULAR_REVIEW_ALL_NULL, null);
-            }
-            return ApiResponse.createSuccess(ResponseCode.POPULAR_REVIEW_NULL_AND_GET_REVIEW, popularReview);
-        }
-
-        // 오늘의 리뷰 데이터 반환
+    public ApiResponse<ReviewDetailsResponse> getPopularReview(@RequestHeader("Authorization") String accessToken) {
+        ReviewDetailsResponse todayPopularReview = todayPopularReviewService.getTodayPopularReview(accessToken);
         return ApiResponse.createSuccess(ResponseCode.POPULAR_REVIEW_GET_SUCCESS, todayPopularReview);
     }
 

@@ -2,7 +2,11 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.ranking.entity.TodayPopularReview;
 import com.ncookie.imad.domain.ranking.repository.TodayPopularReviewsRepository;
+import com.ncookie.imad.domain.report.service.ReportService;
 import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
+import com.ncookie.imad.domain.review.service.ReviewService;
+import com.ncookie.imad.domain.user.entity.UserAccount;
+import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,25 +21,43 @@ import java.util.List;
 @Transactional
 @Service
 public class TodayPopularReviewService {
+
+    private final UserRetrievalService userRetrievalService;
+    private final ReviewService reviewService;
+    private final ReportService reportService;
+
     private final TodayPopularReviewsRepository todayPopularReviewsRepository;
 
-    public ReviewDetailsResponse getTodayPopularReview() {
+    public ReviewDetailsResponse getTodayPopularReview(String accessToken) {
         List<TodayPopularReview> popularReviewList = todayPopularReviewsRepository.findTopByPopularScore();
-        // 인기 리뷰 데이터가 존재하지 않으면 null 반환
-        if (popularReviewList.isEmpty()) {
-            log.info("오늘의 리뷰 데이터가 존재하지 않습니다.");
-            return null;
-        }
+        ReviewDetailsResponse todayPopularReview;
 
-        // 인기 리뷰 점수가 가장 높은 리뷰가 2개 이상일 때 랜덤으로 반환
-        if (popularReviewList.size() > 1) {
+        if (popularReviewList.isEmpty()) {
+            // 인기 리뷰 데이터가 존재하지 않으면 좋아요를 가장 많이 받은 리뷰 반환
+            log.info("오늘의 리뷰 데이터가 존재하지 않아 ");
+            todayPopularReview = reviewService.getMostLikeReview(accessToken);
+        } else if (popularReviewList.size() > 1) {
+            // 인기 리뷰 점수가 가장 높은 리뷰가 2개 이상일 때 랜덤으로 반환
             int randomNum = Utils.getRandomNum(popularReviewList.size());
 
             log.info("인기 점수가 가장 높은 리뷰가 2개 이상이므로 이 중 랜덤으로 반환합니다");
-            return ReviewDetailsResponse.toDTO(popularReviewList.get(randomNum).getReview());
+            todayPopularReview = reviewService.getReview(accessToken, popularReviewList.get(randomNum).getReview());
+        } else {
+            todayPopularReview = reviewService.getReview(accessToken, popularReviewList.get(0).getReview());
+        }
+
+        if (todayPopularReview != null) {
+            UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
+            Long writtenUser = todayPopularReview.getUserId();
+            Long review = todayPopularReview.getReviewId();
+
+            // 신고 여부 조회 및 설정
+            boolean isReported = reportService.isReviewReportedById(writtenUser, review)
+                    || reportService.isReviewReportedById(user.getId(), writtenUser);
+            todayPopularReview.setReported(isReported);
         }
 
         log.info("오늘의 리뷰 데이터를 반환합니다");
-        return ReviewDetailsResponse.toDTO(popularReviewList.get(0).getReview());
+        return todayPopularReview;
     }
 }
