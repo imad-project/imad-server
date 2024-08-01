@@ -36,10 +36,10 @@ public class TodayPopularPostingService {
             int randomNum = Utils.getRandomNum(popularPostingList.size());
             
             log.info("인기 점수가 가장 높은 게시글이 2개 이상이므로 이 중 랜덤으로 반환합니다");
-            return postingService.getPosting(accessToken, popularPostingList.get(randomNum).getPosting().getPostingId(), true);
+            return postingService.getPosting(accessToken, popularPostingList.get(randomNum).getPosting(), true);
         }
         
         log.info("오늘의 게시글 데이터를 반환합니다");
-        return postingService.getPosting(accessToken, popularPostingList.get(0).getPosting().getPostingId(), true);
+        return postingService.getPosting(accessToken, popularPostingList.get(0).getPosting(), true);
     }
 }
