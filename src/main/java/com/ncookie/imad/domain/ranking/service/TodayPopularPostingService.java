@@ -4,9 +4,6 @@ import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
 import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.domain.ranking.entity.TodayPopularPosting;
 import com.ncookie.imad.domain.ranking.repository.TodayPopularPostingsRepository;
-import com.ncookie.imad.domain.report.service.ReportService;
-import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +18,7 @@ import java.util.List;
 @Transactional
 @Service
 public class TodayPopularPostingService {
-    private final UserRetrievalService userRetrievalService;
     private final PostingService postingService;
-    private final ReportService reportService;
 
     private final TodayPopularPostingsRepository todayPopularPostingsRepository;
 

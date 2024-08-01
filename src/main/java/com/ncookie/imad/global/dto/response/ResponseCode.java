@@ -122,12 +122,7 @@ public enum ResponseCode {
     RANKING_WRONG_PERIOD(400, "옯바르지 않은 랭킹 기간입니다."),
 
     POPULAR_REVIEW_GET_SUCCESS(200, "정상적으로 오늘의 리뷰를 조회했습니다."),
-    POPULAR_REVIEW_NULL_AND_GET_REVIEW(200, "오늘의 리뷰 데이터가 없으므로 좋아요가 가장 많은 리뷰를 조회했습니다."),
-    POPULAR_REVIEW_ALL_NULL(200, "오늘의 리뷰와 리뷰의 좋아요 데이터 모두 존재하지 않습니다."),
-
     POPULAR_POSTING_GET_SUCCESS(200, "정상적으로 오늘의 게시글을 조회했습니다."),
-    POPULAR_POSTING_NULL_AND_GET_POSTING(200, "오늘의 게시글 데이터가 없으므로 좋아요가 가장 많은 게시글을 조회했습니다."),
-    POPULAR_POSTING_ALL_NULL(200, "오늘의 게시글과 게시글의 좋아요 데이터 모두 존재하지 않습니다."),
 
     // 추천
     RECOMMEND_GET_SUCCESS(200, "정상적으로 작품 추천 데이터를 조회했습니다."),

@@ -1,7 +1,6 @@
 package com.ncookie.imad.domain.ranking.controller;
 
 import com.ncookie.imad.domain.posting.dto.response.PostingDetailsResponse;
-import com.ncookie.imad.domain.posting.service.PostingService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularPostingService;
 import com.ncookie.imad.domain.ranking.service.TodayPopularReviewService;
 import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
@@ -21,10 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/popular")
 public class TodayPopularController {
+
     private final TodayPopularReviewService todayPopularReviewService;
     private final TodayPopularPostingService todayPopularPostingService;
-
-    private final PostingService postingService;
 
 
     @Description("오늘의 리뷰 조회")

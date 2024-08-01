@@ -158,24 +158,9 @@ public class ReportService {
         return reviewReportRepository.existsByReporterAndReportedReview(reporter, review);
     }
 
-    // 리뷰 신고 여부 확인
-    public boolean isReviewReportedById(Long reporterId, Long reviewId) {
-        UserAccount reporter = userRetrievalService.getUserById(reporterId);
-        Review review = reviewRetrievalService.findByReviewId(reviewId);
-
-        return reviewReportRepository.existsByReporterAndReportedReview(reporter, review);
-    }
-
     // 게시글 신고 여부 확인
     public boolean isPostingReported(UserAccount reporter, Posting posting) {
         return postingReportRepository.existsByReporterAndReportedPosting(reporter, posting);
-    }
-
-    public boolean isPostingReportedById(Long reporterId, Long postingId) {
-        UserAccount reporter = userRetrievalService.getUserById(reporterId);
-        Posting posting = postingRetrievalService.getPostingEntityById(postingId);
-
-        return isPostingReported(reporter, posting);
     }
 
     // 댓글 신고 여부 확인

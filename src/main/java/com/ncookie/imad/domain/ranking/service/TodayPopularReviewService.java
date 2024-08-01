@@ -2,11 +2,8 @@ package com.ncookie.imad.domain.ranking.service;
 
 import com.ncookie.imad.domain.ranking.entity.TodayPopularReview;
 import com.ncookie.imad.domain.ranking.repository.TodayPopularReviewsRepository;
-import com.ncookie.imad.domain.report.service.ReportService;
 import com.ncookie.imad.domain.review.dto.response.ReviewDetailsResponse;
 import com.ncookie.imad.domain.review.service.ReviewService;
-import com.ncookie.imad.domain.user.entity.UserAccount;
-import com.ncookie.imad.domain.user.service.UserRetrievalService;
 import com.ncookie.imad.global.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +18,7 @@ import java.util.List;
 @Transactional
 @Service
 public class TodayPopularReviewService {
-
-    private final UserRetrievalService userRetrievalService;
     private final ReviewService reviewService;
-    private final ReportService reportService;
 
     private final TodayPopularReviewsRepository todayPopularReviewsRepository;
 
@@ -44,17 +38,6 @@ public class TodayPopularReviewService {
             todayPopularReview = reviewService.getReview(accessToken, popularReviewList.get(randomNum).getReview());
         } else {
             todayPopularReview = reviewService.getReview(accessToken, popularReviewList.get(0).getReview());
-        }
-
-        if (todayPopularReview != null) {
-            UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
-            Long writtenUser = todayPopularReview.getUserId();
-            Long review = todayPopularReview.getReviewId();
-
-            // 신고 여부 조회 및 설정
-            boolean isReported = reportService.isReviewReportedById(writtenUser, review)
-                    || reportService.isReviewReportedById(user.getId(), writtenUser);
-            todayPopularReview.setReported(isReported);
         }
 
         log.info("오늘의 리뷰 데이터를 반환합니다");

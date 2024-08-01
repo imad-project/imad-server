@@ -81,6 +81,11 @@ public class ReviewService {
         reviewDetailsResponse.setAuthor(isAuthor);
         reviewDetailsResponse.setLikeStatus(likeStatus);
 
+        // 신고 여부
+        boolean isReported = reportService.isReviewReported(user, review)
+                || reportService.isUserReported(user, review.getUserAccount());
+        reviewDetailsResponse.setReported(isReported);
+
         return reviewDetailsResponse;
     }
 
