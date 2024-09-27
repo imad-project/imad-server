@@ -1,5 +1,6 @@
 package com.ncookie.imad.domain.recommend.controller;
 
+import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.recommend.dto.response.*;
 import com.ncookie.imad.domain.recommend.service.ContentsRecommendationService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -29,10 +30,11 @@ public class RecommendController {
     @Description("선호 장르 기반 추천")
     @GetMapping("/genre")
     public ApiResponse<GenreRecommendationResponse> getPreferredGenreRecommendations(@RequestHeader("Authorization") String accessToken,
+                                                                                     @RequestParam("type") String type,
                                                                                      @RequestParam("page") int pageNumber) {
         return ApiResponse.createSuccess(
                 ResponseCode.RECOMMEND_GET_SUCCESS,
-                recommendationService.getPreferredGenreBasedRecommendation(accessToken, pageNumber));
+                recommendationService.getPreferredGenreBasedRecommendation(accessToken, ContentsType.valueOf(type.toUpperCase()), pageNumber));
     }
 
     @Description("서비스 활동 기반 추천")
@@ -47,17 +49,19 @@ public class RecommendController {
 
     @Description("IMAD 추천")
     @GetMapping("/imad")
-    public ApiResponse<ImadRecommendationResponse> getImadRecommendations(@RequestParam("page") int pageNumber) {
+    public ApiResponse<ImadRecommendationResponse> getImadRecommendations(@RequestParam("type") String type,
+                                                                          @RequestParam("page") int pageNumber) {
         return ApiResponse.createSuccess(
                 ResponseCode.RECOMMEND_GET_SUCCESS,
-                recommendationService.getImadRecommendation(pageNumber));
+                recommendationService.getImadRecommendation(ContentsType.valueOf(type.toUpperCase()), pageNumber));
     }
 
     @Description("트렌드 작품 추천")
     @GetMapping("/trend")
-    public ApiResponse<TrendRecommendationResponse> getTrendingRecommendations(@RequestParam("page") int pageNumber) {
+    public ApiResponse<TrendRecommendationResponse> getTrendingRecommendations(@RequestParam("type") String type,
+                                                                               @RequestParam("page") int pageNumber) {
         return ApiResponse.createSuccess(
                 ResponseCode.RECOMMEND_GET_SUCCESS,
-                recommendationService.getTrendRecommendation(pageNumber));
+                recommendationService.getTrendRecommendation(ContentsType.valueOf(type.toUpperCase()), pageNumber));
     }
 }
