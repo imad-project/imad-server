@@ -32,10 +32,10 @@ public class ContentsRecommendationService {
 
     // 작품 추천 종합 버전 (메인 페이지용)
     public AllRecommendationResponse getAllRecommendations(String accessToken) {
-        GenreRecommendationResponse preferredGenreBasedRecommendation = getPreferredGenreBasedRecommendation(accessToken, 1);
+        GenreRecommendationResponse preferredGenreBasedRecommendation = getPreferredGenreBasedRecommendation(accessToken, ContentsType.ALL, 1);
         UserActivityRecommendationResponse userActivityRecommendationResponse = getUserActivityRecommendation(accessToken, 1);
-        ImadRecommendationResponse imadRecommendation = getImadRecommendation(1);
-        TrendRecommendationResponse trendRecommendation = getTrendRecommendation(1);
+        ImadRecommendationResponse imadRecommendation = getImadRecommendation(ContentsType.ALL, 1);
+        TrendRecommendationResponse trendRecommendation = getTrendRecommendation(ContentsType.ALL, 1);
 
         return AllRecommendationResponse.builder()
                 .preferredGenreRecommendationTv(preferredGenreBasedRecommendation.getPreferredGenreRecommendationTv())
@@ -57,7 +57,7 @@ public class ContentsRecommendationService {
     }
 
     // 장르 기반 추천 (TMDB API - discover 사용)
-    public GenreRecommendationResponse getPreferredGenreBasedRecommendation(String accessToken, int pageNumber) {
+    public GenreRecommendationResponse getPreferredGenreBasedRecommendation(String accessToken, ContentsType contentsType, int pageNumber) {
         UserAccount user = userRetrievalService.getUserFromAccessToken(accessToken);
 
         // 게스트 요청일 경우 추천 데이터를 반환하지 않음
@@ -65,12 +65,25 @@ public class ContentsRecommendationService {
             return GenreRecommendationResponse.builder().build();
         }
 
-        TmdbDiscoverTv tmdbDiscoverTv = apiClient.discoverTvWithPreferredGenre(
-                pageNumber,
-                userRetrievalService.getPreferredTvGenres(user));
-        TmdbDiscoverMovie tmdbDiscoverMovie = apiClient.discoverMovieWithPreferredGenre(
-                pageNumber,
-                userRetrievalService.getPreferredMovieGenres(user));
+        TmdbDiscoverTv tmdbDiscoverTv = null;
+        TmdbDiscoverMovie tmdbDiscoverMovie = null;
+
+        switch (contentsType) {
+            case TV -> tmdbDiscoverTv = apiClient.discoverTvWithPreferredGenre(
+                    pageNumber,
+                    userRetrievalService.getPreferredTvGenres(user));
+            case MOVIE -> tmdbDiscoverMovie = apiClient.discoverMovieWithPreferredGenre(
+                    pageNumber,
+                    userRetrievalService.getPreferredMovieGenres(user));
+            case ALL -> {
+                tmdbDiscoverTv = apiClient.discoverTvWithPreferredGenre(
+                        pageNumber,
+                        userRetrievalService.getPreferredTvGenres(user));
+                tmdbDiscoverMovie = apiClient.discoverMovieWithPreferredGenre(
+                        pageNumber,
+                        userRetrievalService.getPreferredMovieGenres(user));
+            }
+        }
 
         return GenreRecommendationResponse.builder()
                 .preferredGenreRecommendationTv(tmdbDiscoverTv)
@@ -128,7 +141,7 @@ public class ContentsRecommendationService {
         return recommendationResponse;
     }
 
-    // 추천 데이터 개별 요청 시 사용
+    // 서비스 활동 기반 추천 데이터 개별 요청 시 사용
     public UserActivityRecommendationResponse getUserActivityAdditionalRecommendation(int pageNumber, Long contentsId) {
         Contents contents = contentsRetrievalService.getContentsById(contentsId);
 
@@ -160,12 +173,30 @@ public class ContentsRecommendationService {
     }
 
     // IMAD 자체 추천 (TMDB API - Popular, Top Rated 사용)
-    public ImadRecommendationResponse getImadRecommendation(int pageNumber) {
-        TmdbDiscoverTv popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
-        TmdbDiscoverTv topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+    public ImadRecommendationResponse getImadRecommendation(ContentsType contentsType, int pageNumber) {
+        TmdbDiscoverTv popularTv = null;
+        TmdbDiscoverTv topRatedTv = null;
 
-        TmdbDiscoverMovie popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
-        TmdbDiscoverMovie topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+        TmdbDiscoverMovie popularMovie = null;
+        TmdbDiscoverMovie topRatedMovie = null;
+
+        switch (contentsType) {
+            case TV -> {
+                popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
+                topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+            }
+            case MOVIE -> {
+                popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
+                topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+            }
+            case ALL -> {
+                popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
+                topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+
+                popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
+                topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+            }
+        }
 
         return ImadRecommendationResponse.builder()
                 .popularRecommendationTv(popularTv)
@@ -176,9 +207,18 @@ public class ContentsRecommendationService {
     }
 
     // 트렌드 추천 (TMDB API - Trend 사용)
-    public TrendRecommendationResponse getTrendRecommendation(int pageNumber) {
-        TmdbDiscoverTv tmdbDiscoverTv = apiClient.fetchTmdbTrendingTv(pageNumber);
-        TmdbDiscoverMovie tmdbDiscoverMovie = apiClient.fetchTmdbTrendingMovie(pageNumber);
+    public TrendRecommendationResponse getTrendRecommendation(ContentsType contentsType, int pageNumber) {
+        TmdbDiscoverTv tmdbDiscoverTv = null;
+        TmdbDiscoverMovie tmdbDiscoverMovie = null;
+
+        switch (contentsType) {
+            case TV -> tmdbDiscoverTv = apiClient.fetchTmdbTrendingTv(pageNumber);
+            case MOVIE -> tmdbDiscoverMovie = apiClient.fetchTmdbTrendingMovie(pageNumber);
+            case ALL -> {
+                tmdbDiscoverTv = apiClient.fetchTmdbTrendingTv(pageNumber);
+                tmdbDiscoverMovie = apiClient.fetchTmdbTrendingMovie(pageNumber);
+            }
+        }
 
         return TrendRecommendationResponse.builder()
                 .trendRecommendationTv(tmdbDiscoverTv)
