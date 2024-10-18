@@ -10,7 +10,7 @@ public enum RecommendCategory {
 
     private final String category;
 
-    private RecommendCategory(String category) {
+    RecommendCategory(String category) {
         this.category = category;
     }
 }
