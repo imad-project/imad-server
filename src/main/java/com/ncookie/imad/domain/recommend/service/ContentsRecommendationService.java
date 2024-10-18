@@ -3,6 +3,7 @@ package com.ncookie.imad.domain.recommend.service;
 import com.ncookie.imad.domain.contents.entity.Contents;
 import com.ncookie.imad.domain.contents.entity.ContentsType;
 import com.ncookie.imad.domain.contents.service.ContentsRetrievalService;
+import com.ncookie.imad.domain.recommend.data.RecommendCategory;
 import com.ncookie.imad.domain.recommend.dto.response.*;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverMovie;
 import com.ncookie.imad.domain.tmdb.dto.TmdbDiscoverTv;
@@ -34,7 +35,7 @@ public class ContentsRecommendationService {
     public AllRecommendationResponse getAllRecommendations(String accessToken) {
         GenreRecommendationResponse preferredGenreBasedRecommendation = getPreferredGenreBasedRecommendation(accessToken, ContentsType.ALL, 1);
         UserActivityRecommendationResponse userActivityRecommendationResponse = getUserActivityRecommendation(accessToken, 1);
-        ImadRecommendationResponse imadRecommendation = getImadRecommendation(ContentsType.ALL, 1);
+        ImadRecommendationResponse imadRecommendation = getImadRecommendation(ContentsType.ALL, 1, RecommendCategory.ALL);
         TrendRecommendationResponse trendRecommendation = getTrendRecommendation(ContentsType.ALL, 1);
 
         return AllRecommendationResponse.builder()
@@ -173,7 +174,9 @@ public class ContentsRecommendationService {
     }
 
     // IMAD 자체 추천 (TMDB API - Popular, Top Rated 사용)
-    public ImadRecommendationResponse getImadRecommendation(ContentsType contentsType, int pageNumber) {
+    public ImadRecommendationResponse getImadRecommendation(ContentsType contentsType,
+                                                            int pageNumber,
+                                                            RecommendCategory category) {
         TmdbDiscoverTv popularTv = null;
         TmdbDiscoverTv topRatedTv = null;
 
@@ -182,19 +185,37 @@ public class ContentsRecommendationService {
 
         switch (contentsType) {
             case TV -> {
-                popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
-                topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+                if (category.equals(RecommendCategory.POPULAR)) popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
+                else if (category.equals(RecommendCategory.TOP_RATED)) topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+                else if (category.equals(RecommendCategory.ALL)) {
+                    popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
+                    topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+                }
             }
             case MOVIE -> {
-                popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
-                topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+                if (category.equals(RecommendCategory.POPULAR)) popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
+                else if (category.equals(RecommendCategory.TOP_RATED)) topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+                else if (category.equals(RecommendCategory.ALL)) {
+                    popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
+                    topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+                }
             }
             case ALL -> {
-                popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
-                topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+                if (category.equals(RecommendCategory.POPULAR)) {
+                    popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
+                    topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
+                }
+                else if (category.equals(RecommendCategory.TOP_RATED)) {
+                    popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
+                    topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+                }
+                else if (category.equals(RecommendCategory.ALL)) {
+                    popularTv = apiClient.fetchTmdbPopularTv(pageNumber);
+                    topRatedTv = apiClient.fetchTmdbTopRatedTv(pageNumber);
 
-                popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
-                topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+                    popularMovie = apiClient.fetchTmdbPopularMovie(pageNumber);
+                    topRatedMovie = apiClient.fetchTmdbTopRatedMovie(pageNumber);
+                }
             }
         }
 
