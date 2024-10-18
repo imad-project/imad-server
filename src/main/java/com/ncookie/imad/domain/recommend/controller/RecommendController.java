@@ -1,6 +1,7 @@
 package com.ncookie.imad.domain.recommend.controller;
 
 import com.ncookie.imad.domain.contents.entity.ContentsType;
+import com.ncookie.imad.domain.recommend.data.RecommendCategory;
 import com.ncookie.imad.domain.recommend.dto.response.*;
 import com.ncookie.imad.domain.recommend.service.ContentsRecommendationService;
 import com.ncookie.imad.global.dto.response.ApiResponse;
@@ -50,10 +51,16 @@ public class RecommendController {
     @Description("IMAD 추천")
     @GetMapping("/imad")
     public ApiResponse<ImadRecommendationResponse> getImadRecommendations(@RequestParam("type") String type,
-                                                                          @RequestParam("page") int pageNumber) {
+                                                                          @RequestParam("page") int pageNumber,
+                                                                          @RequestParam("category") String recommendCategory) {
         return ApiResponse.createSuccess(
                 ResponseCode.RECOMMEND_GET_SUCCESS,
-                recommendationService.getImadRecommendation(ContentsType.valueOf(type.toUpperCase()), pageNumber));
+                recommendationService.getImadRecommendation(
+                        ContentsType.valueOf(type.toUpperCase()),
+                        pageNumber,
+                        RecommendCategory.valueOf(recommendCategory.toUpperCase())
+                )
+        );
     }
 
     @Description("트렌드 작품 추천")
