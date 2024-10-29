@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -77,21 +78,29 @@ public class UserActivityService {
     }
 
     public void addReviewLike(UserAccount user, Contents contents, Review review) {
-        userActivityRepository.save(
-                UserActivity.builder()
-                        .userAccount(user)
-                        .contents(contents)
-                        .review(review)
-                        .activityType(ActivityType.LIKE_REVIEW)
-                        .build()
+        Optional<UserActivity> reviewLikeActivity = userActivityRepository.findByUserAccountAndReviewAndActivityType(
+                user, review, ActivityType.LIKE_REVIEW
         );
+
+        // 기존에 활동 기록이 저장되어 있지 않은 경우에만 save
+        // 이미 저장되어 있는 경우에는 추가적인 작업을 할 필요가 없음
+        if (reviewLikeActivity.isEmpty()) {
+            userActivityRepository.save(
+                    UserActivity.builder()
+                            .userAccount(user)
+                            .contents(contents)
+                            .review(review)
+                            .activityType(ActivityType.LIKE_REVIEW)
+                            .build()
+            );
+        }
         log.info("활동 기록: 리뷰 좋아요");
     }
 
     public void removeReviewLike(UserAccount user, Review review) {
         userActivityRepository.findByUserAccountAndReviewAndActivityType(
-                user, review, ActivityType.LIKE_REVIEW)
-                .ifPresent(userActivityRepository::delete);
+                user, review, ActivityType.LIKE_REVIEW
+        ).ifPresent(userActivityRepository::delete);
 
         log.info("활동 기록: 리뷰 좋아요 삭제");
     }
@@ -117,21 +126,29 @@ public class UserActivityService {
     }
 
     public void addPostingLike(UserAccount user, Contents contents, Posting posting) {
-        userActivityRepository.save(
-                UserActivity.builder()
-                        .userAccount(user)
-                        .contents(contents)
-                        .posting(posting)
-                        .activityType(ActivityType.LIKE_POSTING)
-                        .build()
+        Optional<UserActivity> postingLikeActivity = userActivityRepository.findByUserAccountAndPostingAndActivityType(
+                user, posting, ActivityType.LIKE_POSTING
         );
+
+        // 기존에 활동 기록이 저장되어 있지 않은 경우에만 save
+        // 이미 저장되어 있는 경우에는 추가적인 작업을 할 필요가 없음
+        if (postingLikeActivity.isEmpty()) {
+            userActivityRepository.save(
+                    UserActivity.builder()
+                            .userAccount(user)
+                            .contents(contents)
+                            .posting(posting)
+                            .activityType(ActivityType.LIKE_POSTING)
+                            .build()
+            );
+        }
         log.info("활동 기록: 게시글 좋아요");
     }
 
     public void removePostingLike(UserAccount user, Posting posting) {
         userActivityRepository.findByUserAccountAndPostingAndActivityType(
-                user, posting, ActivityType.LIKE_POSTING)
-                .ifPresent(userActivityRepository::delete);
+                user, posting, ActivityType.LIKE_POSTING
+        ).ifPresent(userActivityRepository::delete);
 
         log.info("활동 기록: 게시글 좋아요 삭제");
     }
