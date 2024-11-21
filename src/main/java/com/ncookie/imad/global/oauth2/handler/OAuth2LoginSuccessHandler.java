@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static com.ncookie.imad.global.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_ORIGIN_SITE_COOKIE_NAME;
 import static com.ncookie.imad.global.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Slf4j
@@ -52,8 +53,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
         jwtService.updateRefreshToken(oAuth2User.getEmail(), refreshToken);
 
-        Optional<String> cookieRedirectUrl = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
+        Optional<String> cookieRedirectUrl = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME).map(Cookie::getValue);
+        Optional<String> cookieOriginSite = CookieUtils.getCookie(request, REDIRECT_ORIGIN_SITE_COOKIE_NAME).map(Cookie::getValue);
 
         // 리액트에서 로그인 시도한 경우
         if (cookieRedirectUrl.isPresent()) {
@@ -61,6 +62,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     .path("/success")
                     .queryParam("token", accessToken)
                     .queryParam("refresh_token", refreshToken)
+                    .queryParam("origin_site", cookieOriginSite)
                     .build().toUriString();
 
             log.info("리액트 서버의 소셜 로그인 요청 : redirect 작업을 수행합니다.");
