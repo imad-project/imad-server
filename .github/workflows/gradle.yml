@@ -16,9 +16,9 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   PROJECT_NAME: imad-server
-  S3_BUCKET_NAME: ryuforaws01-github-actions-s3-bucket
-  CODE_DEPLOY_APP_NAME: spring-boot-codedeploy-app
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: codedeploy-deployment-group
+  S3_BUCKET_NAME: github-actions-deploy-bucket-ncookie
+  CODE_DEPLOY_APP_NAME: imad-codedeploy-app
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: imad-codedeploy-app-dg
 
 permissions:
   contents: read
