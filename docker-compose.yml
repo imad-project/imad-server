@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  mysql:
+    container_name: imad_local
+    image: mysql:8.0.30
+    volumes:
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=imad
+      - MYSQL_USER=imad_local_user
+      - MYSQL_PASSWORD=imadlocal123
+      - MYSQL_ROOT_PASSWORD=imadlocal123
+      - TZ=Asia/Seoul
+
+  redis:
+    container_name: redis_local
+    image: redis:7.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./db/redis:/data
